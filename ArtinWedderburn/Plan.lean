@@ -21,11 +21,11 @@ abbrev ring_subset_prod : Ideal R := Ideal.span (pair_wise_set_prod A B)
 -- there is a multiplicative structure on the set of ideals of a ring
 instance : Mul (Ideal R) := {mul := fun I J => ring_subset_prod ↑I ↑J}
 
-instance : Mul (TwoSidedIdeal R) := by sorry -- TODO: Is this already in mathlib? There doesn't seem to be a Mul instance for TwoSidedIdeal in the file that define TwoSidedIdeal
+instance : Mul (TwoSidedIdeal R) := by sorry  -- Matevz
+-- TODO: Is this already in mathlib? There doesn't seem to be a Mul instance for TwoSidedIdeal in the file that define TwoSidedIdeal
 
 -- A ring is prime if from I * J = 0 follows I = 0 or J = 0
 def IsPrimeRing (R : Type*) [Ring R] : Prop := ∀ (I J : Ideal R), I * J = ⊥ → I = ⊥ ∨ J = ⊥
-
 
 -- A ring is prime if any the following equivalent statements hold
 -- 1) from I * J = 0 follows I = 0 or J = 0
@@ -33,14 +33,17 @@ def IsPrimeRing (R : Type*) [Ring R] : Prop := ∀ (I J : Ideal R), I * J = ⊥ 
 -- 3) for all TWO-SIDED ideals I, J: I * J = 0 implies I = 0 or J = 0
 
 -- equivalence between 1) and 2)
-theorem prime_ring_equiv : IsPrimeRing R ↔ ∀ (a b : R), (a ⬝ R ⬝ b)  = ⊥ → a = 0 ∨ b = 0 := by sorry
+-- #EASIER
+theorem prime_ring_equiv : IsPrimeRing R ↔ ∀ (a b : R), (a ⬝ R ⬝ b)  = ⊥ → a = 0 ∨ b = 0 := by sorry -- Matevz
 
 -- equivalence between 1) and 3)
-theorem prime_ring_equiv' : IsPrimeRing R ↔ ∀ (I J : TwoSidedIdeal R), I * J = ⊥ → I = ⊥ ∨ J = ⊥ := by sorry
+-- #EASIER
+theorem prime_ring_equiv' : IsPrimeRing R ↔ ∀ (I J : TwoSidedIdeal R), I * J = ⊥ → I = ⊥ ∨ J = ⊥ := by sorry -- Mikita
 
 
 -- Every simple ring is prime
-theorem simple_ring_is_prime [IsSimpleRing R] : IsPrimeRing R := by sorry
+theorem simple_ring_is_prime [IsSimpleRing R] : IsPrimeRing R := by sorry -- Job
+
 
 @[simp]
 theorem prod_eq_span_pairwise_prod : I * J = Ideal.span (pair_wise_set_prod I J) := rfl
@@ -53,14 +56,15 @@ variable {e f : R}
 def AreOrthogonalIdempotents (e f : R) : Prop := IsIdempotentElem e ∧ IsIdempotentElem f ∧ IsOrthogonal e f
 
 -- Lemma 2.9
-theorem one_sub_e_larger_span_on_sub_e_sub_f (e f : R) : Ideal.span {1 - e - f} < Ideal.span {1 - e} := by sorry
+-- #HARDER
+theorem one_sub_e_larger_span_on_sub_e_sub_f (e f : R) : Ideal.span {1 - e - f} < Ideal.span {1 - e} := by sorry -- Mikita
 
-def CornerRingSet (_ : IsIdempotentElem e) : Set R := (e ⬝ R ⬝ e)
+def CornerRingSet (idem_e : IsIdempotentElem e) : Set R := (e ⬝ R ⬝ e)
 
 variable (idem_e : IsIdempotentElem e)
 
 -- an element x of R is in the corner ring if and only if x = e * x * e
-theorem x_in_corner_x_eq_e_x_e (x : R) : x ∈ CornerRingSet idem_e ↔ x = e * x * e := by
+theorem x_in_corner_x_eq_e_x_e (x : R) : x ∈ CornerRingSet idem_e ↔ x = e * x * e := by -- Done by Job
   constructor
   {rintro ⟨x, rfl⟩; rw [mul_assoc, mul_assoc, mul_assoc, mul_assoc, idem_e]; rw [← mul_assoc e x e, ← mul_assoc e (e *x) e, ← mul_assoc e e x, idem_e]}
   {intro hx; use x;symm;assumption}
@@ -69,12 +73,15 @@ theorem x_in_corner_x_eq_e_y_e (x : CornerRingSet idem_e): ∃ (y : R), x = e * 
   use x.val
   exact (x_in_corner_x_eq_e_x_e idem_e x.val).1 x.property
 
+variable (A : Set R)
+variable (x : R)
+variable (h : x ∈ A)
 
 -- CornerRing as a subtype of R
 def CornerRing := {x : R // x ∈ CornerRingSet idem_e}
 
 -- in the corner ring e is the identity element
-theorem e_left_unit (a : CornerRing idem_e) : e * a.val = a.val := by
+theorem e_left_unit (a : CornerRing idem_e) : e * a.val = a.val := by -- Done by Job
   rw [(x_in_corner_x_eq_e_x_e idem_e a.val).1 a.property, ← mul_assoc, ← mul_assoc, idem_e]
 
 theorem e_right_unit (a : CornerRing idem_e) : a.val * e = a.val := by
@@ -84,49 +91,47 @@ theorem a_b_in_corner_prod_in_corner (a b : CornerRing idem_e) : a.val * b.val �
   use a.val * b.val
   rw [←mul_assoc, e_left_unit, mul_assoc, e_right_unit]
 
-#check CornerRingSet idem_e
-
+-- #EASIER
 instance : NonUnitalSubring R where
   carrier := CornerRingSet idem_e
   zero_mem' := ⟨0, by simp⟩
-  add_mem' := by sorry
-  neg_mem' := by sorry
-  mul_mem' := by sorry
+  add_mem' := by sorry -- Mikita
+  neg_mem' := by sorry -- Matevz
+  mul_mem' := by sorry -- Mikita
 
 -- Multiplication strucure is inherited from R
 instance : Mul (CornerRing idem_e) := {mul := λ a b => ⟨a.val * b.val, a_b_in_corner_prod_in_corner idem_e a b⟩}
 
 -- this is a ring
-instance: Ring (CornerRing idem_e) := by sorry
+instance: Ring (CornerRing idem_e) := by sorry -- Matevz
 
 -- Lemma 2.10
 -- a) If R is artinian, then the corner ring is artinian
-theorem corner_ring_artinian [IsArtinian R R] : IsArtinian (CornerRing idem_e) (CornerRing idem_e) := by sorry
+theorem corner_ring_artinian [IsArtinian R R] : IsArtinian (CornerRing idem_e) (CornerRing idem_e) := by sorry -- Mikita
 
 -- b) If R is a prime ring, then the corner ring is prime
-theorem corner_ring_prime (h : IsPrimeRing R) : IsPrimeRing (CornerRing idem_e) := by sorry
+theorem corner_ring_prime (h : IsPrimeRing R) : IsPrimeRing (CornerRing idem_e) := by sorry -- Job
 
 -- Lemma 2.12
 -- hypothesis: I^2 ≠ ⊥ and I is a minimal left ideal
 theorem minimal_ideal_I_sq_nonzero_exists_idem (h : IsAtom I) (I_sq_ne_bot : I * I ≠ ⊥) :
   -- conclusion: there exists an idempotent e in I such that I = Re and eRe is a Division Ring (TODO)
-  ∃ e : R, IsIdempotentElem e ∧ e ∈ I ∧ I = Ideal.span {e} := by sorry
+  ∃ e : R, IsIdempotentElem e ∧ e ∈ I ∧ I = Ideal.span {e} := by sorry -- Matevz
 
 -- lemma 2.14
-theorem artinian_ring_has_minimal_left_ideal [IsArtinian R R] : ∃ I : Ideal R, IsAtom I := by sorry
+theorem artinian_ring_has_minimal_left_ideal [IsArtinian R R] : ∃ I : Ideal R, IsAtom I := by sorry -- Mikita
 
 -- TODO: maybe split this up into multiple definitions
-class hasMatrixUnits (R : Type*) [Ring R] (n : ℕ) where
+class hasMatrixUnits (R : Type*) [Ring R] (n : ℕ) where -- Done by Job
   es : Fin n → Fin n → R
   diag_sum_eq_one : ∑ i, es i i = 1
   mul_ij_kl_eq_kron_delta_jk_mul_es_il : ∀ i j k l, es i j * es k l = (if j = k then es i l else 0)
-
 
 -- Lemma 2.17
 -- hypothesis: R is a ring with matrix units
 -- conclusion: R is isomorphic to matrix ring over ring e_11Re_11
 def ring_with_matrix_units_isomorphic_to_matrix_ring (n : ℕ) (mu : hasMatrixUnits R n) :
-  R ≃+* Matrix (Fin n) (Fin n) (CornerRing idem_e) := by sorry
+  R ≃+* Matrix (Fin n) (Fin n) (CornerRing idem_e) := by sorry -- Leave for now, split into multiple lemmas
 
 -- Lemma 2.18
 -- hypothesis: we have a parwise orthogonal idempotent e_ii for each i in {1, ..., n}
@@ -150,7 +155,7 @@ def lemma_2_18 {n : ℕ} (hn : 0 < n)
   -- they are compatible
   (_ : ∀ i, row0_es i * col0_es i = diag_es ⟨0, hn⟩)
   (_ : ∀ i, col0_es i * row0_es i = diag_es i)
-  : hasMatrixUnits R n := by sorry
+  : hasMatrixUnits R n := by sorry -- Leave for now, split into multiple lemmas
 
 -- Lemma 2.19 (a)
 -- apparently we don't need b) and c)
@@ -158,16 +163,16 @@ theorem lemma_2_19
   (h : IsPrimeRing R)
   (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) (h_o : IsOrthogonal e f)
   (heRe : DivisionRing (CornerRing idem_e)) (hfRf : DivisionRing (CornerRing idem_f)) :
-  ∃ (u v : R) (hu : u ∈ (e ⬝ R ⬝ f)) (hv : v ∈ (f ⬝ R ⬝ e)), u * v = e ∧ v * u = f := by sorry
+  ∃ (u v : R) (hu : u ∈ (e ⬝ R ⬝ f)) (hv : v ∈ (f ⬝ R ⬝ e)), u * v = e ∧ v * u = f := by sorry -- Leave for now, split into multiple lemmas
 
 -- Finally, the Artin-Wedderburn theorem
 universe u
 
 def ArtinWedderburnForPrime {R : Type u} [Ring R] (h : IsPrimeRing R) [IsArtinian R R] :
-  ∃ (n : ℕ) (D : Type u) ( _ :DivisionRing D), Nonempty (R ≃+* Matrix (Fin n) (Fin n) D) := by sorry
+  ∃ (n : ℕ) (D : Type u) ( _ :DivisionRing D), Nonempty (R ≃+* Matrix (Fin n) (Fin n) D) := by sorry -- Leave for now, split into multiple lemmas
 
 def ArtinWedderburnForSimple {R : Type u} [Ring R] [IsSimpleRing R] :
-  ∃ (n : ℕ) (D : Type u) ( _ :DivisionRing D), Nonempty (R ≃+* Matrix (Fin n) (Fin n) D) := by sorry
+  ∃ (n : ℕ) (D : Type u) ( _ :DivisionRing D), Nonempty (R ≃+* Matrix (Fin n) (Fin n) D) := by sorry -- Just an application
 
 -- Can we use previous to prove this
 theorem isSemisimpleRing_iff_pi_matrix_divisionRing {R : Type u} [Ring R] :
