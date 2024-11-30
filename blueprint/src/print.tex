@@ -15,11 +15,13 @@
 \usepackage{geometry}
 
 \usepackage{expl3}
-
+\usepackage{url} 
 \usepackage{amssymb, amsthm, mathtools}
 \usepackage[unicode,colorlinks=true,linkcolor=blue,urlcolor=magenta, citecolor=blue]{hyperref}
 
 \usepackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
+
+\newtheorem{claim}{Claim}    % Claim shares numbering with Theorem
 
 \input{macros/common}
 \input{macros/print}
@@ -30,4 +32,15 @@
 \begin{document}
 \maketitle
 \input{content}
+
+\begin{thebibliography}{99}
+
+    \bibitem{bresar2024wedderburnartintheorem} 
+    Matej Brešar, 
+    \textit{The Wedderburn-Artin Theorem}, 
+    arXiv:2405.04588 [math.RA], 2024. 
+    \url{https://arxiv.org/abs/2405.04588}.
+    
+    \end{thebibliography}
+
 \end{document}

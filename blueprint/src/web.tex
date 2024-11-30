@@ -8,8 +8,10 @@
 
 \usepackage{amssymb, amsthm, amsmath}
 \usepackage{hyperref}
+\usepackage{url} 
 \usepackage[showmore, dep_graph]{blueprint}
 
+\newtheorem{claim}{Claim}    % Claim shares numbering with Theorem
 
 \input{macros/common}
 \input{macros/web}
@@ -24,4 +26,15 @@
 \begin{document}
 \maketitle
 \input{content}
+
+\begin{thebibliography}{99}
+
+    \bibitem{bresar2024wedderburnartintheorem} 
+    Matej Brešar, 
+    \textit{The Wedderburn-Artin Theorem}, 
+    arXiv:2405.04588 [math.RA], 2024. 
+    \url{https://arxiv.org/abs/2405.04588}.
+    
+    \end{thebibliography}
+
 \end{document}
