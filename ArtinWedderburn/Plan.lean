@@ -57,7 +57,7 @@ def AreOrthogonalIdempotents (e f : R) : Prop := IsIdempotentElem e ∧ IsIdempo
 
 -- Lemma 2.9
 -- #HARDER
-theorem one_sub_e_larger_span_on_sub_e_sub_f (e f : R) : Ideal.span {1 - e - f} < Ideal.span {1 - e} := by sorry -- Mikita
+theorem one_sub_e_larger_span_on_sub_e_sub_f (e f : R) (ho : AreOrthogonalIdempotents e f) (nf : f ≠ 0) : Ideal.span {1 - e - f} < Ideal.span {1 - e} := by sorry -- Mikita
 
 def CornerRingSet (idem_e : IsIdempotentElem e) : Set R := (e ⬝ R ⬝ e)
 
