@@ -67,9 +67,6 @@ variable (Γ : Type) [AddGroup Γ]
 variable (G H F : AddSubgroup Γ)
 
 
-theorem afva : AddSubgroup.closure ((AddSubgroup.closure ((G : Set Γ) + (H : Set Γ)) : Set Γ) + (F : Set Γ))  = AddSubgroup.closure ((AddSubgroup.closure ((G : Set Γ) + (H : Set Γ)) : Set Γ ) + (F : Set Γ)) := by exact
-  rfl
-
 
 
 ---- with this we can prove associativity
