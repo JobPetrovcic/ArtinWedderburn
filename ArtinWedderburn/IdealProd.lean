@@ -36,7 +36,7 @@ theorem mul_univ_ideal_eq_ideal (I : TwoSidedIdeal R) : I * (univ : Set R) = I :
   apply Set.ext_iff.mpr
   intro x
   constructor
-  {rintro ⟨y, yu, a, ha, hy⟩;simp at hy;rw [←hy];refine SetLike.mem_coe.mpr ?mp.intro.intro.intro.intro.a;exact
+  {rintro ⟨y, yu, a, ha, hx⟩;simp at hx;rw [←hx];refine SetLike.mem_coe.mpr ?mp.intro.intro.intro.intro.a;exact
     TwoSidedIdeal.mul_mem_right I y a yu}
   {intro hx;use x;simp;constructor;trivial;use 1;exact MulOneClass.mul_one x}
 
