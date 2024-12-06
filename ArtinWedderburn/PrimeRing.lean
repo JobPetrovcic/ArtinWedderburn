@@ -1,4 +1,6 @@
-import ArtinWedderburn.IdelProd
+import ArtinWedderburn.IdealProd
+
+variable {R : Type*} [Ring R]
 
 -- A ring is prime if from I * J = 0 follows I = 0 or J = 0
 def IsPrimeRing (R : Type*) [Ring R] : Prop := ∀ (I J : Ideal R), I * J = ⊥ → I = ⊥ ∨ J = ⊥

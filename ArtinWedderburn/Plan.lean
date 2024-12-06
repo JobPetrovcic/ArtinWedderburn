@@ -2,10 +2,8 @@ import Mathlib.RingTheory.Artinian
 import Mathlib.Algebra.Field.Defs
 import Mathlib.RingTheory.SimpleRing.Basic
 import Mathlib.Algebra.Ring.Idempotents
+import ArtinWedderburn.PrimeRing
 
-def twosidedproduct (R : Type*)[Ring R](a b : R) : Set R := {a * x * b | x : R}
--- A better notation?
-notation:55 "(" a:55 "⬝" R:55 "⬝" b:55 ")"  => twosidedproduct R a b
 
 variable {R : Type*} [Ring R]
 
