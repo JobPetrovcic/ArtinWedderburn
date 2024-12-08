@@ -21,15 +21,19 @@ abbrev ring_subset_prod_two_sided_ideal : TwoSidedIdeal R := TwoSidedIdeal.span 
 
 -- there is a multiplicative structure on the set of ideals of a ring
 instance : Mul (Ideal R) := {mul := fun I J => ring_subset_prod_ideal ↑I ↑J}
+--instance : Mul (Ideal R) := {mul := fun I J => Ideal.span (↑I * ↑J)}
 
 
 instance : Mul (TwoSidedIdeal R) := {mul := fun I J => ring_subset_prod_two_sided_ideal ↑I ↑J}
+
+
+--theorem set_mul_leq_ideal_mul : (↑I : Set R) * (↑J : Set R) ⊆ I * J := by sorry
 
 theorem univ_mul_ideal_eq_ideal (I : TwoSidedIdeal R) : (univ : Set R) * I = I := by
   apply Set.ext_iff.mpr
   intro x
   constructor
-  {rintro ⟨y, yu, a, ha, hy⟩;simp at hy;rw [←hy];refine SetLike.mem_coe.mpr ?mp.intro.intro.intro.intro.a;exact TwoSidedIdeal.mul_mem_left I y a ha}
+  {rintro ⟨y, yu, a, ha, hx⟩;simp at hx;rw [←hx];refine SetLike.mem_coe.mpr ?mp.intro.intro.intro.intro.a;exact TwoSidedIdeal.mul_mem_left I y a ha}
   {intro hx;use 1;simp;trivial}
 
 theorem mul_univ_ideal_eq_ideal (I : TwoSidedIdeal R) : I * (univ : Set R) = I := by

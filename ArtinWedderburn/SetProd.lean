@@ -2,13 +2,14 @@ import Mathlib.Algebra.Ring.Basic
 import Mathlib.Data.Set.Basic
 import Mathlib.RingTheory.Ideal.Basic
 import Mathlib.Tactic.NoncommRing
+import Mathlib.RingTheory.TwoSidedIdeal.Operations
+import ArtinWedderburn.IdealProd
 
+variable {R : Type*} [Ring R] (a b : R)
 
-variable {R : Type} [Ring R] (a b : R)
-
-def left_mul : Set R := {x | ∃ r : R, x = r * a}
-def right_mul : Set R := {x | ∃ r : R, x = a * r}
-def both_mul : Set R := {x | ∃ r : R, x = a * r * b}
+def left_mul (a : R) : Set R := {x | ∃ r : R, x = r * a}
+def right_mul (a : R) : Set R := {x | ∃ r : R, x = a * r}
+def both_mul (a b : R) : Set R := {x | ∃ r : R, x = a * r * b}
 
 theorem left_mul_zero_impl_mul_zero : both_mul a b = {0} → a * b = 0 := by
   intro h
@@ -24,6 +25,7 @@ theorem in_particular (a c b : R) : both_mul a b = {0} → a * c * b = 0 := by
 
 open Pointwise Set
 
+-- aRb = 0 implies Ra = 0 or Rb = 0
 theorem both_mul_zero_one_left_zero : both_mul a b = {0} → (left_mul a) * (left_mul b) = {0} := by
   intro h
   apply Set.ext_iff.mpr
@@ -46,3 +48,25 @@ theorem both_mul_zero_one_left_zero : both_mul a b = {0} → (left_mul a) * (lef
       constructor
       · use 0; noncomm_ring
       · simp; symm; exact hx
+
+def zero_ideal : Ideal R := {
+  carrier := {0},
+  zero_mem' := by simp,
+  add_mem' := by simp,
+  smul_mem' := by simp
+}
+
+def left_ideal (a : R) : Ideal R := {
+  carrier := left_mul a,
+  zero_mem' := by use 0; noncomm_ring,
+  add_mem' := by
+    rintro x y ⟨r, hr⟩ ⟨s, hs⟩
+    use r + s
+    rw [hr, hs]
+    noncomm_ring,
+  smul_mem' := by
+    rintro x y ⟨r, hr⟩
+    use x * r
+    rw [hr]
+    noncomm_ring
+}
