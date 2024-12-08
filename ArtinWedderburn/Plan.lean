@@ -19,8 +19,9 @@ abbrev ring_subset_prod : Ideal R := Ideal.span (pair_wise_set_prod A B)
 -- there is a multiplicative structure on the set of ideals of a ring
 instance : Mul (Ideal R) := {mul := fun I J => ring_subset_prod ↑I ↑J}
 
-instance : Mul (TwoSidedIdeal R) := by sorry  -- Matevz
--- TODO: Is this already in mathlib? There doesn't seem to be a Mul instance for TwoSidedIdeal in the file that define TwoSidedIdeal
+open Pointwise Set
+instance : Mul (TwoSidedIdeal R) := {mul := fun I J => TwoSidedIdeal.span (↑I * ↑J)}
+-- TODO: Is this already in mathlib? There doesn't seem to be a Mul instance for TwoSidedIdeal in the file that defines TwoSidedIdeal
 
 
 
@@ -70,13 +71,25 @@ theorem a_b_in_corner_prod_in_corner (a b : CornerRing idem_e) : a.val * b.val �
   use a.val * b.val
   rw [←mul_assoc, e_left_unit, mul_assoc, e_right_unit]
 
--- #EASIER
-instance : NonUnitalSubring R where
+
+instance : NonUnitalSubring R where -- Done by Matevz
   carrier := CornerRingSet idem_e
   zero_mem' := ⟨0, by simp⟩
-  add_mem' := by sorry -- Mikita
-  neg_mem' := by sorry -- Matevz
-  mul_mem' := by sorry -- Mikita
+  add_mem' := by
+    rintro x y ⟨r, hr⟩ ⟨s, hs⟩
+    use r + s
+    rw [← hr,  ← hs]
+    noncomm_ring
+  neg_mem' := by
+    rintro x ⟨r, hr⟩
+    use -r
+    rw [← hr]
+    noncomm_ring
+  mul_mem' := by
+    rintro x y ⟨r, hr⟩ ⟨s, hs⟩
+    use r * e * e * s
+    rw [← hr, ← hs]
+    noncomm_ring
 
 -- Multiplication strucure is inherited from R
 instance : Mul (CornerRing idem_e) := {mul := λ a b => ⟨a.val * b.val, a_b_in_corner_prod_in_corner idem_e a b⟩}
@@ -91,10 +104,12 @@ theorem corner_ring_artinian [IsArtinian R R] : IsArtinian (CornerRing idem_e) (
 -- b) If R is a prime ring, then the corner ring is prime
 theorem corner_ring_prime (h : IsPrimeRing R) : IsPrimeRing (CornerRing idem_e) := by sorry -- Job
 
+
+
 -- Lemma 2.12
 -- hypothesis: I^2 ≠ ⊥ and I is a minimal left ideal
+-- conclusion: there exists an idempotent e in I such that I = Re and eRe is a Division Ring (TODO) Dude this has to be divided into multiple lemmas
 theorem minimal_ideal_I_sq_nonzero_exists_idem (h : IsAtom I) (I_sq_ne_bot : I * I ≠ ⊥) :
-  -- conclusion: there exists an idempotent e in I such that I = Re and eRe is a Division Ring (TODO)
   ∃ e : R, IsIdempotentElem e ∧ e ∈ I ∧ I = Ideal.span {e} := by sorry -- Matevz
 
 -- lemma 2.14
