@@ -75,5 +75,32 @@ theorem prime_ring_equiv : IsPrimeRing R ↔ ∀ (a b : R), both_mul a b = {0} �
 -- #EASIER
 theorem prime_ring_equiv' : IsPrimeRing R ↔ ∀ (I J : TwoSidedIdeal R), I * J = ⊥ → I = ⊥ ∨ J = ⊥ := by sorry -- Mikita
 
+
+
+
+
 -- Every simple ring is prime
-theorem simple_ring_is_prime [IsSimpleRing R] : IsPrimeRing R := by sorry -- Job
+theorem simple_ring_is_prime [IsSimpleRing R] : IsPrimeRing R := by
+  apply prime_ring_equiv'.mpr
+  intro I J hIJ
+  cases eq_bot_or_eq_top I with
+    | inl hi => apply Or.inl; exact hi
+    | inr hi =>
+      apply Or.inr
+      cases eq_bot_or_eq_top J with
+      | inl hj => exact hj
+      | inr hj =>
+        have h : I * J = ⊤ := by
+          apply (TwoSidedIdeal.one_mem_iff (I * J)).mp
+          apply TwoSidedIdeal.subset_span
+          use 1
+          constructor
+          · rw [hi]; trivial
+          · use 1
+            constructor
+            · rw [hj]; trivial
+            · simp
+        rw [hIJ] at h
+        have k : (⊥ : TwoSidedIdeal R) ≠ (⊤ : TwoSidedIdeal R) := by exact bot_ne_top
+        absurd h
+        trivial
