@@ -20,8 +20,8 @@ abbrev ring_subset_prod_ideal : Ideal R := Ideal.span (A * B)
 abbrev ring_subset_prod_two_sided_ideal : TwoSidedIdeal R := TwoSidedIdeal.span (A * B)
 
 -- there is a multiplicative structure on the set of ideals of a ring
-instance : Mul (Ideal R) := {mul := fun I J => ring_subset_prod_ideal ↑I ↑J}
---instance : Mul (Ideal R) := {mul := fun I J => Ideal.span (↑I * ↑J)}
+--instance : Mul (Ideal R) := {mul := fun I J => ring_subset_prod_ideal ↑I ↑J}
+instance : Mul (Ideal R) := {mul := fun I J => Ideal.span (↑I * ↑J)}
 
 
 instance : Mul (TwoSidedIdeal R) := {mul := fun I J => ring_subset_prod_two_sided_ideal ↑I ↑J}

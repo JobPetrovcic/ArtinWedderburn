@@ -14,7 +14,7 @@ def IsPrimeRing (R : Type*) [Ring R] : Prop := ∀ (I J : Ideal R), (I * J) = �
 open Pointwise Set
 
 -- equivalence between 1) and 2)
-theorem prime_ring_equiv : IsPrimeRing R ↔ ∀ (a b : R), both_mul a b = {0} → a = 0 ∨ b = 0 := by
+theorem prime_ring_equiv : IsPrimeRing R ↔ ∀ (a b : R), both_mul a b = {0} → a = 0 ∨ b = 0 := by -- Done by Matevz
   constructor
   · intro hR a b hab
     have rhs : ∀ x ∈ (left_mul a) * (left_mul b), x = (0 : R) := by
@@ -80,7 +80,7 @@ theorem prime_ring_equiv' : IsPrimeRing R ↔ ∀ (I J : TwoSidedIdeal R), I * J
 
 
 -- Every simple ring is prime
-theorem simple_ring_is_prime [IsSimpleRing R] : IsPrimeRing R := by
+theorem simple_ring_is_prime [IsSimpleRing R] : IsPrimeRing R := by -- Done by Matevz
   apply prime_ring_equiv'.mpr
   intro I J hIJ
   cases eq_bot_or_eq_top I with
