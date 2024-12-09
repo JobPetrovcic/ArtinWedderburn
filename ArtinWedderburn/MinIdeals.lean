@@ -81,6 +81,49 @@ theorem minimal_ideal_I_sq_nonzero_exists_el (hI : IsAtom I) (hII : I * I ≠ �
     have h2 := fun b => hyI (hsi (sub_ideal I y) b)
     exact le_and_not_lt_eq (sub_ideal I y) I h1 h2
 
+theorem minimal_ideal_I_sq_nonzero_exists_els (hI : IsAtom I) (hII : I * I ≠ ⊥) : ∃ y : R, y ∈ I ∧ sub_ideal I y = I ∧ ∃ e ∈ I, y = e * y := by -- Done by Job and Matevz
+  obtain ⟨y, ⟨hy, hI⟩⟩ := minimal_ideal_I_sq_nonzero_exists_el I hI hII
+  use y
+  constructor
+  · exact hy
+  · constructor
+    · exact hI
+    · rw [← hI] at hy
+      obtain ⟨e, ⟨he, hey⟩⟩ := hy
+      use e
+
+
+def elem_ann (I : Ideal R) (a : R) : Ideal R := { -- Done by Job and Matevz
+  carrier := {x | x ∈ I ∧ x * a = 0},
+  zero_mem' := by simp,
+  add_mem' := by
+    rintro x y hx hy
+    constructor
+    · exact Submodule.add_mem I hx.1 hy.1
+    · rw [right_distrib, hx.2, hy.2, add_zero],
+  smul_mem' := by
+    rintro c x ⟨hx, hxa⟩
+    constructor
+    · exact Submodule.smul_mem I c hx
+    · simp [mul_assoc, hxa]
+}
+
+theorem some_lemma (I : Ideal R) (e y : I) (h : e * y = y) : ((e : R) * e - e) ∈ (elem_ann I y) := by -- Done by Job (apply? part) and Matevz
+  unfold elem_ann
+  simp
+  constructor
+  · refine (Submodule.sub_mem_iff_left I ?left.hy).mpr ?left.a
+    exact Submodule.coe_mem e
+    refine Ideal.mul_mem_left I ↑e ?left.a.a
+    exact Submodule.coe_mem e
+  · suffices h13 : (e * e - e) * y = 0 by exact (AddSubmonoid.mk_eq_zero I.toAddSubmonoid).mp h13
+    calc
+      (e * e - e) * y = e * (e * y - y) := by noncomm_ring
+      _ = 0 := by rw [h]; simp
+
+
+
+
 
 -- So all this is just to prove the first to lines of lemma 2.12 Bresar's paper
 
@@ -88,4 +131,6 @@ theorem minimal_ideal_I_sq_nonzero_exists_el (hI : IsAtom I) (hII : I * I ≠ �
 -- hypothesis: I^2 ≠ ⊥ and I is a minimal left ideal
 -- conclusion: there exists an idempotent e in I such that I = Re and eRe is a Division Ring (TODO) Dude this has to be divided into multiple lemmas
 theorem minimal_ideal_I_sq_nonzero_exists_idem (h : IsAtom I) (I_sq_ne_bot : I * I ≠ ⊥) :
-  ∃ e : R, IsIdempotentElem e ∧ e ∈ I ∧ I = Ideal.span {e} := by sorry -- Matevz
+  ∃ e : R, IsIdempotentElem e ∧ e ∈ I ∧ I = Ideal.span {e} := by
+  obtain ⟨y, ⟨hy, hI⟩⟩ := minimal_ideal_I_sq_nonzero_exists_el I h I_sq_ne_bot
+  sorry
