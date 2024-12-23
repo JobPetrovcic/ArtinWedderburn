@@ -138,7 +138,7 @@ theorem elem_ann_le_ideal (I : Ideal R) (a : R) : elem_ann I a ≤ I := by -- Do
   rintro x ⟨hx, hxa⟩
   exact hx
 
-theorem some_lemma (I : Ideal R) (e y : I) (h : e * y = y) : ((e : R) * e - e) ∈ (elem_ann I y) := by -- Done by Job (apply? part) and Matevz
+theorem e_in_elem_ann (I : Ideal R) (e y : I) (h : (e : R) * y = y) : ((e : R) * e - e) ∈ (elem_ann I y) := by -- Done by Job (apply? part) and Matevz
   unfold elem_ann
   simp
   constructor
@@ -146,20 +146,67 @@ theorem some_lemma (I : Ideal R) (e y : I) (h : e * y = y) : ((e : R) * e - e) �
     exact Submodule.coe_mem e
     refine Ideal.mul_mem_left I ↑e ?left.a.a
     exact Submodule.coe_mem e
-  · suffices h13 : (e * e - e) * y = 0 by exact (AddSubmonoid.mk_eq_zero I.toAddSubmonoid).mp h13
+  · suffices h13 : ((e : R) * e - e) * y = 0 by exact h13
     calc
-      (e * e - e) * y = e * (e * y - y) := by noncomm_ring
+      ((e : R) * e - e) * y = e * (e * y - y) := by noncomm_ring
       _ = 0 := by rw [h]; simp
 
 
+theorem subideal_zero : sub_ideal I 0 = ⊥ := by
+  ext x
+  simp [sub_ideal, sub_ideal_set]
+  intro hx
+  use x
+  exact (Submodule.Quotient.mk_eq_zero I).mp (congrArg Submodule.Quotient.mk hx)
+
+theorem atom_neq_bot : IsAtom I → I ≠ ⊥ := by
+  intro hI
+  obtain ⟨Inz, hsi⟩ := hI
+  intro hc
+  apply Inz
+  rw [hc]
 
 
 theorem minimal_ideal_I_sq_nonzero_exists_idem (h_atom_I : IsAtom I) (hII : I * I ≠ ⊥) :
-  ∃ e : I, IsIdempotentElem e ∧ I = Ideal.span {(e : R)} := by
+  ∃ e : I, IsIdempotentElem (e : R) ∧ I = Ideal.span {(e : R)} := by
+  have ⟨Inz, hsi⟩ := h_atom_I
   obtain ⟨y, ⟨hy, hyI, ⟨e, he, hey⟩⟩⟩ := minimal_ideal_I_sq_nonzero_exists_els I h_atom_I hII
   --obtain ⟨h1, h2⟩ := some_lemma I ⟨e, he⟩ ⟨y, hy⟩ _
-  have h_ann_zero : elem_ann I y ≠ I := by sorry
-  sorry
+  have h1 : elem_ann I y ≤ I := elem_ann_le_ideal I y
+  have hIyn0 : sub_ideal I y ≠ ⊥ := by exact Ne.symm (ne_of_ne_of_eq (id (Ne.symm Inz)) (id (Eq.symm hyI)))
+  have h_ann_not_all : elem_ann I y ≠ I := by
+    intro hc; apply hIyn0;
+    refine (Submodule.eq_bot_iff (sub_ideal I y)).mpr ?_
+    intro x hx
+    simp [sub_ideal, sub_ideal_set] at hx
+    obtain ⟨z, ⟨hzI, rfl⟩⟩ := hx
+    have zann : z ∈ elem_ann I y := by rw [hc]; exact hzI
+    exact zann.2
+  have h_ann_zero : elem_ann I y = ⊥ := by
+    apply hsi
+    refine gt_iff_lt.mpr ?intro.a.a
+
+    exact lt_of_le_of_ne h1 h_ann_not_all
+  have k : (e : R) * e - e ∈ elem_ann I y := by apply e_in_elem_ann I ⟨e, he⟩ ⟨y, hy⟩ (by symm; exact hey)
+  have k'' : ((e : R) * e - e) ∈ (⊥ : Ideal R) := by rw [← h_ann_zero]; exact k
+  have is_idem : IsIdempotentElem (e : R) := by
+    unfold IsIdempotentElem
+    rw [← sub_eq_zero]
+    exact k''
+  use ⟨e, he⟩
+  simp [is_idem]
+  have hne : e ≠ 0 := by
+    intro hc
+    rw [hc] at hey
+    simp only [zero_mul] at hey
+    apply Inz
+    rw [←hyI, hey]
+    exact subideal_zero I
+  have hIne : Ideal.span {e} ≠ 0 := by intro hc;apply hne; exact Submodule.span_singleton_eq_bot.mp hc
+  have hIeunderI : Ideal.span {e} ≤ I := by exact (Ideal.span_singleton_le_iff_mem I).mpr he
+  exact Eq.symm (le_and_not_lt_eq (Ideal.span {e}) I hIeunderI fun a ↦ hIne (hsi (Ideal.span {e}) a))
+
+
 
 
 -- So all this is just to prove the first to lines of lemma 2.12 Bresar's paper
