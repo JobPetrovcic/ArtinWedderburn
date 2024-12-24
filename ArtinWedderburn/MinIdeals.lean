@@ -242,33 +242,12 @@ theorem minimal_ideal_I_sq_nonzero_exists_idem (h_atom_I : IsAtom I) (hII : I * 
 
 
 
--- So all this is just to prove the first to lines of lemma 2.12 Bresar's paper
+
 
 
 structure CornerRing (R : Type*) [Ring R] (e : R) where
   (e_idem : e * e = e)
 
-def IsDivisionRing (e : R) (idem_e : IsIdempotentElem e) : Prop := ∀ x : R, CornerSubring idem_e → x ≠ 0 → ∃ y : R, y * x = e -- Done by Matevz
-
-
-instance CornerSubring2 (e : R) : NonUnitalSubring R where -- Done by Matevz
-  carrier := both_mul e e
-  zero_mem' := ⟨0, by simp⟩
-  add_mem' := by
-    rintro x y ⟨r, hr⟩ ⟨s, hs⟩
-    use r + s
-    rw [hr, hs]
-    noncomm_ring
-  neg_mem' := by
-    rintro x ⟨r, hr⟩
-    use -r
-    rw [hr]
-    noncomm_ring
-  mul_mem' := by
-    rintro x y ⟨r, hr⟩ ⟨s, hs⟩
-    use r * e * e * s
-    rw [hr, hs]
-    noncomm_ring
 
 def IsDivisionSubring (S : NonUnitalSubring R) (e : R) : Prop := ∀ x : R, x ∈ S → x ≠ 0 → ∃ y : R, y * x = e -- Done by Matevz
 

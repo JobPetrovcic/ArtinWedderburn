@@ -16,7 +16,7 @@ def IsOrthogonal (e f : R) : Prop := e * f = 0 ∧ f * e = 0
 def AreOrthogonalIdempotents (e f : R) : Prop := IsIdempotentElem e ∧ IsIdempotentElem f ∧ IsOrthogonal e f
 
 
-theorem leq_neq_lt (I J : Ideal R) : I ≤ J → I ≠ J → I < J := by
+theorem leq_neq_lt (I J : Ideal R) : I ≤ J → I ≠ J → I < J := by -- Done by Matevz
   intro hleq hneq
   constructor
   · exact hleq
@@ -26,7 +26,7 @@ theorem leq_neq_lt (I J : Ideal R) : I ≤ J → I ≠ J → I < J := by
 
 -- Lemma 2.9
 -- #HARDER
-theorem one_sub_e_larger_span_on_sub_e_sub_f (e f : R) (ef_ort_idem : AreOrthogonalIdempotents e f) (fnz : f ≠ 0) : Ideal.span {1 - e - f} < Ideal.span {1 - e} := by
+theorem one_sub_e_larger_span_on_sub_e_sub_f (e f : R) (ef_ort_idem : AreOrthogonalIdempotents e f) (fnz : f ≠ 0) : Ideal.span {1 - e - f} < Ideal.span {1 - e} := by -- Done by Matevz
   have hleq : Ideal.span {1 - e - f} ≤ Ideal.span {1 - e} := by
     apply Ideal.span_le.mpr
     intro x hx

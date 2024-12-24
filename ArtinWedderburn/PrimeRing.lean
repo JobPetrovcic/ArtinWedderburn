@@ -71,9 +71,17 @@ theorem prime_ring_equiv : IsPrimeRing R ↔ ∀ (a b : R), both_mul a b = {0} �
 
 
 
+
+
 -- equivalence between 1) and 3)
 -- #EASIER
-theorem prime_ring_equiv' : IsPrimeRing R ↔ ∀ (I J : TwoSidedIdeal R), I * J = ⊥ → I = ⊥ ∨ J = ⊥ := by sorry -- Mikita
+theorem prime_ring_equiv' : IsPrimeRing R ↔ ∀ (I J : TwoSidedIdeal R), I * J = ⊥ → I = ⊥ ∨ J = ⊥ := by -- Mikita
+  constructor
+  · intro hPR I J hIJ
+    sorry
+  sorry
+
+
 
 
 
