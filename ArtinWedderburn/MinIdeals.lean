@@ -2,6 +2,7 @@ import ArtinWedderburn.IdealProd
 import ArtinWedderburn.SetProd
 import Init.Classical
 import ArtinWedderburn.CornerRing
+import Mathlib.Order.Defs
 
 variable {R : Type*} [Ring R]
 variable (I J : Ideal R)
@@ -109,7 +110,7 @@ theorem minimal_ideal_I_sq_nonzero_exists_el2 (hI : IsAtom I) (hII : I * I ≠ �
       have h2 := fun b => hyI (hsi (sub_ideal I y) b)
       exact le_and_not_lt_eq (sub_ideal I y) I h1 h2
 
-theorem minimal_ideal_I_sq_nonzero_exists_els2 (hI : IsAtom I) (hII : I * I ≠ ⊥) : ∃ y : R, y ∈ I ∧ y ≠ 0 ∧ sub_ideal I y = I ∧ ∃ e ∈ I, y = e * y := by -- Done by Matevz
+theorem minimal_ideal_I_sq_nonzero_exists_els2 (hI : IsAtom I) (hII : I * I ≠ ⊥) : ∃ y : R, y ∈ I ∧ y ≠ 0 ∧ sub_ideal I y = I ∧ ∃ e ∈ I, e ≠ 0 ∧ y = e * y := by -- Done by Matevz
   obtain ⟨y, ⟨hy, ynz, hI⟩⟩ := minimal_ideal_I_sq_nonzero_exists_el2 I hI hII
   use y
   constructor
@@ -121,6 +122,19 @@ theorem minimal_ideal_I_sq_nonzero_exists_els2 (hI : IsAtom I) (hII : I * I ≠ 
       · rw [← hI] at hy
         obtain ⟨e, ⟨he, hey⟩⟩ := hy
         use e
+        constructor
+        · exact he
+        · constructor
+          · by_contra hez
+            have yz : y = 0 := by calc
+              y = e * y := hey
+              _ = 0 * y := by rw [hez]
+              _ = 0 := by noncomm_ring
+            contradiction
+          · exact hey
+
+
+
 
 theorem minimal_ideal_I_sq_nonzero_exists_els (hI : IsAtom I) (hII : I * I ≠ ⊥) : ∃ y : R, y ∈ I ∧ sub_ideal I y = I ∧ ∃ e ∈ I, y = e * y := by -- Done by Job and Matevz
   obtain ⟨y, ⟨hy, hI⟩⟩ := minimal_ideal_I_sq_nonzero_exists_el I hI hII
@@ -153,18 +167,6 @@ theorem elem_ann_le_ideal (I : Ideal R) (a : R) : elem_ann I a ≤ I := by -- Do
   rintro x ⟨hx, hxa⟩
   exact hx
 
-theorem some_lemma (I : Ideal R) (e y : I) (h : e * y = y) : ((e : R) * e - e) ∈ (elem_ann I y) := by -- Done by Job (apply? part) and Matevz
-  unfold elem_ann
-  simp
-  constructor
-  · refine (Submodule.sub_mem_iff_left I ?left.hy).mpr ?left.a
-    exact Submodule.coe_mem e
-    refine Ideal.mul_mem_left I ↑e ?left.a.a
-    exact Submodule.coe_mem e
-  · suffices h13 : (e * e - e) * y = 0 by exact (AddSubmonoid.mk_eq_zero I.toAddSubmonoid).mp h13
-    calc
-      (e * e - e) * y = e * (e * y - y) := by noncomm_ring
-      _ = 0 := by rw [h]; simp
 
 
 theorem e_semiidem (I : Ideal R) (e y : R) (he : e ∈ I) (h : e * y = y) : (e * e - e) ∈ (elem_ann I y) := by -- Done by Matevz
@@ -187,11 +189,17 @@ theorem strict_contain (I J : Ideal R) (hleq : I ≤ J) (hneq : ∃ x, x ∈ J �
     apply heq at hxJ
     contradiction
 
+theorem ideal_neq_bot_if_has_nonzero_el (I : Ideal R) (h : ∃ x ∈ I, x ≠ 0) : I ≠ ⊥ := by -- Done by Matevz
+  by_contra hI
+  obtain ⟨x, hx, xnz⟩ := h
+  rw [hI] at hx
+  contradiction
 
 
-theorem minimal_ideal_I_sq_nonzero_exists_idem (h_atom_I : IsAtom I) (hII : I * I ≠ ⊥) :
-  ∃ e : R, e ∈ I ∧ IsIdempotentElem e ∧ I = Ideal.span {e} := by
-  obtain ⟨y, ⟨hy, ynz, hyI, ⟨e, he, hey⟩⟩⟩ := minimal_ideal_I_sq_nonzero_exists_els2 I h_atom_I hII
+
+theorem minimal_ideal_I_sq_nonzero_exists_idem (h_atom_I : IsAtom I) (hII : I * I ≠ ⊥) : -- Done by Matevz
+  ∃ e : R, e ∈ I ∧ IsIdempotentElem e ∧ Ideal.span {e} = I := by
+  obtain ⟨y, ⟨hy, ynz, hyI, ⟨e, he, henz, hey⟩⟩⟩ := minimal_ideal_I_sq_nonzero_exists_els2 I h_atom_I hII
   obtain hye : e * y = y := by exact id (Eq.symm hey)
   obtain h12 := e_semiidem I e y he hye
   have hneq : ∃ x, x ∈ I ∧ x ∉ elem_ann I y := by
@@ -214,7 +222,15 @@ theorem minimal_ideal_I_sq_nonzero_exists_idem (h_atom_I : IsAtom I) (hII : I * 
       e * e = (e * e - e) + e := by noncomm_ring
           _ = 0 + e := by rw [h12]
           _ = e := by abel
-    · sorry
+    · have span_neq_bot : Ideal.span {e} ≠ ⊥ := by
+        by_contra hRe
+        have einspane : e ∈ Ideal.span {e} := Ideal.mem_span_singleton_self e
+        rw [hRe] at einspane
+        contradiction
+      by_contra hcon
+      have hspanltI : (Ideal.span {e} : Ideal R) < I := lt_of_le_of_ne ((Ideal.span_singleton_le_iff_mem I).mpr he) hcon
+      have span_eq_bot : Ideal.span {e} = ⊥ := h_atom_I.right (Ideal.span {e}) hspanltI
+      contradiction
 
 
 
