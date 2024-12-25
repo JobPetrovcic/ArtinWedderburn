@@ -43,7 +43,7 @@ class hasMatrixUnits (R : Type*) [Ring R] (n : ℕ) where -- Done by Job
   diag_sum_eq_one : ∑ i, es i i = 1
   mul_ij_kl_eq_kron_delta_jk_mul_es_il : ∀ i j k l, es i j * es k l = (if j = k then es i l else 0)
 
-
+variable (e : R)
 variable (idem_e : IsIdempotentElem e)
 
 -- Lemma 2.17
@@ -74,15 +74,14 @@ def lemma_2_18 {n : ℕ} (hn : 0 < n)
   -- they are compatible
   (_ : ∀ i, row0_es i * col0_es i = diag_es ⟨0, hn⟩)
   (_ : ∀ i, col0_es i * row0_es i = diag_es i)
-  : hasMatrixUnits R n := by sorry -- Leave for now, split into multiple lemmas
-
+  : hasMatrixUnits R n := by sorry -- Proved in Idempotents.lean
 -- Lemma 2.19 (a)
 -- apparently we don't need b) and c)
 theorem lemma_2_19
   (h : IsPrimeRing R)
   (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) (h_o : IsOrthogonal e f)
   (heRe : DivisionRing (CornerRing idem_e)) (hfRf : DivisionRing (CornerRing idem_f)) :
-  ∃ (u v : R) (hu : u ∈ (e ⬝ R ⬝ f)) (hv : v ∈ (f ⬝ R ⬝ e)), u * v = e ∧ v * u = f := by sorry -- Leave for now, split into multiple lemmas
+  ∃ (u v : R) (hu : u ∈ (e ⬝ R ⬝ f)) (hv : v ∈ (f ⬝ R ⬝ e)), u * v = e ∧ v * u = f := by sorry -- Statement is in Idempotents.lean
 
 -- Finally, the Artin-Wedderburn theorem
 universe u

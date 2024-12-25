@@ -245,11 +245,11 @@ theorem minimal_ideal_I_sq_nonzero_exists_idem (h_atom_I : IsAtom I) (hII : I * 
 
 
 
-structure CornerRing (R : Type*) [Ring R] (e : R) where
-  (e_idem : e * e = e)
 
 
 def IsDivisionSubring (S : NonUnitalSubring R) (e : R) : Prop := ∀ x : R, x ∈ S → x ≠ 0 → ∃ y : R, y * x = e -- Done by Matevz
+
+def IsDivisionRing (R : Type*) [Ring R] : Prop := ∀ x : R, x ≠ 0 → ∃ y : R, y * x = 1 -- Done by Matevz
 
 -- If at some point we decide to define division ring as a ring in which every nonzero element has a two sided inverse
 --theorem left_inv_implies_divring (h : ∀ x : R, x ≠ 0 → ∃ y : R, y * x = 0) : IsDivisionRing R := by trivial -- Done by Matevz

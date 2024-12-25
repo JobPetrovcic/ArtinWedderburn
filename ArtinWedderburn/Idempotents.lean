@@ -5,6 +5,7 @@ import Mathlib.Algebra.Ring.Idempotents
 import ArtinWedderburn.PrimeRing
 import ArtinWedderburn.CornerRing
 import ArtinWedderburn.SetProd
+import ArtinWedderburn.MinIdeals
 
 
 variable {R : Type*} [Ring R]
@@ -151,3 +152,13 @@ theorem OrtIdem_imply_MatUnits {n : ℕ} (hn : 0 < n) -- Done by Matevz
       calc
         (col_es i * row_es j) * (col_es k * row_es l) = col_es i * (diag_es ⟨0, hn⟩ * r * (diag_es j * diag_es k) * s * diag_es ⟨0, hn⟩) * row_es l := by rw [hr, hs]; noncomm_ring
         _ = 0 := by rw [(ort j k h).left]; noncomm_ring
+
+
+
+-- Lemma 2.19 (a)
+theorem lemma_2_19
+  (h : IsPrimeRing R)
+  (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) (ort : IsOrthogonal e f)
+  (heRe : IsDivisionRing (CornerSubring idem_e)) (hfRf : IsDivisionRing (CornerSubring idem_f)) :
+  ∃ u v : R, u ∈ both_mul e f ∧ v ∈ both_mul f e ∧ u * v = e ∧ v * u = f := by
+  sorry
