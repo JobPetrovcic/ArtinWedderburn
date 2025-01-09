@@ -43,6 +43,26 @@ instance CornerSubring : NonUnitalSubring R where -- Done by Matevz
     rw [← hr, ← hs]
     noncomm_ring
 
+-- I would much rather work with this, because this is the definition I used in Lemma 2.12
+instance CornerSubring2 (e : R) : NonUnitalSubring R where -- Done by Matevz
+  carrier := both_mul e e
+  zero_mem' := ⟨0, by simp⟩
+  add_mem' := by
+    rintro x y ⟨r, hr⟩ ⟨s, hs⟩
+    use r + s
+    rw [hr, hs]
+    noncomm_ring
+  neg_mem' := by
+    rintro x ⟨r, hr⟩
+    use -r
+    rw [hr]
+    noncomm_ring
+  mul_mem' := by
+    rintro x y ⟨r, hr⟩ ⟨s, hs⟩
+    use r * e * e * s
+    rw [hr, hs]
+    noncomm_ring
+
 variable {idem_e : IsIdempotentElem e}
 
 variable {x : R}

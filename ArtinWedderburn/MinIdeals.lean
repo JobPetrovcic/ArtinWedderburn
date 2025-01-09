@@ -2,6 +2,7 @@ import ArtinWedderburn.IdealProd
 import ArtinWedderburn.SetProd
 import Init.Classical
 import ArtinWedderburn.CornerRing
+import Mathlib.Order.Defs
 
 variable {R : Type*} [Ring R]
 variable (I J : Ideal R)
@@ -97,15 +98,43 @@ theorem minimal_ideal_I_sq_nonzero_exists_el (hI : IsAtom I) (hII : I * I ≠ �
     have h2 := fun b => hyI (hsi (sub_ideal I y) b)
     exact le_and_not_lt_eq (sub_ideal I y) I h1 h2
 
-theorem minimal_ideal_I_sq_nonzero_exists_el2 (hI : IsAtom I) (hII : I * I ≠ ⊥) : ∃ y : R, y ∈ I ∧ sub_ideal I y = I := by -- Done by Matevz
-  obtain ⟨y, ⟨hy, _, hyI⟩⟩ := ideal_sq_ne_bot_imply_subideal_ne_bot2 I hII
+theorem minimal_ideal_I_sq_nonzero_exists_el2 (hI : IsAtom I) (hII : I * I ≠ ⊥) : ∃ y : R, y ∈ I ∧ y ≠ 0 ∧ sub_ideal I y = I := by -- Done by Matevz
+  obtain ⟨y, ⟨hy, ynz, hyI⟩⟩ := ideal_sq_ne_bot_imply_subideal_ne_bot2 I hII
   use y
   constructor
   · exact hy
-  · obtain ⟨Inz, hsi⟩ := hI
-    have h1 := sub_ideal_le_ideal I y hy
-    have h2 := fun b => hyI (hsi (sub_ideal I y) b)
-    exact le_and_not_lt_eq (sub_ideal I y) I h1 h2
+  · constructor
+    · exact ynz
+    · obtain ⟨Inz, hsi⟩ := hI
+      have h1 := sub_ideal_le_ideal I y hy
+      have h2 := fun b => hyI (hsi (sub_ideal I y) b)
+      exact le_and_not_lt_eq (sub_ideal I y) I h1 h2
+
+theorem minimal_ideal_I_sq_nonzero_exists_els2 (hI : IsAtom I) (hII : I * I ≠ ⊥) : ∃ y : R, y ∈ I ∧ y ≠ 0 ∧ sub_ideal I y = I ∧ ∃ e ∈ I, e ≠ 0 ∧ y = e * y := by -- Done by Matevz
+  obtain ⟨y, ⟨hy, ynz, hI⟩⟩ := minimal_ideal_I_sq_nonzero_exists_el2 I hI hII
+  use y
+  constructor
+  · exact hy
+  · constructor
+    · exact ynz
+    · constructor
+      · exact hI
+      · rw [← hI] at hy
+        obtain ⟨e, ⟨he, hey⟩⟩ := hy
+        use e
+        constructor
+        · exact he
+        · constructor
+          · by_contra hez
+            have yz : y = 0 := by calc
+              y = e * y := hey
+              _ = 0 * y := by rw [hez]
+              _ = 0 := by noncomm_ring
+            contradiction
+          · exact hey
+
+
+
 
 theorem minimal_ideal_I_sq_nonzero_exists_els (hI : IsAtom I) (hII : I * I ≠ ⊥) : ∃ y : R, y ∈ I ∧ sub_ideal I y = I ∧ ∃ e ∈ I, y = e * y := by -- Done by Job and Matevz
   obtain ⟨y, ⟨hy, hI⟩⟩ := minimal_ideal_I_sq_nonzero_exists_el I hI hII
@@ -138,83 +167,132 @@ theorem elem_ann_le_ideal (I : Ideal R) (a : R) : elem_ann I a ≤ I := by -- Do
   rintro x ⟨hx, hxa⟩
   exact hx
 
-theorem e_in_elem_ann (I : Ideal R) (e y : I) (h : (e : R) * y = y) : ((e : R) * e - e) ∈ (elem_ann I y) := by -- Done by Job (apply? part) and Matevz
+theorem e_semiidem (I : Ideal R) (e y : R) (he : e ∈ I) (h : e * y = y) : (e * e - e) ∈ (elem_ann I y) := by -- Done by Matevz
   unfold elem_ann
   simp
   constructor
-  · refine (Submodule.sub_mem_iff_left I ?left.hy).mpr ?left.a
-    exact Submodule.coe_mem e
-    refine Ideal.mul_mem_left I ↑e ?left.a.a
-    exact Submodule.coe_mem e
-  · suffices h13 : ((e : R) * e - e) * y = 0 by exact h13
-    calc
-      ((e : R) * e - e) * y = e * (e * y - y) := by noncomm_ring
+  · have hde : e * e - e = (e - 1) * e := by noncomm_ring
+    rw [hde]
+    exact Ideal.mul_mem_left I (e - 1) he
+  · calc
+      (e * e - e) * y = e * (e * y - y) := by noncomm_ring
       _ = 0 := by rw [h]; simp
 
 
-theorem subideal_zero : sub_ideal I 0 = ⊥ := by
-  ext x
-  simp [sub_ideal, sub_ideal_set]
-  intro hx
-  use x
-  exact (Submodule.Quotient.mk_eq_zero I).mp (congrArg Submodule.Quotient.mk hx)
+theorem strict_contain (I J : Ideal R) (hleq : I ≤ J) (hneq : ∃ x, x ∈ J ∧ x ∉ I) : I < J := by -- Done by Matevz
+  constructor
+  · exact hleq
+  · rintro heq
+    obtain ⟨x, hxJ, hxnI⟩ := hneq
+    apply heq at hxJ
+    contradiction
 
-theorem atom_neq_bot : IsAtom I → I ≠ ⊥ := by
-  intro hI
-  obtain ⟨Inz, hsi⟩ := hI
-  intro hc
-  apply Inz
-  rw [hc]
-
-
-theorem minimal_ideal_I_sq_nonzero_exists_idem (h_atom_I : IsAtom I) (hII : I * I ≠ ⊥) :
-  ∃ e : I, IsIdempotentElem (e : R) ∧ I = Ideal.span {(e : R)} := by
-  have ⟨Inz, hsi⟩ := h_atom_I
-  obtain ⟨y, ⟨hy, hyI, ⟨e, he, hey⟩⟩⟩ := minimal_ideal_I_sq_nonzero_exists_els I h_atom_I hII
-  --obtain ⟨h1, h2⟩ := some_lemma I ⟨e, he⟩ ⟨y, hy⟩ _
-  have h1 : elem_ann I y ≤ I := elem_ann_le_ideal I y
-  have hIyn0 : sub_ideal I y ≠ ⊥ := by exact Ne.symm (ne_of_ne_of_eq (id (Ne.symm Inz)) (id (Eq.symm hyI)))
-  have h_ann_not_all : elem_ann I y ≠ I := by
-    intro hc; apply hIyn0;
-    refine (Submodule.eq_bot_iff (sub_ideal I y)).mpr ?_
-    intro x hx
-    simp [sub_ideal, sub_ideal_set] at hx
-    obtain ⟨z, ⟨hzI, rfl⟩⟩ := hx
-    have zann : z ∈ elem_ann I y := by rw [hc]; exact hzI
-    exact zann.2
-  have h_ann_zero : elem_ann I y = ⊥ := by
-    apply hsi
-    refine gt_iff_lt.mpr ?intro.a.a
-
-    exact lt_of_le_of_ne h1 h_ann_not_all
-  have k : (e : R) * e - e ∈ elem_ann I y := by apply e_in_elem_ann I ⟨e, he⟩ ⟨y, hy⟩ (by symm; exact hey)
-  have k'' : ((e : R) * e - e) ∈ (⊥ : Ideal R) := by rw [← h_ann_zero]; exact k
-  have is_idem : IsIdempotentElem (e : R) := by
-    unfold IsIdempotentElem
-    rw [← sub_eq_zero]
-    exact k''
-  use ⟨e, he⟩
-  simp [is_idem]
-  have hne : e ≠ 0 := by
-    intro hc
-    rw [hc] at hey
-    simp only [zero_mul] at hey
-    apply Inz
-    rw [←hyI, hey]
-    exact subideal_zero I
-  have hIne : Ideal.span {e} ≠ 0 := by intro hc;apply hne; exact Submodule.span_singleton_eq_bot.mp hc
-  have hIeunderI : Ideal.span {e} ≤ I := by exact (Ideal.span_singleton_le_iff_mem I).mpr he
-  exact Eq.symm (le_and_not_lt_eq (Ideal.span {e}) I hIeunderI fun a ↦ hIne (hsi (Ideal.span {e}) a))
+theorem ideal_neq_bot_if_has_nonzero_el (I : Ideal R) (h : ∃ x ∈ I, x ≠ 0) : I ≠ ⊥ := by -- Done by Matevz
+  by_contra hI
+  obtain ⟨x, hx, xnz⟩ := h
+  rw [hI] at hx
+  contradiction
 
 
 
+theorem nonzero_ideal_in_min_ideal (I J : Ideal R) (atom_I : IsAtom I) (Jnz : J ≠ ⊥) (hJsubI : J ≤ I) : J = I := by -- Done by Matevz
+  by_contra hcon
+  have hJltI : J < I := lt_of_le_of_ne hJsubI hcon
+  have span_eq_bot : J = ⊥ := atom_I.right J hJltI
+  contradiction
 
--- So all this is just to prove the first to lines of lemma 2.12 Bresar's paper
+theorem minimal_ideal_I_sq_nonzero_exists_idem (h_atom_I : IsAtom I) (hII : I * I ≠ ⊥) : -- Done by Matevz
+  ∃ e : R, e ∈ I ∧ e ≠ 0 ∧ IsIdempotentElem e ∧ Ideal.span {e} = I := by
+  obtain ⟨y, ⟨hy, ynz, hyI, ⟨e, he, henz, hey⟩⟩⟩ := minimal_ideal_I_sq_nonzero_exists_els2 I h_atom_I hII
+  obtain hye : e * y = y := by exact id (Eq.symm hey)
+  obtain h12 := e_semiidem I e y he hye
+  have hneq : ∃ x, x ∈ I ∧ x ∉ elem_ann I y := by
+    use e
+    constructor
+    · exact he
+    · unfold elem_ann
+      simp
+      rw [hye]
+      tauto
+  have h_ann_sub : elem_ann I y < I := strict_contain (elem_ann I y) I (elem_ann_le_ideal I y) hneq
+  have ann_zero : elem_ann I y = ⊥ := h_atom_I.2 (elem_ann I y) h_ann_sub
+  use e
+  constructor
+  · exact he
+  · constructor
+    · exact henz
+    · constructor
+      · unfold IsIdempotentElem
+        rw [ann_zero] at h12
+        calc
+        e * e = (e * e - e) + e := by noncomm_ring
+            _ = 0 + e := by rw [h12]
+            _ = e := by abel
+      · have span_neq_bot : Ideal.span {e} ≠ ⊥ := by
+          by_contra hRe
+          have einspane : e ∈ Ideal.span {e} := Ideal.mem_span_singleton_self e
+          rw [hRe] at einspane
+          contradiction
+        by_contra hcon
+        have hspanltI : (Ideal.span {e} : Ideal R) < I := lt_of_le_of_ne ((Ideal.span_singleton_le_iff_mem I).mpr he) hcon
+        have span_eq_bot : Ideal.span {e} = ⊥ := h_atom_I.right (Ideal.span {e}) hspanltI
+        contradiction
+
+
+
+
+
+
+
+
+def IsDivisionSubring (S : NonUnitalSubring R) (e : R) : Prop := ∀ x : R, x ∈ S → x ≠ 0 → ∃ y : R, y * x = e -- Done by Matevz
+
+def IsDivisionRing (R : Type*) [Ring R] : Prop := ∀ x : R, x ≠ 0 → ∃ y : R, y * x = 1 -- Done by Matevz
+
+-- If at some point we decide to define division ring as a ring in which every nonzero element has a two sided inverse
+--theorem left_inv_implies_divring (h : ∀ x : R, x ≠ 0 → ∃ y : R, y * x = 0) : IsDivisionRing R := by trivial -- Done by Matevz
 
 -- Lemma 2.12
 -- hypothesis: I^2 ≠ ⊥ and I is a minimal left ideal
 -- conclusion: there exists an idempotent e in I such that I = Re and eRe is a Division Ring (TODO) Dude this has to be divided into multiple lemmas
-theorem minimal_ideal_I_sq_nonzero_exists_idem_and_div (h : IsAtom I) (I_sq_ne_bot : I * I ≠ ⊥) :
-  ∃ e : R, IsIdempotentElem e ∧ e ∈ I ∧ I = Ideal.span {e} ∧ ∀ x : R, x ≠ 0 → ∃ y : R, x * y = 1 := by
-  obtain ⟨y, ⟨hy, hI⟩⟩ := minimal_ideal_I_sq_nonzero_exists_el I h I_sq_ne_bot
-  sorry
+
+theorem corner_ring_div (h_atom_I : IsAtom I) (e : R) (e_in_I : e ∈ I) : IsDivisionSubring (CornerSubring2 e) e := by -- Done by Matevz
+  intro x hx
+  unfold CornerSubring2 at hx
+  obtain ⟨r, _, _⟩ := hx
+  intro erenz
+  have hsubI : left_ideal (e * r * e) ≤ I := by
+    rintro x ⟨y, hy⟩
+    have hx : x = (y * e * r) * e := by calc
+      x = y * (e * r * e) := hy
+      _ = (y * e * r) * e := by noncomm_ring
+    rw [hx]
+    exact Ideal.mul_mem_left I (y * e * r) e_in_I
+  have hnz : left_ideal (e * r * e) ≠ ⊥ := by
+    refine ideal_neq_bot_if_has_nonzero_el (left_ideal (e * r * e)) ?h
+    use e * r * e
+    constructor
+    · use 1
+      simp
+    · exact erenz
+  have heq : left_ideal (e * r * e) = I := nonzero_ideal_in_min_ideal I (left_ideal (e * r * e)) h_atom_I hnz hsubI
+  obtain ⟨s, hs⟩ := (Ideal.ext_iff.mp heq e).mpr e_in_I
+  use s
+  exact id (Eq.symm hs)
+
+
+
+-- The lemma of this file
+theorem minimal_ideal_I_sq_nonzero_exists_idem_and_div (h_atom_I : IsAtom I) (hII : I * I ≠ ⊥) : -- Done by Matevz
+  ∃ e : R, e ∈ I ∧ e ≠ 0 ∧ IsIdempotentElem e ∧ Ideal.span {e} = I ∧ IsDivisionSubring (CornerSubring2 e) e := by
+  obtain ⟨e, ⟨he, henz, he_idem, hspan, hdiv⟩⟩ := minimal_ideal_I_sq_nonzero_exists_idem I h_atom_I hII
+  use e
+  constructor
+  · exact he
+  · constructor
+    · exact henz
+    · constructor
+      · exact he_idem
+      · constructor
+        · trivial
+        · exact corner_ring_div (Ideal.span {e}) h_atom_I e he

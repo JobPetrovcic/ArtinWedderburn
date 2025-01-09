@@ -30,23 +30,9 @@ instance : Mul (TwoSidedIdeal R) := {mul := fun I J => TwoSidedIdeal.span (↑I 
 theorem prod_eq_span_pairwise_prod : I * J = Ideal.span (pair_wise_set_prod I J) := rfl
 
 
-def IsOrthogonal (e f : R) : Prop := e * f = 0 ∧ f * e = 0
-
-variable {e f : R}
-
-def AreOrthogonalIdempotents (e f : R) : Prop := IsIdempotentElem e ∧ IsIdempotentElem f ∧ IsOrthogonal e f
-
--- Lemma 2.9
--- #HARDER
-theorem one_sub_e_larger_span_on_sub_e_sub_f (e f : R) (ho : AreOrthogonalIdempotents e f) (nf : f ≠ 0) : Ideal.span {1 - e - f} < Ideal.span {1 - e} := by sorry -- Mikita
 
 
 
--- Lemma 2.12
--- hypothesis: I^2 ≠ ⊥ and I is a minimal left ideal
--- conclusion: there exists an idempotent e in I such that I = Re and eRe is a Division Ring (TODO) Dude this has to be divided into multiple lemmas
-theorem minimal_ideal_I_sq_nonzero_exists_idem (h : IsAtom I) (I_sq_ne_bot : I * I ≠ ⊥) :
-  ∃ e : R, IsIdempotentElem e ∧ e ∈ I ∧ I = Ideal.span {e} := by sorry -- Matevz
 
 -- lemma 2.14
 theorem artinian_ring_has_minimal_left_ideal [IsArtinian R R] : ∃ I : Ideal R, IsAtom I := by sorry -- Mikita
@@ -57,7 +43,7 @@ class hasMatrixUnits (R : Type*) [Ring R] (n : ℕ) where -- Done by Job
   diag_sum_eq_one : ∑ i, es i i = 1
   mul_ij_kl_eq_kron_delta_jk_mul_es_il : ∀ i j k l, es i j * es k l = (if j = k then es i l else 0)
 
-
+variable (e : R)
 variable (idem_e : IsIdempotentElem e)
 
 -- Lemma 2.17
@@ -88,15 +74,14 @@ def lemma_2_18 {n : ℕ} (hn : 0 < n)
   -- they are compatible
   (_ : ∀ i, row0_es i * col0_es i = diag_es ⟨0, hn⟩)
   (_ : ∀ i, col0_es i * row0_es i = diag_es i)
-  : hasMatrixUnits R n := by sorry -- Leave for now, split into multiple lemmas
-
+  : hasMatrixUnits R n := by sorry -- Proved in Idempotents.lean
 -- Lemma 2.19 (a)
 -- apparently we don't need b) and c)
 theorem lemma_2_19
   (h : IsPrimeRing R)
   (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) (h_o : IsOrthogonal e f)
   (heRe : DivisionRing (CornerRing idem_e)) (hfRf : DivisionRing (CornerRing idem_f)) :
-  ∃ (u v : R) (hu : u ∈ (e ⬝ R ⬝ f)) (hv : v ∈ (f ⬝ R ⬝ e)), u * v = e ∧ v * u = f := by sorry -- Leave for now, split into multiple lemmas
+  ∃ (u v : R) (hu : u ∈ (e ⬝ R ⬝ f)) (hv : v ∈ (f ⬝ R ⬝ e)), u * v = e ∧ v * u = f := by sorry -- Statement is in Idempotents.lean
 
 -- Finally, the Artin-Wedderburn theorem
 universe u
