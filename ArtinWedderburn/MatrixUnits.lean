@@ -35,7 +35,7 @@ def ij_corner (i j : Fin n) (a : R) : @CornerSubring R _ _ (@e00_idem R _ n hn m
 abbrev matrix_corner := Matrix (Fin n) (Fin n) (@e00_cornerring R _ n hn mu)
 
 -- define the map from R to matrix ring by a ↦ e_{0i}ae_{j0} for all i, j
-def ring_to_matrix_ring (n : ℕ)(hn : 0 < n)(mu : hasMatrixUnits R n) : R → Matrix (Fin n) (Fin n) (@e00_cornerring R _ n hn mu) := fun a => λ i j => (ij_corner R i j a)
+def ring_to_matrix_ring (n : ℕ) (hn : 0 < n)(mu : hasMatrixUnits R n) : R → Matrix (Fin n) (Fin n) (@e00_cornerring R _ n hn mu) := fun a => λ i j => (ij_corner R i j a)
 
 -- show that this map is additive
 theorem ring_to_matrix_ring_additive
@@ -166,6 +166,21 @@ def ring_to_matrix_ring_hom: R →+* Matrix (Fin n) (Fin n) (@e00_cornerring R _
 -- define the reverse map from matrix ring to R
 def matrix_to_ring (n : ℕ)(hn : 0 < n)(mu : hasMatrixUnits R n) : Matrix (Fin n) (Fin n) (@e00_cornerring R _ n hn mu) → R := fun M => ∑ i, ∑ j, (mu.es i ⟨0, hn⟩) * M i j * (mu.es ⟨0, hn⟩ j)
 
+-- lemma: multiplying e0k with ∑ ei0 f i = e0k ek0 fk  = e00 f k
+lemma e0k_left_mul_sum {k : Fin n} {f : Fin n → R} : mu.es ⟨0, hn⟩ k * ∑ i, mu.es i ⟨0, hn⟩ * f i = mu.es ⟨0, hn⟩ ⟨0, hn⟩ * f k := by
+  rw [Finset.mul_sum]
+  have hif : ∀ i, es ⟨0, hn⟩ k * (es i ⟨0, hn⟩ * f i) = if k=i then es ⟨0, hn⟩ ⟨0, hn⟩ * f k else 0 := by intro i; rw [←mul_assoc, mu.mul_ij_kl_eq_kron_delta_jk_mul_es_il ⟨0, hn⟩ k i ⟨0, hn⟩]; split_ifs with h; simp only[h]; simp only [zero_mul]
+  simp only [hif]
+  exact Fintype.sum_ite_eq k fun j ↦ es ⟨0, hn⟩ ⟨0, hn⟩ * f k
+-- same but now from the right: ∑ f i e0i and ek0 = fk e0k ek0 = f k e00
+lemma right_mul_sum_e0k {k : Fin n} {f : Fin n → R} : (∑ i, f i * mu.es ⟨0, hn⟩ i) * mu.es k ⟨0, hn⟩ = f k * mu.es ⟨0, hn⟩ ⟨0, hn⟩ := by
+  rw [Finset.sum_mul]
+  have hif : ∀ i, (f i * mu.es ⟨0, hn⟩ i) * mu.es k ⟨0, hn⟩ = if i=k then f k * mu.es ⟨0, hn⟩ ⟨0, hn⟩ else 0 := by intro i; rw [mul_assoc,  mu.mul_ij_kl_eq_kron_delta_jk_mul_es_il ⟨0, hn⟩ i k ⟨0, hn⟩]; split_ifs with h; simp only[h]; simp only [mul_zero]
+  simp only [hif]
+  exact Fintype.sum_ite_eq' k fun j ↦ f k * es ⟨0, hn⟩ ⟨0, hn⟩
+
+-- with these two lemmas we can show that matrix_to
+
 
 lemma matrixcorner1 : (1 : Matrix (Fin n) (Fin n) (@e00_cornerring R _ n hn mu)) = (λ i j => if i = j then (1 : (@e00_cornerring R _ n hn mu)) else 0) := by exact rfl
 
@@ -210,6 +225,14 @@ def matrix_to_ring_hom : Matrix (Fin n) (Fin n) (@e00_cornerring R _ n hn mu) �
     simp only [Matrix.zero_apply, ZeroMemClass.coe_zero, mul_zero, zero_mul, Finset.sum_const_zero]
 }
 
+lemma e00_unit (a : @e00_cornerring R _ n hn mu) : mu.es ⟨0, hn⟩ ⟨0, hn⟩ * (a : R) = a := by
+  have h : 1 * a = a := by simp only [one_mul]
+  nth_rewrite 2 [←h]
+  rfl
+lemma unit_e00 (a : @e00_cornerring R _ n hn mu) : (a : R) * mu.es ⟨0, hn⟩ ⟨0, hn⟩ = a := by
+  have h : a * 1 = a := by simp only [mul_one]
+  nth_rewrite 2 [←h]
+  rfl
 
 noncomputable
 def ring_to_matrix_iso [mu : hasMatrixUnits R n] : R ≃+* Matrix (Fin n) (Fin n) (@e00_cornerring R _ n hn mu) := by
@@ -230,7 +253,20 @@ def ring_to_matrix_iso [mu : hasMatrixUnits R n] : R ≃+* Matrix (Fin n) (Fin n
     exact fn_lemma h j
   }
   {
-    sorry
+    intro A
+    let a : R := ∑ i, ∑ j, es i ⟨0, hn⟩ * ((A i j : R) * es ⟨0, hn⟩ j)
+    use a
+    simp [ring_to_matrix_ring_hom]
+    unfold ring_to_matrix_ring
+    ext i j
+    unfold ij_corner
+    simp only [a]
+    have h : (es ⟨0, hn⟩ i * ∑ i : Fin n, ∑ j : Fin n, es i ⟨0, hn⟩ * ((A i j : R) * es ⟨0, hn⟩ j)) = (es ⟨0, hn⟩ i * ∑ i : Fin n, es i ⟨0, hn⟩ * ∑ j : Fin n, ((A i j : R) * es ⟨0, hn⟩ j)) := by rw [Finset.sum_congr]; rfl; intro i hi; rw [Finset.mul_sum];
+    rw [h]
+    rw [e0k_left_mul_sum]
+    simp only [mul_assoc]
+    rw [right_mul_sum_e0k]
+    simp only [unit_e00, e00_unit]
   }
 
 
@@ -244,33 +280,3 @@ def ring_with_matrix_units_isomorphic_to_matrix_ring (n : ℕ) (hn : 0 < n)(mu :
 
 def PairwiseOrthogonal {R : Type*} [Ring R](e f : R) := e * f  = 0
   -- show that this map is
-
--- Lemma 2.18
--- hypothesis: we have a parwise orthogonal idempotent e_ii for each i in {1, ..., n}
--- and e1i ∈ e11Reii for all i in {2, ..., n}
--- and e1iei1 = e11 and ei1e1i = eii for all i in {2, ..., n}
--- conclusion: has matrix units R
-def lemma_2_18 {n : ℕ} {hn : 0 < n}
-  (diag_es : Fin n → R) -- candidate matrix units
-  (h_idem : (∀ i : Fin n, IsIdempotentElem (diag_es i))) -- idempotent
-  (h_ortho : (∀ i j : Fin n, i ≠ j → PairwiseOrthogonal (diag_es i) (diag_es j))) -- pairwise orthogonal
-  -- first row
-  (row0_es : Fin n -> R)
-  (_ : row0_es ⟨0, hn⟩ = diag_es ⟨0, hn⟩)
-  (_ : ∀ i : Fin n, row0_es i ∈ (diag_es ⟨0, hn⟩ ⬝ R ⬝ diag_es i))
-  -- first column
-  (col0_es : Fin n -> R)
-  (_ : col0_es ⟨0, hn⟩ = diag_es ⟨0, hn⟩)
-  (_ : ∀ i : Fin n, col0_es i ∈ (diag_es i ⬝ R ⬝ diag_es ⟨0, hn⟩))
-  -- they are compatible
-  (_ : ∀ i, row0_es i * col0_es i = diag_es ⟨0, hn⟩)
-  (_ : ∀ i, col0_es i * row0_es i = diag_es i)
-  : hasMatrixUnits R n := by sorry -- Leave for now, split into multiple lemmas
-
--- Lemma 2.19 (a)
--- apparently we don't need b) and c)
-theorem lemma_2_19
-  (h : IsPrimeRing R)
-  (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) (h_o : PairwiseOrthogonal e f)
-  (heRe : DivisionRing (CornerSubring idem_e)) (hfRf : DivisionRing (CornerSubring idem_f)) :
-  ∃ (u v : R) (hu : u ∈ (e ⬝ R ⬝ f)) (hv : v ∈ (f ⬝ R ⬝ e)), u * v = e ∧ v * u = f := by sorry
