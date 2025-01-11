@@ -98,6 +98,11 @@ theorem is_right_unit : ∀ (x : CornerSubring idem_e), x * 1 = x := by -- Done 
 -- The corner ring is a ring
 instance CornerRingIsRing (idem_e : IsIdempotentElem e) : Ring (CornerSubring idem_e) := non_unital_w_e_is_ring 1 (is_left_unit idem_e) (is_right_unit idem_e) -- Done by Job
 
+
+-- I left ideal in eRe -> RI is a left ideal in R -- Maša
+
+-- I ⊆ J -> RI ⊆ RJ -- Maša
+
 -- Lemma 2.10
 -- a) If R is artinian, then the corner ring is artinian
 theorem corner_ring_artinian [IsArtinian R R] : IsArtinian (CornerSubring idem_e) (CornerSubring idem_e) := by sorry -- Mikita
@@ -121,8 +126,7 @@ theorem both_mul_lift (x y : CornerSubring idem_e) : (both_mul (x : CornerSubrin
   }
   {
     rintro ⟨s, hs⟩
-    rw [←is_right_unit idem_e ↑x] at hs
-    rw [←is_left_unit idem_e ↑y] at hs
+    rw [←is_right_unit idem_e ↑x, ←is_left_unit idem_e ↑y] at hs
     simp only [NonUnitalSubring.val_mul] at hs
     let sc : R := (1 :(CornerSubring idem_e)) * s * (1 :(CornerSubring idem_e))
     rw [←mul_assoc] at hs
@@ -144,8 +148,7 @@ theorem corner_ring_prime (hRP : IsPrimeRing R) : IsPrimeRing (CornerSubring ide
   rw [prime_ring_equiv]
   intro a b h
   have h_lift : ((both_mul a b) : Set R) = {0} := by
-    rw [←both_mul_lift]
-    rw [congrArg (Set.image Subtype.val) h]
+    rw [←both_mul_lift, congrArg (Set.image Subtype.val) h]
     simp
   have l := prime_ring_equiv.1 hRP _ _ h_lift
   simp at l

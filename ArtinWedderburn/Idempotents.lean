@@ -61,45 +61,14 @@ theorem one_sub_e_larger_span_on_sub_e_sub_f (e f : R) (ef_ort_idem : AreOrthogo
     contradiction
   exact leq_neq_lt (Ideal.span {1 - e - f}) (Ideal.span {1 - e}) hleq hneq
 
-
-
-
-
-
 def HasMatrixUnits (R : Type*) [Ring R] (n : ℕ) : Prop := ∃ (es : Fin n → Fin n → R), (∑ i, es i i = 1) ∧ (∀ i j k l, es i j * es k l = (if j = k then es i l else 0)) -- Done by Job (as class - see above) and rewritten by Matevz (as def)
-
--- just a test to see how the matrices work
-theorem TestMatrixUnits (n : ℕ) : HasMatrixUnits (Matrix (Fin 2) (Fin 2) R) 2 := by
-  use fun i j => (fun i' j' => if i = i' ∧ j = j' then 1 else 0)
-  constructor
-  · apply Matrix.ext_iff.mp
-    intro i j
-    simp
-    split_ifs with h1 h2 h3
-    · by_contra h
-      have h1' := h1.left
-      have h2' := h2.left
-      rw [← h2'] at h1'
-      trivial
-    · rw [← h1.left, ← h1.right]
-      simp
-    · rw [← h3.left, ← h3.right]
-      simp
-    · sorry
-  · sorry
-
-
-
 
 variable (e : R)
 variable (idem_e : IsIdempotentElem e)
 
 
-
 def kronecker_delta (n : ℕ) (i j : Fin n) : R :=
   if i = j then 1 else 0
-
-
 
 -- Lemma 2.18
 -- hypothesis: we have a parwise orthogonal idempotent e_ii for each i in {1, ..., n}
@@ -150,7 +119,7 @@ theorem OrtIdem_imply_MatUnits {n : ℕ} (hn : 0 < n) -- Done by Matevz
 
 
 -- Lemma 2.19 (a)
-theorem lemma_2_19
+theorem lemma_2_19 -- Maša
   (h : IsPrimeRing R)
   (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) (ort : IsOrthogonal e f)
   (heRe : IsDivisionRing (CornerSubring idem_e)) (hfRf : IsDivisionRing (CornerSubring idem_f)) :
