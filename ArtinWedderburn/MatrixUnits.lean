@@ -184,46 +184,46 @@ lemma right_mul_sum_e0k {k : Fin n} {f : Fin n → R} : (∑ i, f i * mu.es ⟨0
 
 lemma matrixcorner1 : (1 : Matrix (Fin n) (Fin n) (@e00_cornerring R _ n hn mu)) = (λ i j => if i = j then (1 : (@e00_cornerring R _ n hn mu)) else 0) := by exact rfl
 
-def matrix_to_ring_hom : Matrix (Fin n) (Fin n) (@e00_cornerring R _ n hn mu) →+* R :=
-{
-  toFun := matrix_to_ring R n hn mu,
-  map_one' := by
-    unfold matrix_to_ring
-    have h : ∀ i j, (mu.es i ⟨0, hn⟩) * (if i = j then (1 : R) else 0) * (mu.es ⟨0, hn⟩ j) = if i = j then mu.es i i else 0 := by
-      intro i j
-      split_ifs with h
-      rw [h]
-      simp only [mul_one]
-      rw [mu.mul_ij_kl_eq_kron_delta_jk_mul_es_il j ⟨0, hn⟩ ⟨0, hn⟩ j ]
-      simp only [↓reduceIte]
-      simp only [mul_zero, zero_mul]
-    rw [matrixcorner1]
-    simp only
-    calc
-      _ = ∑ x : Fin n, ∑ x_1 : Fin n, if x = x_1 then mu.es x x_1 else 0 := by
-        apply Finset.sum_congr
-        rfl
-        intro i hj
-        apply Finset.sum_congr
-        rfl
-        intro j hj
-        split_ifs with h''
-        rw [e00_cornerring_1, ei0e00_eq_e_ei0, ei0e0j_eq_eij]
-
-        simp only [ZeroMemClass.coe_zero, mul_zero, zero_mul]
-      _ = ∑ x : Fin n, mu.es x x := by apply Finset.sum_congr ;simp;intro x hx;exact Fintype.sum_ite_eq x (es x)
-      _ = 1 := by exact mu.diag_sum_eq_one
-  map_mul' := by
-    intro A B
-    simp only
-    unfold matrix_to_ring
-    sorry
-  map_add' := by sorry
-  map_zero' := by
-    simp only [RingHom.map_zero]
-    unfold matrix_to_ring
-    simp only [Matrix.zero_apply, ZeroMemClass.coe_zero, mul_zero, zero_mul, Finset.sum_const_zero]
-}
+--def matrix_to_ring_hom : Matrix (Fin n) (Fin n) (@e00_cornerring R _ n hn mu) →+* R :=
+--{
+--  toFun := matrix_to_ring R n hn mu,
+--  map_one' := by
+--    unfold matrix_to_ring
+--    have h : ∀ i j, (mu.es i ⟨0, hn⟩) * (if i = j then (1 : R) else 0) * (mu.es ⟨0, hn⟩ j) = if i = j then mu.es i i else 0 := by
+--      intro i j
+--      split_ifs with h
+--      rw [h]
+--      simp only [mul_one]
+--      rw [mu.mul_ij_kl_eq_kron_delta_jk_mul_es_il j ⟨0, hn⟩ ⟨0, hn⟩ j ]
+--      simp only [↓reduceIte]
+--      simp only [mul_zero, zero_mul]
+--    rw [matrixcorner1]
+--    simp only
+--    calc
+--      _ = ∑ x : Fin n, ∑ x_1 : Fin n, if x = x_1 then mu.es x x_1 else 0 := by
+--        apply Finset.sum_congr
+--        rfl
+--        intro i hj
+--        apply Finset.sum_congr
+--        rfl
+--        intro j hj
+--        split_ifs with h''
+--        rw [e00_cornerring_1, ei0e00_eq_e_ei0, ei0e0j_eq_eij]
+--
+--        simp only [ZeroMemClass.coe_zero, mul_zero, zero_mul]
+--      _ = ∑ x : Fin n, mu.es x x := by apply Finset.sum_congr ;simp;intro x hx;exact Fintype.sum_ite_eq x (es x)
+--      _ = 1 := by exact mu.diag_sum_eq_one
+--  map_mul' := by
+--    intro A B
+--    simp only
+--    unfold matrix_to_ring
+--    sorry
+--  map_add' := by sorry
+--  map_zero' := by
+--    simp only [RingHom.map_zero]
+--    unfold matrix_to_ring
+--    simp only [Matrix.zero_apply, ZeroMemClass.coe_zero, mul_zero, zero_mul, Finset.sum_const_zero]
+--}
 
 lemma e00_unit (a : @e00_cornerring R _ n hn mu) : mu.es ⟨0, hn⟩ ⟨0, hn⟩ * (a : R) = a := by
   have h : 1 * a = a := by simp only [one_mul]
@@ -262,8 +262,7 @@ def ring_to_matrix_iso [mu : hasMatrixUnits R n] : R ≃+* Matrix (Fin n) (Fin n
     unfold ij_corner
     simp only [a]
     have h : (es ⟨0, hn⟩ i * ∑ i : Fin n, ∑ j : Fin n, es i ⟨0, hn⟩ * ((A i j : R) * es ⟨0, hn⟩ j)) = (es ⟨0, hn⟩ i * ∑ i : Fin n, es i ⟨0, hn⟩ * ∑ j : Fin n, ((A i j : R) * es ⟨0, hn⟩ j)) := by rw [Finset.sum_congr]; rfl; intro i hi; rw [Finset.mul_sum];
-    rw [h]
-    rw [e0k_left_mul_sum]
+    rw [h,e0k_left_mul_sum]
     simp only [mul_assoc]
     rw [right_mul_sum_e0k]
     simp only [unit_e00, e00_unit]
