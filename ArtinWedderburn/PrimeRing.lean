@@ -21,16 +21,16 @@ theorem prime_ring_equiv : IsPrimeRing R ↔ ∀ (a b : R), both_mul a b = {0} �
       rintro x hx
       rw [both_mul_zero_one_left_zero a b hab] at hx
       trivial
-    have h := hR (left_ideal a) (left_ideal b) (Ideal.span_eq_bot.mpr rhs)
+    have h := hR (left_ideal_of_element a) (left_ideal_of_element b) (Ideal.span_eq_bot.mpr rhs)
     cases h with
     | inl ha =>
       apply Or.inl
-      have ainbot : a ∈ left_ideal a := by use 1; simp
+      have ainbot : a ∈ left_ideal_of_element a := by use 1; simp
       rw [ha] at ainbot
       exact ainbot
     | inr hb =>
       apply Or.inr
-      have binbot : b ∈ left_ideal b := by use 1; simp
+      have binbot : b ∈ left_ideal_of_element b := by use 1; simp
       rw [hb] at binbot
       exact binbot
   · intro h I J hIJ
@@ -68,10 +68,6 @@ theorem prime_ring_equiv : IsPrimeRing R ↔ ∀ (a b : R), both_mul a b = {0} �
       cases h x y hxRy with
       | inl hx => contradiction
       | inr hy => exact hy
-
-
-
-
 
 -- equivalence between 1) and 3)
 -- #EASIER

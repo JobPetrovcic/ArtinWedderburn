@@ -256,26 +256,26 @@ def IsDivisionRing (R : Type*) [Ring R] : Prop := ∀ x : R, x ≠ 0 → ∃ y :
 -- hypothesis: I^2 ≠ ⊥ and I is a minimal left ideal
 -- conclusion: there exists an idempotent e in I such that I = Re and eRe is a Division Ring (TODO) Dude this has to be divided into multiple lemmas
 
-theorem corner_ring_div (h_atom_I : IsAtom I) (e : R) (e_in_I : e ∈ I) : IsDivisionSubring (CornerSubring2 e) e := by -- Done by Matevz
+theorem corner_ring_div (h_atom_I : IsAtom I) (e : R) (e_in_I : e ∈ I) : IsDivisionSubring (CornerSubringNonUnital e) e := by -- Done by Matevz
   intro x hx
-  unfold CornerSubring2 at hx
+  unfold CornerSubringNonUnital at hx
   obtain ⟨r, _, _⟩ := hx
   intro erenz
-  have hsubI : left_ideal (e * r * e) ≤ I := by
+  have hsubI : left_ideal_of_element (e * r * e) ≤ I := by
     rintro x ⟨y, hy⟩
     have hx : x = (y * e * r) * e := by calc
       x = y * (e * r * e) := hy
       _ = (y * e * r) * e := by noncomm_ring
     rw [hx]
     exact Ideal.mul_mem_left I (y * e * r) e_in_I
-  have hnz : left_ideal (e * r * e) ≠ ⊥ := by
-    refine ideal_neq_bot_if_has_nonzero_el (left_ideal (e * r * e)) ?h
+  have hnz : left_ideal_of_element (e * r * e) ≠ ⊥ := by
+    refine ideal_neq_bot_if_has_nonzero_el (left_ideal_of_element (e * r * e)) ?h
     use e * r * e
     constructor
     · use 1
       simp
     · exact erenz
-  have heq : left_ideal (e * r * e) = I := nonzero_ideal_in_min_ideal I (left_ideal (e * r * e)) h_atom_I hnz hsubI
+  have heq : left_ideal_of_element (e * r * e) = I := nonzero_ideal_in_min_ideal I (left_ideal_of_element (e * r * e)) h_atom_I hnz hsubI
   obtain ⟨s, hs⟩ := (Ideal.ext_iff.mp heq e).mpr e_in_I
   use s
   exact id (Eq.symm hs)
@@ -284,7 +284,7 @@ theorem corner_ring_div (h_atom_I : IsAtom I) (e : R) (e_in_I : e ∈ I) : IsDiv
 
 -- The lemma of this file
 theorem minimal_ideal_I_sq_nonzero_exists_idem_and_div (h_atom_I : IsAtom I) (hII : I * I ≠ ⊥) : -- Done by Matevz
-  ∃ e : R, e ∈ I ∧ e ≠ 0 ∧ IsIdempotentElem e ∧ Ideal.span {e} = I ∧ IsDivisionSubring (CornerSubring2 e) e := by
+  ∃ e : R, e ∈ I ∧ e ≠ 0 ∧ IsIdempotentElem e ∧ Ideal.span {e} = I ∧ IsDivisionSubring (CornerSubringNonUnital e) e := by
   obtain ⟨e, ⟨he, henz, he_idem, hspan, hdiv⟩⟩ := minimal_ideal_I_sq_nonzero_exists_idem I h_atom_I hII
   use e
   constructor

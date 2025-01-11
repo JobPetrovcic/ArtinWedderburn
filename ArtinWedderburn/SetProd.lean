@@ -9,7 +9,6 @@ variable {R : Type*} [Ring R] (a b : R)
 
 def left_mul (a : R) : Set R := {x | ∃ r : R, x = r * a}
 def right_mul (a : R) : Set R := {x | ∃ r : R, x = a * r}
-def both_mul (a b : R) : Set R := {x | ∃ r : R, x = a * r * b}
 
 theorem left_mul_zero_impl_mul_zero : both_mul a b = {0} → a * b = 0 := by
   intro h
@@ -49,14 +48,7 @@ theorem both_mul_zero_one_left_zero : both_mul a b = {0} → (left_mul a) * (lef
       · use 0; noncomm_ring
       · simp; symm; exact hx
 
-def zero_ideal : Ideal R := {
-  carrier := {0},
-  zero_mem' := by simp,
-  add_mem' := by simp,
-  smul_mem' := by simp
-}
-
-def left_ideal (a : R) : Ideal R := {
+def left_ideal_of_element (a : R) : Ideal R := {
   carrier := left_mul a,
   zero_mem' := by use 0; noncomm_ring,
   add_mem' := by

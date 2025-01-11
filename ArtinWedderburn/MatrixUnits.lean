@@ -29,7 +29,7 @@ lemma ei0e00_eq_e_ei0 (i : Fin n) : mu.es i ⟨0, hn⟩* mu.es  ⟨0, hn⟩ ⟨0
 lemma ei0e0j_eq_eij (i j : Fin n) : mu.es i ⟨0, hn⟩ * mu.es ⟨0, hn⟩ j = mu.es i j := by rw [mu.mul_ij_kl_eq_kron_delta_jk_mul_es_il]; simp only [↓reduceIte]
 
 def ij_corner (i j : Fin n) (a : R) : @CornerSubring R _ _ (@e00_idem R _ n hn mu) := ⟨es ⟨0, hn⟩ i  * a * es j ⟨0, hn⟩,
-  by rw [subring_mem, ←mul_assoc, ←mul_assoc, e00e0i_eq_e_0i, mul_assoc, mul_assoc, mul_assoc, ei0e00_eq_e_ei0]⟩
+  by rw [subring_mem_idem , ←mul_assoc, ←mul_assoc, e00e0i_eq_e_0i, mul_assoc, mul_assoc, mul_assoc, ei0e00_eq_e_ei0]⟩
 
 
 abbrev matrix_corner := Matrix (Fin n) (Fin n) (@e00_cornerring R _ n hn mu)
