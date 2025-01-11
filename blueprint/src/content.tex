@@ -10,6 +10,8 @@ The proof is heavily based on \cite{bresar2024wedderburnartintheorem}
 
 \section{Preliminaries}
   \begin{definition}
+      \lean{both_mul}
+      \leanok
       For $a, b \in R$, denote by $aRb$ the set $\{arb| r \in R\}$.
   \end{definition}
 
@@ -26,7 +28,8 @@ The proof is heavily based on \cite{bresar2024wedderburnartintheorem}
   \end{definition}
 
   \begin{definition}
-    %\lean{IsPrimeRing}
+    \lean{IsPrimeRing}
+    \leanok
     A ring is prime if we have $I = 0$ or $J = 0$ whenever $IJ = 0$ for some left ideals $I$ and $J$ .
   \end{definition}
 
@@ -108,6 +111,7 @@ The proof is heavily based on \cite{bresar2024wedderburnartintheorem}
 
   \begin{theorem}
     \label{thm:characterization_of_corner_ring_elements}
+    \uses{thm:characterization_of_corner_elements}
     %\lean{x_in_corner_x_eq_e_x_e}
     An element $x$ of $R$ is in the corner ring if and only if $x = e x e$.
   \end{theorem}
@@ -117,11 +121,12 @@ The proof is heavily based on \cite{bresar2024wedderburnartintheorem}
 
   \begin{theorem}
     \label{thm:characterization_of_corner_ring_elements'}
+    \uses{thm:characterization_of_corner_ring_elements}
     %\lean{x_in_corner_x_eq_e_y_e}
     An element $x$ of the corner ring is of the form $e y e$ for some $y \in R$.
   \end{theorem}
   \begin{proof}
-    Clear from the previous theorem.
+    Clear from the theorem \ref{thm:characterization_of_corner_ring_elements}
   \end{proof}
 
   \begin{theorem}
@@ -147,6 +152,7 @@ The proof is heavily based on \cite{bresar2024wedderburnartintheorem}
 
   \begin{theorem}
     \label{thm:corner_ring_prime}
+    \uses{thm:prime_ring_equiv}
     %\lean{corner_ring_prime}
     If $R$ is a prime ring, then the corner ring is prime.
   \end{theorem}
@@ -164,6 +170,7 @@ The proof is heavily based on \cite{bresar2024wedderburnartintheorem}
 
   \begin{theorem}
     \label{thm:brauer_lemma}
+    \uses{thm:all_left_inv_div_ring}
     %\leanok{minimal_ideal_I_sq_nonzero_exists_idem}
     Suppose $L$ is a minimal (left) ideal of $R$ and $L^2 \neq 0$. Then there exists an idempotent $e \in L$ such that $L = Re$ and $eRe$ is a division ring.
   \end{theorem}
@@ -183,7 +190,7 @@ The proof is heavily based on \cite{bresar2024wedderburnartintheorem}
   \end{proof}
 
   \begin{theorem}
-    %\leanok{artinian_ring_has_minimal_left_ideal}
+    %\leanok{artinian_ring_has_minimal_left_ideal_of_element}
     (Already proven in Mathlib) A nonzero left artinian ring has a minimal left ideal.
   \end{theorem}
 
@@ -202,6 +209,7 @@ The proof is heavily based on \cite{bresar2024wedderburnartintheorem}
 
   \begin{theorem}
       \label{thm:ring_with_matrix_units}
+      \uses{def:matrixunits}
       %\lean{ring_with_matrix_units_isomorphic_to_matrix_ring}
       If $R$ has a set of matrix units $e_{ij}$, then $R$ is isomorphic to the ring of $n \times n$ matrices over the corner ring $e_{11}Re_{11}$.
   \end{theorem}
@@ -241,6 +249,7 @@ The proof is heavily based on \cite{bresar2024wedderburnartintheorem}
 
   \begin{theorem}
     \label{thm:criterion_for_matrix_units}
+    \uses{thm:characterization_of_corner_elements}
     %\lean{lemma_2_18}
     If a ring $R$ has a set of pairwise orthogonal idempotents $e_{ii}$ and
     \begin{itemize}
@@ -284,6 +293,7 @@ The proof is heavily based on \cite{bresar2024wedderburnartintheorem}
 
   \begin{theorem}
     \label{thm:orthogonal_idempotents_division_ring}
+    \uses{thm:prime_ring_equiv'}
     Let $e, f \in R$ be nonzero orthogonal idempotents and $R$ a prime ring. Also let $eRe$ and $fRf$ be division rings. 
 
     Then there exist $u, v \in R$ such that $u \in eRf$ and $v \in fRe$ such that $uv = e$ and $vu = f$.
@@ -310,6 +320,7 @@ The proof is heavily based on \cite{bresar2024wedderburnartintheorem}
 
   \begin{theorem}
     \label{thm:orthogonal_idempotents_division_ring_matrix}
+    \uses{thm:orthogonal_idempotents_division_ring, thm:criterion_for_matrix_units}
     If a prime ring $R$ contains pairwise orthogonal idempotents $e_{ii}$ with sum $1$ and $e_{ii}Re_{ii}$ is a division ring for every $i$, then $R$  is isomorphic to $M_n(e_{11}Re_{11})$.
   \end{theorem}
   \begin{proof}
@@ -335,6 +346,7 @@ The proof is heavily based on \cite{bresar2024wedderburnartintheorem}
 
   \begin{theorem}[Artin Wedderburn for prime rings]
     \label{thm:artin_wedderburn_for_prime}
+    \uses{thm:corner_ring_prime, thm:corner_ring_artinian, thm:one_sub_e_larger_span_on_sub_e_sub_f, thm:orthogonal_idempotents_division_ring_matrix}
     %\lean{ArtinWedderburnForPrime}
     If $R$ is a prime ring and artinian, then $R$ is isomorphic to $M_n(D)$ for some division ring $D$.
   \end{theorem}
@@ -346,6 +358,7 @@ The proof is heavily based on \cite{bresar2024wedderburnartintheorem}
 
   \begin{theorem}
     \label{thm:artin_wedderburn_for_simple}
+    \uses{thm:artin_wedderburn_for_prime}
     %\lean{ArtinWedderburnForSimple}
     If $R$ is a simple ring, then $R$ is isomorphic to $M_n(D)$ for some division ring $D$.
   \end{theorem}
@@ -358,6 +371,7 @@ The proof is heavily based on \cite{bresar2024wedderburnartintheorem}
     In this section, we prove the following result, which clearly generalizes Artin Wedderburn to semisimple rings
     \begin{theorem}
         Let $R$ be a semisimple ring. Then, $R$ is isomorphic to a direct product of simple, artinian rings.
+        \uses{thm:artin_wedderburn_for_simple}
     \end{theorem}
     \begin{proof}
         WLOG, suppose, $R$ is not simple. We know that $R$ is (left) artinian, which is a stronger condition that being (two-sided) artinian. Since it is (two-sided) artinian, it must contain a nontrivial minimal (two-sided) ideal $I$, which is therefore simple. Since $R$ is semisimple, $I$ must be a direct summand of $R$ (AS A LEFT $R$-module). Thus, $R = I \oplus J$ for some (left) ideal $J$. Then $1 = i + j$ for some $i \in I$ and $j \in J$ . Note that $I$ and $J$ are both nontrivial.
@@ -400,13 +414,6 @@ The proof is heavily based on \cite{bresar2024wedderburnartintheorem}
       \end{proof}
 
       \begin{claim}
-        Both $I$ and $J$ are artinian.
-      \end{claim}
-      \begin{proof}
-        They are both submodules of $R$ which is assumed to be artinian. Submodules of artinian modules are artinian. Note that $R$ is artinian since it is semisimple.
-      \end{proof}
-
-      \begin{claim}
         $ R = I \times J$ as rings.
       \end{claim}
       \begin{proof}
@@ -418,10 +425,26 @@ The proof is heavily based on \cite{bresar2024wedderburnartintheorem}
       \end{proof}
 
       \begin{claim}
+        Let $K \subseteq I$ be a left $I$-submodule of $I$, where $I$ is treated as a unital ring. Then $K$ is a left submodule of $R$.
+      \end{claim}
+      \begin{proof}
+        Let $r \in R$ and $x \in K$. Then $r k = r 1 k = r (i + j) k = r i k + r j k = r i k \in K$ since $k \in K$, $r i \in I$ and $r j k = 0$ as $j \in J$ and $k \in I$ and we know $J I = 0$. Thus $K$ is closed under left multiplication by element of $R$.
+      \end{proof}
+
+      \begin{claim}
+        Both $I$ and $J$ are artinian (as rings).
+      \end{claim}
+      \begin{proof}
+        They are both submodules of $R$ which is assumed to be artinian. Submodules of artinian modules are artinian. Note that $R$ is artinian since it is semisimple. Thus they are artinian as left $R$-modules.
+
+        Let $K_1 \supseteq K_2 \supseteq \ldots$ be a descending chain of left ideals (modules) in ring $I$. By the previous claim, they are also left ideals in $R$. Since $R$ is artinian, this chain stabilizes. But then so does $K_1 \supseteq K_2 \supseteq \ldots$. Thus $I$ is artinian. Same argument applies to $J$.
+      \end{proof}
+
+      \begin{claim}
         $J$ is (left) semisimple.
       \end{claim}
       \begin{proof}
-        A submodule of a semisimple module is semisimple.
+        A submodule of a semisimple module is semisimple. Thus $J$ is semisimple as a left $R$-module. Let $K \subseteq J$ be a left $J$-submodule. Then $K$ is a left $R$-submodule by the previous claim. Since $R$ is semisimple, every submodules of a submodules has a direct complement, call it $K'$. Then $J = K \oplus K'$, as $R$-modules. Since $K'$ is a left $R$-submodule, it is also a left $J$-submodule. Thus $J$ is semisimple as a left $J$-module.
       \end{proof}
 
       Thus, we can repeat the process of splitting $J$ (if it is not simple) into a direct product of simple, artinian rings. Since $R$ is artinian, this process must stabilize, and we get a direct product of simple, artinian rings.
