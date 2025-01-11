@@ -64,13 +64,6 @@ theorem one_sub_e_larger_span_on_sub_e_sub_f (e f : R) (ef_ort_idem : AreOrthogo
 
 
 
--- maybe split this up into multiple definitions
-class hasMatrixUnits (R : Type*) [Ring R] (n : ℕ) where -- Done by Job
-  es : Fin n → Fin n → R
-  diag_sum_eq_one : ∑ i, es i i = 1
-  mul_ij_kl_eq_kron_delta_jk_mul_es_il : ∀ i j k l, es i j * es k l = (if j = k then es i l else 0)
-
-
 
 
 def HasMatrixUnits (R : Type*) [Ring R] (n : ℕ) : Prop := ∃ (es : Fin n → Fin n → R), (∑ i, es i i = 1) ∧ (∀ i j k l, es i j * es k l = (if j = k then es i l else 0)) -- Done by Job (as class - see above) and rewritten by Matevz (as def)
@@ -102,8 +95,6 @@ variable (e : R)
 variable (idem_e : IsIdempotentElem e)
 
 
-def PairwiseOrthogonal (a b : R) : Prop := a * b = 0 ∧ b * a = 0
-
 
 def kronecker_delta (n : ℕ) (i j : Fin n) : R :=
   if i = j then 1 else 0
@@ -115,6 +106,9 @@ def kronecker_delta (n : ℕ) (i j : Fin n) : R :=
 -- and e1i ∈ e11Reii for all i in {2, ..., n}
 -- and e1iei1 = e11 and ei1e1i = eii for all i in {2, ..., n}
 -- conclusion: has matrix units R
+
+def PairwiseOrthogonal (a b : R) : Prop := a * b = 0 ∧ b * a = 0
+
 theorem OrtIdem_imply_MatUnits {n : ℕ} (hn : 0 < n) -- Done by Matevz
   (diag_es : Fin n → R)
   (idem : (∀ i : Fin n, IsIdempotentElem (diag_es i))) -- idempotent

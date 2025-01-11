@@ -276,6 +276,3 @@ def ring_to_matrix_iso [mu : hasMatrixUnits R n] : R ≃+* Matrix (Fin n) (Fin n
 noncomputable
 def ring_with_matrix_units_isomorphic_to_matrix_ring (n : ℕ) (hn : 0 < n)(mu : hasMatrixUnits R n) :
   R ≃+* Matrix (Fin n) (Fin n) (@e00_cornerring R _ n hn mu) := ring_to_matrix_iso R
-
-def PairwiseOrthogonal {R : Type*} [Ring R](e f : R) := e * f  = 0
-  -- show that this map is
