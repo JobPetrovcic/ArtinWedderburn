@@ -99,9 +99,18 @@ theorem is_right_unit : ∀ (x : CornerSubring idem_e), x * 1 = x := by -- Done 
 instance CornerRingIsRing (idem_e : IsIdempotentElem e) : Ring (CornerSubring idem_e) := non_unital_w_e_is_ring 1 (is_left_unit idem_e) (is_right_unit idem_e) -- Done by Job
 
 
--- I left ideal in eRe -> RI is a left ideal in R -- Maša
 
--- I ⊆ J -> RI ⊆ RJ -- Maša
+
+
+-- I left ideal in eRe -> RI is a left ideal in R
+def ideal_lift (I : Ideal (CornerSubring idem_e)) : Ideal R := sorry -- Maša
+
+-- I ⊆ J -> RI ⊆ RJ
+theorem lift_monotonicity (I J : Ideal (CornerSubring idem_e)) : I ≤ J → (ideal_lift idem_e I) ≤ (ideal_lift idem_e J) := sorry -- Maša
+
+
+
+
 
 -- Lemma 2.10
 -- a) If R is artinian, then the corner ring is artinian
