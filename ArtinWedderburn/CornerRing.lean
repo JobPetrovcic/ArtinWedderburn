@@ -6,6 +6,7 @@ import ArtinWedderburn.PrimeRing
 import ArtinWedderburn.NonUnitalToUnital
 import Mathlib.Algebra.Ring.MinimalAxioms
 import ArtinWedderburn.PrimeRing
+import Mathlib.RingTheory.Ideal.Span
 
 variable {R : Type*} [Ring R]
 variable {e : R}
@@ -99,25 +100,27 @@ theorem is_right_unit : ∀ (x : CornerSubring idem_e), x * 1 = x := by -- Done 
 instance CornerRingIsRing (idem_e : IsIdempotentElem e) : Ring (CornerSubring idem_e) := non_unital_w_e_is_ring 1 (is_left_unit idem_e) (is_right_unit idem_e) -- Done by Job
 
 
-
+-- coercions from Sets of CornerSubrings to Set of R
+instance : CoeOut (Set (CornerSubring idem_e)) (Set R) := {coe := fun X => Set.image Subtype.val X}
 
 
 -- I left ideal in eRe -> RI is a left ideal in R
-def ideal_lift (I : Ideal (CornerSubring idem_e)) : Ideal R := sorry -- Maša
+def ideal_lift (I : Ideal (CornerSubring idem_e)) : Ideal R := Ideal.span (I.carrier) -- Maša
+
+-- coercion from Ideals of CornerSubrings to Ideals of R
+instance : CoeOut (Ideal (CornerSubring idem_e)) (Ideal R) := {coe := ideal_lift idem_e} -- Maša
 
 -- I ⊆ J -> RI ⊆ RJ
-theorem lift_monotonicity (I J : Ideal (CornerSubring idem_e)) : I ≤ J → (ideal_lift idem_e I) ≤ (ideal_lift idem_e J) := sorry -- Maša
-
-
-
+theorem lift_monotonicity (I J : Ideal (CornerSubring idem_e)) : I ≤ J → (ideal_lift idem_e I) ≤ (ideal_lift idem_e J) := by -- Maša
+  intro I_leq_J
+  apply Ideal.span_mono
+  exact Set.image_mono I_leq_J
 
 
 -- Lemma 2.10
 -- a) If R is artinian, then the corner ring is artinian
-theorem corner_ring_artinian [IsArtinian R R] : IsArtinian (CornerSubring idem_e) (CornerSubring idem_e) := by sorry -- Mikita
+theorem corner_ring_artinian [IsArtinian R R] : IsArtinian (CornerSubring idem_e) (CornerSubring idem_e) := by sorry -- Maša
 
--- coercions from Sets of CornerSubrings to Set of R
-instance : CoeOut (Set (CornerSubring idem_e)) (Set R) := {coe := fun X => Set.image Subtype.val X}
 
 theorem corner_ring_both_mul_mem' (x y : CornerSubring idem_e) (w : R) : x * w * y ∈ CornerSubring idem_e := by
   apply corner_ring_both_mul_mem
