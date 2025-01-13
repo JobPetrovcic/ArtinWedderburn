@@ -245,9 +245,9 @@ theorem minimal_ideal_I_sq_nonzero_exists_idem (h_atom_I : IsAtom I) (hII : I * 
 
 
 
-def IsDivisionSubring (S : NonUnitalSubring R) (e : R) : Prop := ∀ x : R, x ∈ S → x ≠ 0 → ∃ y : R, y * x = e -- Done by Matevz
+def IsDivisionSubring (S : NonUnitalSubring R) (e : R) : Prop := (∃ x : R, x ∈ S ∧ x ≠ 0) ∧ (∀ x : R, x ∈ S → x ≠ 0 → ∃ y : R, y ∈ S ∧ y * x = e) -- Done by Matevz
 
-def IsDivisionRing (R : Type*) [Ring R] : Prop := ∀ x : R, x ≠ 0 → ∃ y : R, y * x = 1 -- Done by Matevz
+def IsDivisionRing (R : Type*) [Ring R] : Prop := (∃ x : R, x ≠ 0) ∧ (∀ x : R, x ≠ 0 → ∃ y : R, y * x = 1) -- Done by Matevz
 
 -- If at some point we decide to define division ring as a ring in which every nonzero element has a two sided inverse
 --theorem left_inv_implies_divring (h : ∀ x : R, x ≠ 0 → ∃ y : R, y * x = 0) : IsDivisionRing R := by trivial -- Done by Matevz
@@ -256,29 +256,39 @@ def IsDivisionRing (R : Type*) [Ring R] : Prop := ∀ x : R, x ≠ 0 → ∃ y :
 -- hypothesis: I^2 ≠ ⊥ and I is a minimal left ideal
 -- conclusion: there exists an idempotent e in I such that I = Re and eRe is a Division Ring (TODO) Dude this has to be divided into multiple lemmas
 
-theorem corner_ring_div (h_atom_I : IsAtom I) (e : R) (e_in_I : e ∈ I) : IsDivisionSubring (CornerSubringNonUnital e) e := by -- Done by Matevz
-  intro x hx
-  unfold CornerSubringNonUnital at hx
-  obtain ⟨r, _, _⟩ := hx
-  intro erenz
-  have hsubI : left_ideal_of_element (e * r * e) ≤ I := by
-    rintro x ⟨y, hy⟩
-    have hx : x = (y * e * r) * e := by calc
-      x = y * (e * r * e) := hy
-      _ = (y * e * r) * e := by noncomm_ring
-    rw [hx]
-    exact Ideal.mul_mem_left I (y * e * r) e_in_I
-  have hnz : left_ideal_of_element (e * r * e) ≠ ⊥ := by
-    refine ideal_neq_bot_if_has_nonzero_el (left_ideal_of_element (e * r * e)) ?h
-    use e * r * e
+theorem corner_ring_div (h_atom_I : IsAtom I) (e : R) (e_in_I : e ∈ I) (henz : e ≠ 0) (he_idem : IsIdempotentElem e) : IsDivisionSubring (CornerSubringNonUnital e) e := by -- Done by Matevz
+  constructor
+  · use e
     constructor
-    · use 1
-      simp
-    · exact erenz
-  have heq : left_ideal_of_element (e * r * e) = I := nonzero_ideal_in_min_ideal I (left_ideal_of_element (e * r * e)) h_atom_I hnz hsubI
-  obtain ⟨s, hs⟩ := (Ideal.ext_iff.mp heq e).mpr e_in_I
-  use s
-  exact id (Eq.symm hs)
+    · use e
+      rw [he_idem, he_idem]
+    · exact henz
+  · intro x hx
+    unfold CornerSubringNonUnital at hx
+    obtain ⟨r, _, _⟩ := hx
+    intro erenz
+    have hsubI : left_ideal_of_element (e * r * e) ≤ I := by
+      rintro x ⟨y, hy⟩
+      have hx : x = (y * e * r) * e := by calc
+        x = y * (e * r * e) := hy
+        _ = (y * e * r) * e := by noncomm_ring
+      rw [hx]
+      exact Ideal.mul_mem_left I (y * e * r) e_in_I
+    have hnz : left_ideal_of_element (e * r * e) ≠ ⊥ := by
+      refine ideal_neq_bot_if_has_nonzero_el (left_ideal_of_element (e * r * e)) ?k
+      use e * r * e
+      constructor
+      · use 1
+        simp
+      · exact erenz
+    have heq : left_ideal_of_element (e * r * e) = I := nonzero_ideal_in_min_ideal I (left_ideal_of_element (e * r * e)) h_atom_I hnz hsubI
+    obtain ⟨s, hs⟩ := (Ideal.ext_iff.mp heq e).mpr e_in_I
+    use e * s * e
+    constructor
+    · use s
+    · calc (e * s * e) * (e * r * e) = e * s * (e * e) * r * e := by noncomm_ring
+        _ = e * (s * (e * r * e)) := by rw [he_idem]; noncomm_ring
+        _ = e := by rw [←hs,he_idem]
 
 
 
@@ -295,4 +305,4 @@ theorem minimal_ideal_I_sq_nonzero_exists_idem_and_div (h_atom_I : IsAtom I) (hI
       · exact he_idem
       · constructor
         · trivial
-        · exact corner_ring_div (Ideal.span {e}) h_atom_I e he
+        · exact corner_ring_div (Ideal.span {e}) h_atom_I e he henz he_idem
