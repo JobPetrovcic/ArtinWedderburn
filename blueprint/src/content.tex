@@ -6,7 +6,17 @@
 % the current file can be a simple sequence of \input. Otherwise It
 % can start with a \section or \chapter for instance.
 
-The proof is heavily based on \cite{bresar2024wedderburnartintheorem}
+\section{Current division of team work}
+
+Summary: we have defined the necessary structures that are used in the proof. Namely, ideal products, the corner ring, and matrix units. We have proved two major auxiliary theorems that are used in the proof of the main theorem: Brauer's lemma and theorem \ref{thm:orthogonal_idempotents_division_ring_matrix}. Our next target is theorem \ref{thm:orthogonal_idempotents_division_ring} which is the last prerequisite of the main theorem. After that, we will split the proof of the main theorem into manageable parts.
+
+\begin{itemize}
+  \item \textbf{Matevž Miščič: } Has done some major parts of the proof: theorem \ref{thm:prime_ring_equiv}, properties of ideal products and set-like products, properties of corner rings, Brauer's lemma, theorem \ref{thm:all_left_inv_div_ring}, theorem \ref{thm:criterion_for_matrix_units}, and theorem \ref{thm:one_sub_e_larger_span_on_sub_e_sub_f}. Now he is helping the new members.
+  \item \textbf{Maša Žaucer: } Assigned and working on theorem \ref{thm:corner_ring_artinian} and theorem \ref{thm:orthogonal_idempotents_division_ring} as an introduction to the project. After that, she will split the proof of the main theorem \ref{thm:artin_wedderburn_for_prime}. This will include setting up the definitions of subrings for which the conclusion of the statement holds. A handful of intermediary lemmas will be needed to enable the use of the artinian property.
+  \item \textbf{Mikita Barodka: } Working on theorem \ref{thm:prime_ring_equiv'}. After that he will either help Maša with the main theorem or will start working on the generalized theorem. This again will include splitting up the proof of the generalization into smaller parts: the decomposition of the (sub)rings into the direct sum of (two-sided) ideals, proving such ideals are semisimple as rings, proving orthogonality of the ideals, and setting up the use of the artinian property.
+  \item \textbf{Job Petrovčič: } Has done some major parts of the proof: initial project setup, definition of ideal products, definition of corner ring, basic properties of corner rings, definition of matrix units, and theorem \ref{thm:orthogonal_idempotents_division_ring_matrix}. Now he is helping the new members.
+\end{itemize}
+If time permits, we will work on the uniqueness part of the proof.
 
 \section{Preliminaries}
   \begin{definition}
@@ -75,6 +85,7 @@ The proof is heavily based on \cite{bresar2024wedderburnartintheorem}
   \end{definition}
 
 \section{Proof of Artin-Wedderburn Theorem for prime and simple rings}
+The proof is heavily based on \cite{bresar2024wedderburnartintheorem}.
   \begin{theorem}
     \label{thm:one_sub_e_larger_span_on_sub_e_sub_f}
     %\lean{one_sub_e_larger_span_on_sub_e_sub_f}
@@ -171,7 +182,7 @@ The proof is heavily based on \cite{bresar2024wedderburnartintheorem}
   \begin{theorem}
     \label{thm:brauer_lemma}
     \uses{thm:all_left_inv_div_ring}
-    %\leanok{minimal_ideal_I_sq_nonzero_exists_idem}
+    %\lean{minimal_ideal_I_sq_nonzero_exists_idem}
     Suppose $L$ is a minimal (left) ideal of $R$ and $L^2 \neq 0$. Then there exists an idempotent $e \in L$ such that $L = Re$ and $eRe$ is a division ring.
   \end{theorem}
   \begin{proof}
