@@ -62,3 +62,5 @@ def left_ideal_of_element (a : R) : Ideal R := {
     rw [hr]
     noncomm_ring
 }
+
+theorem carrier_of_left_ideal_of_element (a : R) : (left_ideal_of_element a).carrier = left_mul a := rfl

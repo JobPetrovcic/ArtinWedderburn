@@ -3,6 +3,7 @@ import Mathlib.Algebra.Field.Defs
 import Mathlib.RingTheory.SimpleRing.Basic
 import Mathlib.Algebra.Ring.Idempotents
 import Mathlib.RingTheory.TwoSidedIdeal.Operations
+import Mathlib.Algebra.Group.Submonoid.Basic
 
 def both_mul {R : Type*}[Ring R] (a b : R): Set R := {x | ∃ r : R, x = a * r * b}
 -- TODO : A better notation?
@@ -64,10 +65,6 @@ namespace TwoSidedIdealProd
   variable (Γ : Type) [AddGroup Γ]
   variable (G H F : AddSubgroup Γ)
 
-  -- Associativity of ideal product
-  -- Technically not needed, but would be a useful addition to the library
-  --theorem mul_two_sided_ideal_assoc (I J K : TwoSidedIdeal R) : (I * J) * K = I * (J * K) := by sorry
-
   theorem ideal_eq_span (I : TwoSidedIdeal R): I = TwoSidedIdeal.span I := by
     apply le_antisymm
     {exact @TwoSidedIdeal.subset_span R _ ↑I}
@@ -86,8 +83,7 @@ namespace TwoSidedIdealProd
     apply TwoSidedIdeal.set_mul_subset
     trivial
 
-  -- Not needed, but would be a useful addition to the library
-  --instance : Semigroup (TwoSidedIdeal R) := by sorry
+
 
   theorem mul_top (I : TwoSidedIdeal R) : I * ⊤ = I := by
     apply le_antisymm
@@ -119,13 +115,125 @@ namespace TwoSidedIdealProd
       trivial
     }
 
-  -- Already proven if we know that it is a semigroup
+  theorem ideal_prod_subgroup_pair_products(I J : TwoSidedIdeal R) : (((I * J) : TwoSidedIdeal R) : Set R) = AddSubgroup.closure ((I : Set R) * (J : Set R)) := by
+    ext x
+    apply TwoSidedIdeal.mem_span_iff_mem_addSubgroup_closure_absorbing
+    {
+      rintro y z ⟨i, hi, j, hj, k⟩
+      simp only at k
+      rw [←k, ←mul_assoc]
+      refine mul_mem_mul ?h.h_left.intro.intro.intro.intro.a hj
+      simp only [SetLike.mem_coe]
+      exact TwoSidedIdeal.mul_mem_left I y i hi
+    }
+    {
+      intro y z ⟨i, hi, j, hj, k⟩
+      simp only at k
+      rw [←k, mul_assoc]
+      refine mul_mem_mul hi ?h.h_right.intro.intro.intro.intro.a
+      simp only [SetLike.mem_coe]
+      exact TwoSidedIdeal.mul_mem_right J j z hj
+    }
+
+  #check AddSubgroup.mul
+  theorem subgroup_product_eq (A B C : AddSubgroup R) : AddSubgroup.closure ((((AddSubgroup.closure ((A : Set R) * (B : Set R)))) : Set R) * (C : Set R)) = AddSubgroup.closure ((A : Set R) * (B: Set R) * (C : Set R)) :=
+    by
+      apply le_antisymm
+      {
+        rw [AddSubgroup.closure_le]
+        rintro x ⟨y, hy, c, hc, h⟩
+        simp at h
+        rw [←h]
+        clear h
+        induction hy using AddSubgroup.closure_induction with
+        | mem z hz => {
+          have ⟨a, ha, b, hb, k⟩ := hz
+          simp at k
+          rw [←k]
+          have habc : a * b * c ∈ (A : Set R) * (B: Set R) * (C : Set R) := by {
+            use a * b
+            use ⟨a, ⟨ha, ⟨b, ⟨hb, by simp only⟩⟩⟩⟩
+            use c
+          }
+          exact AddSubgroup.subset_closure habc
+        }
+        | one => {simp only [zero_mul, SetLike.mem_coe];apply AddSubgroup.zero_mem _
+        }
+        | mul t u ht hu hh k => {rw [right_distrib];apply AddSubgroup.add_mem;exact hh;exact k}
+        | inv t ht hh => {rw [neg_mul];apply AddSubgroup.neg_mem;exact hh}
+      }
+      {
+        apply AddSubgroup.closure_mono
+        apply mul_subset_mul_right
+        exact AddSubgroup.subset_closure
+      }
+  -- same as subgroup_product_eq but different order
+  theorem product_subgroup_eq (A B C : AddSubgroup R) : AddSubgroup.closure ((A : Set R) * (AddSubgroup.closure ((B : Set R) * (C : Set R)) : Set R)) = AddSubgroup.closure ((A : Set R) * (B : Set R) * (C : Set R)) := by
+      apply le_antisymm
+      {
+        rw [AddSubgroup.closure_le]
+        rintro x ⟨a, ha, y, hy, h⟩
+        simp at h
+        rw [←h]
+        clear h
+        induction hy using AddSubgroup.closure_induction with
+        | mem z hz => {
+          have ⟨b, hb, c, hc, k⟩ := hz
+          simp at k
+          rw [←k]
+          have habc : a * b * c ∈ (A : Set R) * (B: Set R) * (C : Set R) := by {
+            use a * b
+            use ⟨a, ⟨ha, ⟨b, ⟨hb, by simp only⟩⟩⟩⟩
+            use c
+          }
+          rw [←mul_assoc]
+          exact AddSubgroup.subset_closure habc
+        }
+        | one => {simp only [mul_zero, SetLike.mem_coe]; apply AddSubgroup.zero_mem _
+        }
+        | mul t u ht hu hh k => {rw [left_distrib];apply AddSubgroup.add_mem;exact hh;exact k}
+        | inv t ht hh => {simp only [mul_neg, SetLike.mem_coe, neg_mem_iff];exact hh}
+      }
+      {
+        apply AddSubgroup.closure_mono
+        rw [mul_assoc]
+        apply mul_subset_mul_left
+        exact AddSubgroup.subset_closure
+      }
+
+  def two_sided_ideal_to_subgroup (I : TwoSidedIdeal R) : AddSubgroup R :=
+    {
+      carrier := I,
+      zero_mem' := I.zero_mem,
+      add_mem' := I.add_mem,
+      neg_mem' := I.neg_mem
+    }
+
+  theorem subgroup_of_ideal_carrier_eq_carrier (I : TwoSidedIdeal R) : ((two_sided_ideal_to_subgroup I) : Set R) = I := rfl
+
+  theorem ideal_product_subgroup_eq (A B C  : TwoSidedIdeal R) : AddSubgroup.closure ((((AddSubgroup.closure ((A : Set R) * (B : Set R)))) : Set R) * (C : Set R)) = AddSubgroup.closure ((A : Set R) * (B : Set R) * (C : Set R)) := by
+      have k := subgroup_product_eq (two_sided_ideal_to_subgroup A) (two_sided_ideal_to_subgroup B) (two_sided_ideal_to_subgroup C)
+      rw [subgroup_of_ideal_carrier_eq_carrier, subgroup_of_ideal_carrier_eq_carrier, subgroup_of_ideal_carrier_eq_carrier] at k
+      exact k
+
+  theorem product_ideal_subgroup_eq (A B C : TwoSidedIdeal R) : AddSubgroup.closure ((A : Set R) * (AddSubgroup.closure ((B : Set R) * (C : Set R)) : Set R)) = AddSubgroup.closure ((A : Set R) * (B : Set R) * (C : Set R)) :=
+    by
+      have k := product_subgroup_eq (two_sided_ideal_to_subgroup A) (two_sided_ideal_to_subgroup B) (two_sided_ideal_to_subgroup C)
+      rw [subgroup_of_ideal_carrier_eq_carrier, subgroup_of_ideal_carrier_eq_carrier, subgroup_of_ideal_carrier_eq_carrier] at k
+      exact k
+
+  theorem ideal_mul_assoc (I J K : TwoSidedIdeal R) :  (I * J) * K = I * (J * K) := by
+    refine ideal_eq_set_eq  (I * J * K) (I * (J * K)) ?h
+    rw [ideal_prod_subgroup_pair_products, ideal_prod_subgroup_pair_products, ideal_product_subgroup_eq, ←product_ideal_subgroup_eq, ←ideal_prod_subgroup_pair_products, ←ideal_prod_subgroup_pair_products]
+
   -- Not needed, but would be a useful addition to the library
-  --@[simp]
-  --instance MulTwoSidedisMonoid: Monoid (TwoSidedIdeal R) :=
-  --{
-  --  one := ⊤,
-  --  one_mul := top_mul
-  --  mul_one := mul_top
-  --}
+  instance : Semigroup (TwoSidedIdeal R) := {mul_assoc := ideal_mul_assoc}
+  @[simp]
+  instance MulTwoSidedisMonoid: Monoid (TwoSidedIdeal R) :=
+  {
+    one := ⊤,
+    one_mul := top_mul
+    mul_one := mul_top
+  }
+
 end TwoSidedIdealProd
