@@ -135,8 +135,7 @@ namespace TwoSidedIdealProd
       exact TwoSidedIdeal.mul_mem_right J j z hj
     }
 
-  #check AddSubgroup.mul
-  theorem subgroup_product_eq (A B C : AddSubgroup R) : AddSubgroup.closure ((((AddSubgroup.closure ((A : Set R) * (B : Set R)))) : Set R) * (C : Set R)) = AddSubgroup.closure ((A : Set R) * (B: Set R) * (C : Set R)) :=
+  theorem subgroup_product_eq (A B C : AddSubgroup R) : AddSubgroup.closure ((((AddSubgroup.closure ((A : Set R) * (B : Set R)))) : Set R) * (C : Set R)) = AddSubgroup.closure ((A : Set R) * (B: Set R) * (C : Set R)) :=  -- Done by Job
     by
       apply le_antisymm
       {
@@ -168,7 +167,7 @@ namespace TwoSidedIdealProd
         exact AddSubgroup.subset_closure
       }
   -- same as subgroup_product_eq but different order
-  theorem product_subgroup_eq (A B C : AddSubgroup R) : AddSubgroup.closure ((A : Set R) * (AddSubgroup.closure ((B : Set R) * (C : Set R)) : Set R)) = AddSubgroup.closure ((A : Set R) * (B : Set R) * (C : Set R)) := by
+  theorem product_subgroup_eq (A B C : AddSubgroup R) : AddSubgroup.closure ((A : Set R) * (AddSubgroup.closure ((B : Set R) * (C : Set R)) : Set R)) = AddSubgroup.closure ((A : Set R) * (B : Set R) * (C : Set R)) := by  -- Done by Job
       apply le_antisymm
       {
         rw [AddSubgroup.closure_le]
@@ -201,7 +200,7 @@ namespace TwoSidedIdealProd
         exact AddSubgroup.subset_closure
       }
 
-  def two_sided_ideal_to_subgroup (I : TwoSidedIdeal R) : AddSubgroup R :=
+  def two_sided_ideal_to_subgroup (I : TwoSidedIdeal R) : AddSubgroup R :=  -- Done by Job
     {
       carrier := I,
       zero_mem' := I.zero_mem,
@@ -209,27 +208,27 @@ namespace TwoSidedIdealProd
       neg_mem' := I.neg_mem
     }
 
-  theorem subgroup_of_ideal_carrier_eq_carrier (I : TwoSidedIdeal R) : ((two_sided_ideal_to_subgroup I) : Set R) = I := rfl
+  theorem subgroup_of_ideal_carrier_eq_carrier (I : TwoSidedIdeal R) : ((two_sided_ideal_to_subgroup I) : Set R) = I := rfl  -- Done by Job
 
-  theorem ideal_product_subgroup_eq (A B C  : TwoSidedIdeal R) : AddSubgroup.closure ((((AddSubgroup.closure ((A : Set R) * (B : Set R)))) : Set R) * (C : Set R)) = AddSubgroup.closure ((A : Set R) * (B : Set R) * (C : Set R)) := by
+  theorem ideal_product_subgroup_eq (A B C  : TwoSidedIdeal R) : AddSubgroup.closure ((((AddSubgroup.closure ((A : Set R) * (B : Set R)))) : Set R) * (C : Set R)) = AddSubgroup.closure ((A : Set R) * (B : Set R) * (C : Set R)) := by  -- Done by Job
       have k := subgroup_product_eq (two_sided_ideal_to_subgroup A) (two_sided_ideal_to_subgroup B) (two_sided_ideal_to_subgroup C)
       rw [subgroup_of_ideal_carrier_eq_carrier, subgroup_of_ideal_carrier_eq_carrier, subgroup_of_ideal_carrier_eq_carrier] at k
       exact k
 
-  theorem product_ideal_subgroup_eq (A B C : TwoSidedIdeal R) : AddSubgroup.closure ((A : Set R) * (AddSubgroup.closure ((B : Set R) * (C : Set R)) : Set R)) = AddSubgroup.closure ((A : Set R) * (B : Set R) * (C : Set R)) :=
+  theorem product_ideal_subgroup_eq (A B C : TwoSidedIdeal R) : AddSubgroup.closure ((A : Set R) * (AddSubgroup.closure ((B : Set R) * (C : Set R)) : Set R)) = AddSubgroup.closure ((A : Set R) * (B : Set R) * (C : Set R)) :=  -- Done by Job
     by
       have k := product_subgroup_eq (two_sided_ideal_to_subgroup A) (two_sided_ideal_to_subgroup B) (two_sided_ideal_to_subgroup C)
       rw [subgroup_of_ideal_carrier_eq_carrier, subgroup_of_ideal_carrier_eq_carrier, subgroup_of_ideal_carrier_eq_carrier] at k
       exact k
 
-  theorem ideal_mul_assoc (I J K : TwoSidedIdeal R) :  (I * J) * K = I * (J * K) := by
+  theorem ideal_mul_assoc (I J K : TwoSidedIdeal R) :  (I * J) * K = I * (J * K) := by -- Done by Job
     refine ideal_eq_set_eq  (I * J * K) (I * (J * K)) ?h
     rw [ideal_prod_subgroup_pair_products, ideal_prod_subgroup_pair_products, ideal_product_subgroup_eq, ←product_ideal_subgroup_eq, ←ideal_prod_subgroup_pair_products, ←ideal_prod_subgroup_pair_products]
 
   -- Not needed, but would be a useful addition to the library
-  instance : Semigroup (TwoSidedIdeal R) := {mul_assoc := ideal_mul_assoc}
+  instance : Semigroup (TwoSidedIdeal R) := {mul_assoc := ideal_mul_assoc} -- Done by Job
   @[simp]
-  instance MulTwoSidedisMonoid: Monoid (TwoSidedIdeal R) :=
+  instance MulTwoSidedisMonoid: Monoid (TwoSidedIdeal R) := -- Done by Job
   {
     one := ⊤,
     one_mul := top_mul
