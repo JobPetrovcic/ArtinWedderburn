@@ -144,6 +144,21 @@ theorem lift_acc_then_ideal_acc (idem_e : IsIdempotentElem e) (J : Ideal R) (h_J
 
 
 
+-- Lemma 2.10
+-- a) If R is artinian, then the corner ring is artinian
+theorem corner_ring_artinian [h_ar : IsArtinian R R] : IsArtinian (CornerSubring idem_e) (CornerSubring idem_e) := by
+  unfold IsArtinian at *
+  unfold WellFoundedLT at *
+  have Iacc : ∀ I : Ideal R, Acc (fun x y => x < y) I := by
+    intro I
+    exact WellFounded.apply h_ar.wf I
+  apply IsWellFounded.mk
+  have allacc : ∀ I : Ideal (CornerSubring idem_e), Acc (fun x y => x < y) I := by
+    intro I
+    have h : Acc (fun x y => x < y) (ideal_push idem_e (ideal_lift idem_e I)) := lift_acc_then_ideal_acc idem_e I (by use I) (Iacc (ideal_lift idem_e I))
+    rw [push_pull idem_e I] at h
+    exact h
+  exact WellFounded.intro allacc
 
 
 theorem corner_ring_both_mul_mem' (x y : CornerSubring idem_e) (w : R) : x * w * y ∈ CornerSubring idem_e := by
