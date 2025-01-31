@@ -117,19 +117,18 @@ theorem lift_monotonicity (I J : Ideal (CornerSubring idem_e)) : I ≤ J → (id
   exact Set.image_mono I_leq_J
 
 
-theorem corner_ring_art_to_acc (I : Ideal (CornerSubring idem_e)) (h : Acc (fun x y => x < y) (ideal_lift idem_e I)) : Acc (fun x y => x < y) I := by
-  cases h with
-  | intro _ h2 => sorry
 
-theorem lift_strict_monotonicity (I J : Ideal (CornerSubring idem_e)) : I < J → (ideal_lift idem_e I) < (ideal_lift idem_e J) := sorry
 
 def ideal_push (idem_e : IsIdempotentElem e) (J : Ideal R) : Ideal (CornerSubring idem_e) := sorry
 
 theorem push_pull (idem_e : IsIdempotentElem e) (I : Ideal (CornerSubring idem_e)) : ideal_push idem_e (ideal_lift idem_e I) = I := sorry
 
+-- I have put this below push_pull, because it can be proved using push_pull and lift_monotonicity
+theorem lift_strict_monotonicity (I J : Ideal (CornerSubring idem_e)) : I < J → (ideal_lift idem_e I) < (ideal_lift idem_e J) := sorry
 
 
-theorem lift_acc_then_ideal_acc (idem_e : IsIdempotentElem e) (J : Ideal R) (h_J_is_lift : ∃ I3 : Ideal (CornerSubring idem_e), J = ideal_lift idem_e I3) (h_acc_J : Acc (fun x y => x < y) J) : Acc (fun x y => x < y) (ideal_push idem_e J) := by
+
+theorem lift_acc_then_ideal_acc (idem_e : IsIdempotentElem e) (J : Ideal R) (h_J_is_lift : ∃ I3 : Ideal (CornerSubring idem_e), J = ideal_lift idem_e I3) (h_acc_J : Acc (fun x y => x < y) J) : Acc (fun x y => x < y) (ideal_push idem_e J) := by -- done by Matevz
   induction h_acc_J with
   | intro J2 h_acc_j2 hi =>
     obtain ⟨I, hI⟩ := h_J_is_lift
@@ -146,7 +145,7 @@ theorem lift_acc_then_ideal_acc (idem_e : IsIdempotentElem e) (J : Ideal R) (h_J
 
 -- Lemma 2.10
 -- a) If R is artinian, then the corner ring is artinian
-theorem corner_ring_artinian [h_ar : IsArtinian R R] : IsArtinian (CornerSubring idem_e) (CornerSubring idem_e) := by
+theorem corner_ring_artinian [h_ar : IsArtinian R R] : IsArtinian (CornerSubring idem_e) (CornerSubring idem_e) := by -- done by Matevz
   unfold IsArtinian at *
   unfold WellFoundedLT at *
   have Iacc : ∀ I : Ideal R, Acc (fun x y => x < y) I := by
