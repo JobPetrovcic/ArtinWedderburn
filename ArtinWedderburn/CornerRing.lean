@@ -129,6 +129,22 @@ theorem push_pull (idem_e : IsIdempotentElem e) (I : Ideal (CornerSubring idem_e
 
 
 
+theorem lift_acc_then_ideal_acc (idem_e : IsIdempotentElem e) (J : Ideal R) (h_J_is_lift : ∃ I3 : Ideal (CornerSubring idem_e), J = ideal_lift idem_e I3) (h_acc_J : Acc (fun x y => x < y) J) : Acc (fun x y => x < y) (ideal_push idem_e J) := by
+  induction h_acc_J with
+  | intro J2 h_acc_j2 hi =>
+    obtain ⟨I, hI⟩ := h_J_is_lift
+    rw [hI, push_pull idem_e I]
+    have c1 : (I2 : Ideal (CornerSubring idem_e)) → I2 < I → Acc (fun x y => x < y) I2 := by
+      intro I2 hI2
+      rw [←push_pull idem_e I2]
+      have subJ2 := (lift_strict_monotonicity idem_e I2 I) hI2
+      rw [←hI] at subJ2
+      exact hi (ideal_lift idem_e I2) subJ2 (by use I2)
+    exact Acc.intro I c1
+
+
+
+
 
 theorem corner_ring_both_mul_mem' (x y : CornerSubring idem_e) (w : R) : x * w * y ∈ CornerSubring idem_e := by
   apply corner_ring_both_mul_mem
