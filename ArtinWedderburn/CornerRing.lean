@@ -117,9 +117,17 @@ theorem lift_monotonicity (I J : Ideal (CornerSubring idem_e)) : I ≤ J → (id
   exact Set.image_mono I_leq_J
 
 
--- Lemma 2.10
--- a) If R is artinian, then the corner ring is artinian
-theorem corner_ring_artinian [IsArtinian R R] : IsArtinian (CornerSubring idem_e) (CornerSubring idem_e) := by sorry -- Maša
+theorem corner_ring_art_to_acc (I : Ideal (CornerSubring idem_e)) (h : Acc (fun x y => x < y) (ideal_lift idem_e I)) : Acc (fun x y => x < y) I := by
+  cases h with
+  | intro _ h2 => sorry
+
+theorem lift_strict_monotonicity (I J : Ideal (CornerSubring idem_e)) : I < J → (ideal_lift idem_e I) < (ideal_lift idem_e J) := sorry
+
+def ideal_push (idem_e : IsIdempotentElem e) (J : Ideal R) : Ideal (CornerSubring idem_e) := sorry
+
+theorem push_pull (idem_e : IsIdempotentElem e) (I : Ideal (CornerSubring idem_e)) : ideal_push idem_e (ideal_lift idem_e I) = I := sorry
+
+
 
 
 theorem corner_ring_both_mul_mem' (x y : CornerSubring idem_e) (w : R) : x * w * y ∈ CornerSubring idem_e := by
