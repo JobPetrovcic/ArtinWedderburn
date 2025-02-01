@@ -167,8 +167,19 @@ theorem push_pull (idem_e : IsIdempotentElem e) (I : Ideal (CornerSubring idem_e
 
 
 
--- I have put this below push_pull, because it can be proved using push_pull and lift_monotonicity
-theorem lift_strict_monotonicity (I J : Ideal (CornerSubring idem_e)) : I < J → (ideal_lift idem_e I) < (ideal_lift idem_e J) := sorry -- Maša
+-- I have put this below push_pull, because it can be proven using push_pull and lift_monotonicity
+theorem lift_strict_monotonicity (I J : Ideal (CornerSubring idem_e)) : I < J → (ideal_lift idem_e I) < (ideal_lift idem_e J) := by -- Maša
+  intro I_leq_J
+  have I_neq_J : I ≠ J := by exact ne_of_lt I_leq_J
+  have lift_leq : (ideal_lift idem_e I) ≤ (ideal_lift idem_e J) := by
+    exact lift_monotonicity idem_e I J (le_of_lt I_leq_J)
+  have lift_neq : (ideal_lift idem_e I) ≠ (ideal_lift idem_e J) := by
+    by_contra h_eq
+    have h_eq : ideal_push idem_e (ideal_lift idem_e I) = ideal_push idem_e (ideal_lift idem_e J) := by
+      exact congrArg (ideal_push idem_e) h_eq
+    rw [push_pull, push_pull] at h_eq
+    exact I_neq_J h_eq
+  exact lt_of_le_of_ne lift_leq lift_neq
 
 
 
