@@ -117,6 +117,89 @@ theorem OrtIdem_imply_MatUnits {n : ℕ} (hn : 0 < n) -- Done by Matevz
         _ = 0 := by rw [(ort j k h).left]; noncomm_ring
 
 
+def ideal_push (idem_e : IsIdempotentElem e) (J : Ideal R) : Ideal (CornerSubring idem_e) where -- Maša
+  carrier := {x | ∃ y ∈ J, x = e * y * e}
+  zero_mem' := by sorry
+  add_mem' := by sorry
+  smul_mem' _ _ h := by sorry
+
+
+-- If e and f are nonzero elements then corner ring eRf contains nonzero element
+lemma eRf_nonzero --Maša
+  (h : IsPrimeRing R) (e f : R) (he : e ≠ 0) (hf : f ≠ 0) :
+  ∃(a : R), e * a * f ≠ 0 := by
+  by_contra ha
+  push_neg at ha
+  have eRf_zero : both_mul e f = {0} := by
+    ext x
+    constructor
+    · intro ⟨r, hr⟩
+      specialize ha r
+      exact Set.mem_of_eq_of_mem hr ha
+    · intro hx
+      use 0
+      noncomm_ring
+      exact hx
+  apply prime_ring_equiv.1 h at eRf_zero
+  cases eRf_zero with
+  | inl h => exact he h
+  | inr h => exact hf h
+
+
+-- If eRe is a division ring then e is nonzero
+lemma corner_ring_division_e_nonzero --Maša
+  (heRe : IsDivisionRing (CornerSubring idem_e)) : e ≠ 0 := by
+  by_contra he
+  have ha : ∀(a : R), e * a * e = 0 := by exact fun a ↦ mul_eq_zero_of_right (e * a) he
+  have h_zero : ∀(x : CornerSubring idem_e), x = 0 := by
+    intro ⟨x, hx⟩
+    apply x_in_corner_x_eq_e_y_e at hx
+    obtain ⟨y, hy⟩ := hx
+    specialize ha y
+    rw [ha] at hy
+    exact (NonUnitalSubring.coe_eq_zero_iff (CornerSubring idem_e)).mp hy
+  obtain ⟨⟨x, hx⟩, _⟩ := heRe
+  exact hx (h_zero x)
+
+--multiplication with e and f preserves both_mul e f
+lemma nevem (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) :
+  ∀ x ∈ both_mul e f, e * x = x ∧ x * f = x := by
+  rintro x ⟨y, hy⟩
+  have he : e * x = x := by
+    calc _ = (e * e) * y * f := by rw [hy]; noncomm_ring
+        _ = e * y * f := by rw [idem_e]
+        _ = x := by exact id (Eq.symm hy)
+  have hf : x * f = x := by
+    calc _ = e * y * (f * f) := by rw [hy]; noncomm_ring
+        _ = e * y * f := by rw [idem_f]
+        _ = x := by exact id (Eq.symm hy)
+  exact ⟨he, hf⟩
+
+-- both_mul is closed for addition and multiplication
+lemma both_mul_add : ∀ (x y : R), x ∈ both_mul e f → y ∈ both_mul e f → x + y ∈ both_mul e f := by
+  intro x y ⟨a, ha⟩ ⟨b, hb⟩
+  use (a + b)
+  rw [ha, hb]
+  noncomm_ring
+
+lemma both_mul_neg : ∀ (x : R), x ∈ both_mul e f → -x ∈ both_mul e f := by
+  intro x ⟨a, ha⟩
+  use - a
+  rw [ha]
+  noncomm_ring
+
+lemma both_mul_sub : ∀ (x y : R), x ∈ both_mul e f → y ∈ both_mul e f → x - y ∈ both_mul e f := by
+  intro x y ⟨a, ha⟩ ⟨b, hb⟩
+  use (a - b)
+  rw [ha, hb]
+  noncomm_ring
+
+lemma both_mul_mul : ∀ (x y : R), x ∈ both_mul e f → y ∈ both_mul f e → x * y ∈ both_mul e e := by
+  intro  x y ⟨a, ha⟩ ⟨b, hb⟩
+  use (a * f * f * b)
+  rw [ha, hb]
+  noncomm_ring
+
 
 -- Lemma 2.19 (a)
 theorem lemma_2_19 -- Maša
@@ -124,4 +207,120 @@ theorem lemma_2_19 -- Maša
   (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) (ort : IsOrthogonal e f)
   (heRe : IsDivisionRing (CornerSubring idem_e)) (hfRf : IsDivisionRing (CornerSubring idem_f)) :
   ∃ u v : R, u ∈ both_mul e f ∧ v ∈ both_mul f e ∧ u * v = e ∧ v * u = f := by
-  sorry
+  have he : e ≠ 0 := by exact corner_ring_division_e_nonzero e idem_e heRe
+  have hf : f ≠ 0 := by exact corner_ring_division_e_nonzero f idem_f hfRf
+  have ha : ∃ (a : R), e * a * f ≠ 0 := by exact eRf_nonzero h e f he hf
+  obtain ⟨a, ha⟩ := ha
+  have hb : ∃(b : R), e * a * f * b * e ≠ 0 := by exact eRf_nonzero h (e * a * f) e ha he
+  obtain ⟨b, hb⟩ := hb
+
+  have hx : e * a * f * b * e ∈ CornerSubring idem_e := by
+    rw [subring_mem_idem]
+    rw [eq_comm]
+    calc e * (e * a * f * b * e) * e = (e * e) * a * f * b * (e * e) := by noncomm_ring
+        _ = e * a * f * b * e := by rw [IsIdempotentElem.eq idem_e]
+        _ = e * a * f * b * e := by exact rfl
+
+  let x : CornerSubring idem_e := ⟨e * a * f * b * e, hx⟩
+  have x_val_eq : x.val = e * a * f * b * e := by rfl
+
+  have x_nonzero : (x : CornerSubring idem_e) ≠ 0 := by
+    apply nonzero
+    rw [x_val_eq]
+    exact hb
+
+  have x_inv : ∃ (y : CornerSubring idem_e), x * y = (1 : CornerSubring idem_e) := by
+    obtain ⟨_, h'⟩ := heRe
+    specialize h' x x_nonzero
+    obtain ⟨y, ⟨hy₁, hy₂⟩⟩ := h'
+    exact Exists.intro y hy₂
+
+  obtain ⟨y, hy⟩ := x_inv
+
+  let e_corner : CornerSubring idem_e := ⟨e, by exact e_in_corner_ring idem_e⟩
+  have hxy : e_corner = (1 : CornerSubring idem_e) := by exact rfl
+  have hxy : x * y = (e_corner : R):= by
+    have hxy' : x * y = (e_corner : CornerSubring idem_e) := by exact hy
+    rw [Subtype.ext_iff_val] at hxy'
+    exact hxy'
+
+  have hc : ∃ (c : R), y = e * c * e := by
+    apply x_in_corner_x_eq_e_y_e y.2
+  obtain ⟨c, hc⟩ := hc
+
+  have y_val_eq : y.val = e * c * e := by exact hc
+
+  let v := f * b * e * c * e
+  let u := e * a * f
+  use u
+  use v
+
+  have hu : u ∈ both_mul e f := by use a
+  have hv : v ∈ both_mul f e := by
+    have _ : f * b * e * c * e = f * (b * e * c) * e := by noncomm_ring
+    use (b * e * c)
+
+  have fv_eq_v : f * v = (v : R) := by exact (nevem f idem_f idem_e v hv).1
+  have ve_eq_v : v * e = v := by exact (nevem f idem_f idem_e v hv).2
+
+  have uv_eq_e : u * v = e := by
+    calc e * a * f * (f * b * e * c * e) = e * a * (f * f) * b * e * c * e := by noncomm_ring
+                                          _ = e * a *  f * b * e * c * e := by rw [IsIdempotentElem.eq idem_f]
+                                          _ = e * a * f * b * (e * e) * c * e := by rw [IsIdempotentElem.eq idem_e]
+                                          _ = (e * a * f * b * e) * (e * c * e) := by noncomm_ring
+                                          _ = x * y := by rw [x_val_eq, y_val_eq]
+                                          _ = e := by exact hxy
+
+  have vuv_eq_v : v * u * v = v := by
+    calc _ = v * (u * v) := by noncomm_ring
+        _ = v * e := by rw [uv_eq_e]
+        _ = v := by exact ve_eq_v
+
+
+  constructor
+  · exact hu
+  · constructor
+    · exact hv
+    · constructor
+      · exact uv_eq_e
+      · by_contra h_neq
+        push_neg at h_neq
+        have h_nonzero : v * u - f ≠ 0 := by exact sub_ne_zero_of_ne h_neq
+        have h_mem : v * u - f ∈ CornerSubring idem_f := by
+          have vu_mem : v * u ∈ both_mul f f := by
+            apply both_mul_mul
+            exact hv
+            exact hu
+          have f_mem : f ∈ both_mul f f := by
+            apply e_in_corner_ring idem_f
+          apply both_mul_sub
+          exact vu_mem
+          exact f_mem
+        let w : CornerSubring idem_f := ⟨v * u - f, h_mem⟩
+        have w_val_eq : w.val = v * u - f := by exact rfl
+        have h_inv : ∃(a : CornerSubring idem_f), a * w = (1 : CornerSubring idem_f) := by
+          obtain ⟨a, ⟨h1, h2⟩⟩ := hfRf.2 w (nonzero idem_f w h_nonzero)
+          use a
+        obtain ⟨a, ha⟩ := h_inv
+        have wv_eq_zero : w * v = 0 := by
+          calc _ = (v * u - f) * v := by exact rfl
+              _ = v * u * v - f * v := by noncomm_ring
+              _ = 0 := by rw[vuv_eq_v, fv_eq_v]; simp
+
+        have v_eq_zero : v = 0 := by
+          calc _ = (1 : CornerSubring idem_f) * v := by exact id (Eq.symm fv_eq_v)
+              _ = (a * w) * v := by rw [← ha]; simp
+              _ = a * (w * v) := by noncomm_ring
+              _ = 0 := by rw[wv_eq_zero]; simp
+        have e_eq_zero : e = 0 := by
+          calc _ = u * v := by rw[uv_eq_e]
+              _ = 0 := by rw[v_eq_zero]; noncomm_ring
+        exact he e_eq_zero
+
+-- lemma one_sub_e_idem (e : R) (idem_e : IsIdempotentElem e): IsIdempotentElem (1 - e) := by sorry
+
+theorem f_in_corner_othogonal (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) --Maša
+  (f_mem : f ∈ both_mul (1 - e) (1 - e)) : IsOrthogonal e f := by sorry
+
+theorem prime_and_artinian_esists_idem_corner_div (h : IsPrimeRing R) (h' : IsArtinian R R) : -- Maša
+  ∃(e : R), e ≠ 0 ∧ IsIdempotentElem e ∧ IsDivisionSubring (CornerSubringNonUnital e) e := by sorry
