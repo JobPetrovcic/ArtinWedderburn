@@ -328,5 +328,17 @@ theorem f_in_corner_othogonal (e f : R) (idem_e : IsIdempotentElem e) (idem_f : 
         _ = (1 - e) * x * (e - e) := by rw [idem_e]
         _ = 0 := by noncomm_ring
 
+lemma e_idem_to_one_sub_e_idem (e : R) (idem_e : IsIdempotentElem e) : IsIdempotentElem (1 - e) := by --Maša
+  unfold IsIdempotentElem
+  calc _ = 1 - 2 * e + e * e := by noncomm_ring
+      _ = 1 - e := by rw [idem_e]; noncomm_ring
+
+lemma sum_orthogonal_idem_is_idem (e f : R) (h : AreOrthogonalIdempotents e f) : IsIdempotentElem (e + f) := by --Maša
+  let ⟨idem_e, idem_f, h1, h2⟩ := h
+  calc
+    (e + f) * (e + f) = e * e + e * f + f * e + f * f := by noncomm_ring
+    _ = e + 0 + 0 + f := by rw [idem_e, idem_f, h1, h2]
+    _ = e + f := by simp
+
 theorem prime_and_artinian_esists_idem_corner_div (h : IsPrimeRing R) (h' : IsArtinian R R) : -- Maša
   ∃(e : R), e ≠ 0 ∧ IsIdempotentElem e ∧ IsDivisionSubring (CornerSubringNonUnital e) e := by sorry
