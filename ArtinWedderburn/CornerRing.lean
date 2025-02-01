@@ -107,7 +107,8 @@ instance : CoeOut (Set (CornerSubring idem_e)) (Set R) := {coe := fun X => Set.i
 -- I left ideal in eRe -> RI is a left ideal in R
 def ideal_lift (I : Ideal (CornerSubring idem_e)) : Ideal R := Ideal.span (I.carrier) -- Maša
 
-def ideal_pull (I : Ideal (CornerSubring idem_e)) : Ideal R :=
+--def ideal_pull (I : Ideal (CornerSubring idem_e)) : Ideal R where
+--  carrier := {∃ n : ℕ, }
 
 -- coercion from Ideals of CornerSubrings to Ideals of R
 instance : CoeOut (Ideal (CornerSubring idem_e)) (Ideal R) := {coe := ideal_lift idem_e} -- Maša
