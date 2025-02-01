@@ -315,7 +315,18 @@ theorem lemma_2_19 -- Maša
 -- lemma one_sub_e_idem (e : R) (idem_e : IsIdempotentElem e): IsIdempotentElem (1 - e) := by sorry
 
 theorem f_in_corner_othogonal (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) --Maša
-  (f_mem : f ∈ both_mul (1 - e) (1 - e)) : IsOrthogonal e f := by sorry
+  (f_mem : f ∈ both_mul (1 - e) (1 - e)) : IsOrthogonal e f := by
+  obtain ⟨x, hx⟩ := f_mem
+  unfold IsOrthogonal
+  constructor
+  · rw [hx]
+    calc _ = (e - e * e) * x * (1 - e) := by noncomm_ring
+         _ = (e - e) * x * (1 - e) := by rw [idem_e]
+         _ = 0 := by noncomm_ring
+  · rw [hx]
+    calc _ = (1 - e) * x * (e - e * e) := by noncomm_ring
+        _ = (1 - e) * x * (e - e) := by rw [idem_e]
+        _ = 0 := by noncomm_ring
 
 theorem prime_and_artinian_esists_idem_corner_div (h : IsPrimeRing R) (h' : IsArtinian R R) : -- Maša
   ∃(e : R), e ≠ 0 ∧ IsIdempotentElem e ∧ IsDivisionSubring (CornerSubringNonUnital e) e := by sorry
