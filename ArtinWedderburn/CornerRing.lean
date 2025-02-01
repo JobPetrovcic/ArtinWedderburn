@@ -118,8 +118,30 @@ theorem lift_monotonicity (I J : Ideal (CornerSubring idem_e)) : I ≤ J → (id
 
 
 
+def ideal_push (idem_e : IsIdempotentElem e) (J : Ideal R) : Ideal (CornerSubring idem_e) where -- Maša
+  carrier := {x | ∃ y ∈ J, x = e * y * e}
+  zero_mem' := by
+    use 0
+    constructor
+    · exact Submodule.zero_mem J
+    · simp
+  add_mem' := by
+    rintro x y ⟨r, ⟨hr_mem, hr⟩⟩ ⟨s, ⟨hs_mem, hs⟩⟩
+    use r + s
+    constructor
+    · exact (Submodule.add_mem_iff_right J hr_mem).mpr hs_mem
+    · simp [hr, hs]
+      noncomm_ring
+  smul_mem' := by
+    rintro ⟨c, ⟨a, hc⟩⟩ x ⟨r, ⟨hr_mem, hr⟩⟩
+    use a * e  * e * r
+    constructor
+    · exact Ideal.mul_mem_left J (a * e *e) hr_mem
+    · simp [hc, hr]
+      noncomm_ring
 
-def ideal_push (idem_e : IsIdempotentElem e) (J : Ideal R) : Ideal (CornerSubring idem_e) := sorry
+
+
 
 theorem push_pull (idem_e : IsIdempotentElem e) (I : Ideal (CornerSubring idem_e)) : ideal_push idem_e (ideal_lift idem_e I) = I := sorry
 
