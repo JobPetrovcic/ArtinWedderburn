@@ -121,13 +121,68 @@ theorem lift_monotonicity (I J : Ideal (CornerSubring idem_e)) : I ≤ J → (id
 
 
 
+def ideal_push (idem_e : IsIdempotentElem e) (J : Ideal R) : Ideal (CornerSubring idem_e) where -- Maša
+  carrier := {x | ∃ y ∈ J, x = e * y * e}
+  zero_mem' := by
+    use 0
+    constructor
+    · exact Submodule.zero_mem J
+    · simp
+  add_mem' := by
+    rintro x y ⟨r, ⟨hr_mem, hr⟩⟩ ⟨s, ⟨hs_mem, hs⟩⟩
+    use r + s
+    constructor
+    · exact (Submodule.add_mem_iff_right J hr_mem).mpr hs_mem
+    · simp [hr, hs]
+      noncomm_ring
+  smul_mem' := by
+    rintro ⟨c, ⟨a, hc⟩⟩ x ⟨r, ⟨hr_mem, hr⟩⟩
+    use a * e  * e * r
+    constructor
+    · exact Ideal.mul_mem_left J (a * e *e) hr_mem
+    · simp [hc, hr]
+      noncomm_ring
 
-def ideal_push (idem_e : IsIdempotentElem e) (J : Ideal R) : Ideal (CornerSubring idem_e) := sorry
 
-theorem push_pull (idem_e : IsIdempotentElem e) (I : Ideal (CornerSubring idem_e)) : ideal_push idem_e (ideal_lift idem_e I) = I := sorry
 
--- I have put this below push_pull, because it can be proved using push_pull and lift_monotonicity
-theorem lift_strict_monotonicity (I J : Ideal (CornerSubring idem_e)) : I < J → (ideal_lift idem_e I) < (ideal_lift idem_e J) := sorry
+
+theorem push_pull (idem_e : IsIdempotentElem e) (I : Ideal (CornerSubring idem_e)) : ideal_push idem_e (ideal_lift idem_e I) = I := by -- Maša
+  ext x
+  constructor
+  · rintro ⟨y, ⟨hy_mem, hy⟩⟩
+    unfold ideal_lift at hy_mem
+
+    sorry
+
+  · intro hx
+    have h : ↑x ∈ ideal_lift idem_e I := by
+      unfold ideal_lift
+      have hx1 : ↑x ∈ (I.carrier : Set R) := by exact Set.mem_image_of_mem Subtype.val hx
+      exact (Ideal.mem_span ↑x).mpr fun p a ↦ a hx1
+    unfold ideal_push
+    use ↑x
+    constructor
+    · exact h
+    · obtain ⟨y, hy⟩ := x.2
+      have hx : ↑x ∈ CornerRingSet e := by exact Subtype.coe_prop x
+      apply (corner_ring_set_mem idem_e).1 at hx
+      exact hx
+
+
+
+-- I have put this below push_pull, because it can be proven using push_pull and lift_monotonicity
+theorem lift_strict_monotonicity (I J : Ideal (CornerSubring idem_e)) : I < J → (ideal_lift idem_e I) < (ideal_lift idem_e J) := by -- Maša
+  intro I_leq_J
+  have I_neq_J : I ≠ J := by exact ne_of_lt I_leq_J
+  have lift_leq : (ideal_lift idem_e I) ≤ (ideal_lift idem_e J) := by
+    exact lift_monotonicity idem_e I J (le_of_lt I_leq_J)
+  have lift_neq : (ideal_lift idem_e I) ≠ (ideal_lift idem_e J) := by
+    by_contra h_eq
+    have h_eq : ideal_push idem_e (ideal_lift idem_e I) = ideal_push idem_e (ideal_lift idem_e J) := by
+      exact congrArg (ideal_push idem_e) h_eq
+    rw [push_pull, push_pull] at h_eq
+    exact I_neq_J h_eq
+  exact lt_of_le_of_ne lift_leq lift_neq
 
 
 
@@ -206,3 +261,16 @@ theorem corner_ring_prime (hRP : IsPrimeRing R) : IsPrimeRing (CornerSubring ide
   have l := prime_ring_equiv.1 hRP _ _ h_lift
   simp at l
   exact l
+
+lemma e_in_corner_ring : --Maša
+  e ∈ (CornerSubring idem_e) := by
+  rw [subring_mem_idem]
+  rw [IsIdempotentElem.eq idem_e, IsIdempotentElem.eq idem_e]
+
+lemma nonzero (x : CornerSubring idem_e) (hx : x.val ≠ 0): (x : CornerSubring idem_e) ≠ 0 := by
+  by_contra hzero
+  rw [Subtype.ext_iff_val] at hzero
+  exact hx hzero
+
+lemma eq_iff_val (x y z : CornerSubring idem_e) : (x + y).val = z.val ↔ x.val + y.val = z.val := by
+  exact Eq.congr_right rfl
