@@ -143,10 +143,32 @@ def ideal_push (idem_e : IsIdempotentElem e) (J : Ideal R) : Ideal (CornerSubrin
 
 
 
-theorem push_pull (idem_e : IsIdempotentElem e) (I : Ideal (CornerSubring idem_e)) : ideal_push idem_e (ideal_lift idem_e I) = I := sorry
+theorem push_pull (idem_e : IsIdempotentElem e) (I : Ideal (CornerSubring idem_e)) : ideal_push idem_e (ideal_lift idem_e I) = I := by -- Maša
+  ext x
+  constructor
+  · rintro ⟨y, ⟨hy_mem, hy⟩⟩
+    unfold ideal_lift at hy_mem
+
+    sorry
+
+  · intro hx
+    have h : ↑x ∈ ideal_lift idem_e I := by
+      unfold ideal_lift
+      have hx1 : ↑x ∈ (I.carrier : Set R) := by exact Set.mem_image_of_mem Subtype.val hx
+      exact (Ideal.mem_span ↑x).mpr fun p a ↦ a hx1
+    unfold ideal_push
+    use ↑x
+    constructor
+    · exact h
+    · obtain ⟨y, hy⟩ := x.2
+      have hx : ↑x ∈ CornerRingSet e := by exact Subtype.coe_prop x
+      apply (corner_ring_set_mem idem_e).1 at hx
+      exact hx
+
+
 
 -- I have put this below push_pull, because it can be proved using push_pull and lift_monotonicity
-theorem lift_strict_monotonicity (I J : Ideal (CornerSubring idem_e)) : I < J → (ideal_lift idem_e I) < (ideal_lift idem_e J) := sorry
+theorem lift_strict_monotonicity (I J : Ideal (CornerSubring idem_e)) : I < J → (ideal_lift idem_e I) < (ideal_lift idem_e J) := sorry -- Maša
 
 
 

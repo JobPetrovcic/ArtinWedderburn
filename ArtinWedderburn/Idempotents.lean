@@ -117,11 +117,6 @@ theorem OrtIdem_imply_MatUnits {n : ℕ} (hn : 0 < n) -- Done by Matevz
         _ = 0 := by rw [(ort j k h).left]; noncomm_ring
 
 
-def ideal_push (idem_e : IsIdempotentElem e) (J : Ideal R) : Ideal (CornerSubring idem_e) where -- Maša
-  carrier := {x | ∃ y ∈ J, x = e * y * e}
-  zero_mem' := by sorry
-  add_mem' := by sorry
-  smul_mem' _ _ h := by sorry
 
 
 -- If e and f are nonzero elements then corner ring eRf contains nonzero element
