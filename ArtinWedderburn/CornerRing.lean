@@ -118,9 +118,46 @@ theorem lift_monotonicity (I J : Ideal (CornerSubring idem_e)) : I ≤ J → (id
 
 
 
+
+def ideal_push (idem_e : IsIdempotentElem e) (J : Ideal R) : Ideal (CornerSubring idem_e) := sorry
+
+theorem push_pull (idem_e : IsIdempotentElem e) (I : Ideal (CornerSubring idem_e)) : ideal_push idem_e (ideal_lift idem_e I) = I := sorry
+
+-- I have put this below push_pull, because it can be proved using push_pull and lift_monotonicity
+theorem lift_strict_monotonicity (I J : Ideal (CornerSubring idem_e)) : I < J → (ideal_lift idem_e I) < (ideal_lift idem_e J) := sorry
+
+
+
+theorem lift_acc_then_ideal_acc (idem_e : IsIdempotentElem e) (J : Ideal R) (h_J_is_lift : ∃ I3 : Ideal (CornerSubring idem_e), J = ideal_lift idem_e I3) (h_acc_J : Acc (fun x y => x < y) J) : Acc (fun x y => x < y) (ideal_push idem_e J) := by -- done by Matevz
+  induction h_acc_J with
+  | intro J2 h_acc_j2 hi =>
+    obtain ⟨I, hI⟩ := h_J_is_lift
+    rw [hI, push_pull idem_e I]
+    have c1 : (I2 : Ideal (CornerSubring idem_e)) → I2 < I → Acc (fun x y => x < y) I2 := by
+      intro I2 hI2
+      rw [←push_pull idem_e I2]
+      have subJ2 := (lift_strict_monotonicity idem_e I2 I) hI2
+      rw [←hI] at subJ2
+      exact hi (ideal_lift idem_e I2) subJ2 (by use I2)
+    exact Acc.intro I c1
+
+
+
 -- Lemma 2.10
 -- a) If R is artinian, then the corner ring is artinian
-theorem corner_ring_artinian [IsArtinian R R] : IsArtinian (CornerSubring idem_e) (CornerSubring idem_e) := by sorry
+theorem corner_ring_artinian [h_ar : IsArtinian R R] : IsArtinian (CornerSubring idem_e) (CornerSubring idem_e) := by -- done by Matevz
+  unfold IsArtinian at *
+  unfold WellFoundedLT at *
+  have Iacc : ∀ I : Ideal R, Acc (fun x y => x < y) I := by
+    intro I
+    exact WellFounded.apply h_ar.wf I
+  apply IsWellFounded.mk
+  have allacc : ∀ I : Ideal (CornerSubring idem_e), Acc (fun x y => x < y) I := by
+    intro I
+    have h : Acc (fun x y => x < y) (ideal_push idem_e (ideal_lift idem_e I)) := lift_acc_then_ideal_acc idem_e I (by use I) (Iacc (ideal_lift idem_e I))
+    rw [push_pull idem_e I] at h
+    exact h
+  exact WellFounded.intro allacc
 
 
 theorem corner_ring_both_mul_mem' (x y : CornerSubring idem_e) (w : R) : x * w * y ∈ CornerSubring idem_e := by
