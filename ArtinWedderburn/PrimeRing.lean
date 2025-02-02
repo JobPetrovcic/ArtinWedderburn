@@ -69,6 +69,33 @@ theorem prime_ring_equiv : IsPrimeRing R ↔ ∀ (a b : R), both_mul a b = {0} �
       | inl hx => contradiction
       | inr hy => exact hy
 
+
+
+theorem span_le_two_sided_span (S : Set R) : Ideal.span S ≤ TwoSidedIdeal.asIdeal (TwoSidedIdeal.span S) := by
+  have h : S ⊆ TwoSidedIdeal.asIdeal (TwoSidedIdeal.span S) := TwoSidedIdeal.subset_span
+  exact Ideal.span_le.mpr h
+
+
+theorem ideal_bot (I J : TwoSidedIdeal R) : I * J = ⊥ → (TwoSidedIdeal.asIdeal I) * (TwoSidedIdeal.asIdeal J) = ⊥ := by
+  intro h
+  apply Ideal.span_eq_bot.mpr
+  rintro x ⟨a, ha, b, hb, hx⟩
+  simp at hx
+  have h2 : ↑(TwoSidedIdeal.asIdeal I) = (↑I : Set R) := by rfl
+  have haI : a ∈ I := ha
+  have hbJ : b ∈ J := hb
+  have hab1 : a * b ∈ (↑I : Set R) * (↑J : Set R) := by exact mul_mem_mul ha hb
+  have hss : (↑I : Set R) * (↑J : Set R) ⊆ I * J := by exact fun ⦃a⦄ a ↦ a
+  have hab : a * b ∈ I * J := by
+    sorry
+  have abz : a * b = 0 := by
+    rw [h] at hab
+    exact hab
+  rw [← hx]
+  exact abz
+
+
+
 -- equivalence between 1) and 3)
 -- #EASIER
 theorem prime_ring_equiv' : IsPrimeRing R ↔ ∀ (I J : TwoSidedIdeal R), I * J = ⊥ → I = ⊥ ∨ J = ⊥ := by -- Mikita
