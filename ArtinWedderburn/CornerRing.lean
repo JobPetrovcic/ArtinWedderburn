@@ -7,6 +7,7 @@ import ArtinWedderburn.NonUnitalToUnital
 import Mathlib.Algebra.Ring.MinimalAxioms
 import ArtinWedderburn.PrimeRing
 import Mathlib.RingTheory.Ideal.Span
+import Mathlib.LinearAlgebra.Finsupp.LinearCombination
 
 variable {R : Type*} [Ring R]
 variable {e : R}
@@ -20,6 +21,8 @@ theorem corner_ring_set_mem {x : R} (idem_e : IsIdempotentElem e): x ∈ CornerR
   {intro hx; use x;}
 
 theorem x_in_corner_x_eq_e_y_e {x : R} (h : x ∈ CornerRingSet e): ∃ (y : R), x = e * y * e := by exact h
+
+
 
 -- I would much rather work with this, because this is the definition I used in Lemma 2.12
 instance CornerSubringNonUnital (e : R) : NonUnitalSubring R where -- Done by Matevz
@@ -96,6 +99,25 @@ theorem is_right_unit : ∀ (x : CornerSubring idem_e), x * 1 = x := by -- Done 
   simp only [NonUnitalSubring.val_mul]
   rw [corner_ring_one, right_unit_mul idem_e hx]
 
+lemma e_in_corner_ring : --Maša
+  e ∈ (CornerSubring idem_e) := by
+  rw [subring_mem_idem]
+  rw [IsIdempotentElem.eq idem_e, IsIdempotentElem.eq idem_e]
+
+lemma nonzero (x : CornerSubring idem_e) (hx : x.val ≠ 0): (x : CornerSubring idem_e) ≠ 0 := by
+  by_contra hzero
+  rw [Subtype.ext_iff_val] at hzero
+  exact hx hzero
+
+lemma eq_iff_val (x y z : CornerSubring idem_e) : (x + y).val = z.val ↔ x.val + y.val = z.val := by
+  exact Eq.congr_right rfl
+
+lemma e_x_e_in_corner : ∀(x : R), e * x * e ∈ CornerSubring idem_e := by
+  intro x
+  rw [subring_mem_idem, eq_comm]
+  calc _ = (e * e) * x * (e * e) := by noncomm_ring
+        _ = e * x * e := by rw [idem_e]
+
 -- The corner ring is a ring
 instance CornerRingIsRing (idem_e : IsIdempotentElem e) : Ring (CornerSubring idem_e) := non_unital_w_e_is_ring 1 (is_left_unit idem_e) (is_right_unit idem_e) -- Done by Job
 
@@ -140,14 +162,26 @@ def ideal_push (idem_e : IsIdempotentElem e) (J : Ideal R) : Ideal (CornerSubrin
     · simp [hc, hr]
       noncomm_ring
 
-
-
-
-theorem push_pull (idem_e : IsIdempotentElem e) (I : Ideal (CornerSubring idem_e)) : ideal_push idem_e (ideal_lift idem_e I) = I := by -- Maša
+theorem push_pull' (idem_e : IsIdempotentElem e) (I : Ideal (CornerSubring idem_e)) : ideal_push idem_e (ideal_lift idem_e I) = I := by
   ext x
   constructor
   · rintro ⟨y, ⟨hy_mem, hy⟩⟩
+
     unfold ideal_lift at hy_mem
+    rw [← Ideal.submodule_span_eq] at hy_mem
+    rw [mem_span_set'] at hy_mem
+    obtain ⟨n, f, g, h⟩ := hy_mem
+    rw [← h] at hy
+    have h_mem : ∀ (x : CornerSubring idem_e), x ∈ I.carrier → x ∈ I := by exact fun x a ↦ a
+    --rw [Subtype.coe_image] at g
+    --simp at g
+    #check I.carrier
+
+    --rw [Set.mem_image] at g
+    have hi : ∀ (i : Fin n), ⟨e * (f i * g i) * e, by exact e_x_e_in_corner idem_e (f i * g i)⟩ ∈ I := by
+      intro i
+      --have hgi : g i ∈ I.carrier := by sorry
+      sorry
 
     sorry
 
@@ -165,6 +199,58 @@ theorem push_pull (idem_e : IsIdempotentElem e) (I : Ideal (CornerSubring idem_e
       apply (corner_ring_set_mem idem_e).1 at hx
       exact hx
 
+
+theorem push_pull (idem_e : IsIdempotentElem e) (I : Ideal (CornerSubring idem_e)) : ideal_push idem_e (ideal_lift idem_e I) = I := by -- Maša
+  ext x
+  constructor
+  · rintro ⟨y, ⟨hy_mem, hy⟩⟩
+    induction hy_mem using Submodule.span_induction with
+    | mem z hz =>
+      rw [Set.mem_image] at hz
+      obtain ⟨w, ⟨hw1, hw2⟩⟩ := hz
+      have hw : w ∈ I := by exact hw1
+      rw [← hw2] at hy
+      have hw' : w = e * w * e := by exact (corner_ring_set_mem idem_e).1 (Subtype.coe_prop w)
+      rw [← hw'] at hy
+      have h : x = w := by rw [Subtype.ext_iff_val]; exact hy
+      rw [← h] at hw
+      exact hw
+    | zero => simp at hy; exact (Submodule.Quotient.mk_eq_zero I).mp (congrArg Submodule.Quotient.mk hy)
+    | add y₁ y₂ hy1 hy2 h₁ h₂ =>
+      let w : CornerSubring idem_e := ⟨e * y₁ * e, by exact e_x_e_in_corner idem_e y₁⟩
+      have w_val : w.val = e * y₁ * e := by rfl
+      let z : CornerSubring idem_e := ⟨e * y₂ * e, by exact e_x_e_in_corner idem_e y₂⟩
+      have z_val : z.val = e * y₂ * e := by rfl
+      have w_mem : w ∈ I := by sorry
+      have z_mem : z ∈ I := by sorry
+      have hwz : x =  w + z := by
+        rw [Subtype.ext_iff_val]
+        simp only [NonUnitalSubring.val_add]
+        rw [hy]
+        noncomm_ring
+      rw [hwz]
+      exact Ideal.add_mem I w_mem z_mem
+    | smul a z h1 h =>
+
+      rw [mem_span_set'] at h1
+
+
+      sorry
+
+
+  · intro hx
+    have h : ↑x ∈ ideal_lift idem_e I := by
+      unfold ideal_lift
+      have hx1 : ↑x ∈ (I.carrier : Set R) := by exact Set.mem_image_of_mem Subtype.val hx
+      exact (Ideal.mem_span ↑x).mpr fun p a ↦ a hx1
+    unfold ideal_push
+    use ↑x
+    constructor
+    · exact h
+    · obtain ⟨y, hy⟩ := x.2
+      have hx : ↑x ∈ CornerRingSet e := by exact Subtype.coe_prop x
+      apply (corner_ring_set_mem idem_e).1 at hx
+      exact hx
 
 
 -- I have put this below push_pull, because it can be proven using push_pull and lift_monotonicity
@@ -258,16 +344,3 @@ theorem corner_ring_prime (hRP : IsPrimeRing R) : IsPrimeRing (CornerSubring ide
   have l := prime_ring_equiv.1 hRP _ _ h_lift
   simp at l
   exact l
-
-lemma e_in_corner_ring : --Maša
-  e ∈ (CornerSubring idem_e) := by
-  rw [subring_mem_idem]
-  rw [IsIdempotentElem.eq idem_e, IsIdempotentElem.eq idem_e]
-
-lemma nonzero (x : CornerSubring idem_e) (hx : x.val ≠ 0): (x : CornerSubring idem_e) ≠ 0 := by
-  by_contra hzero
-  rw [Subtype.ext_iff_val] at hzero
-  exact hx hzero
-
-lemma eq_iff_val (x y z : CornerSubring idem_e) : (x + y).val = z.val ↔ x.val + y.val = z.val := by
-  exact Eq.congr_right rfl
