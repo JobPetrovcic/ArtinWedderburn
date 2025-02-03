@@ -176,12 +176,41 @@ theorem add_el_push_eq_add (x y : R) : el_push idem_e x + el_push idem_e y = el_
   noncomm_ring
   simp only [AddMemClass.mk_add_mk]
 
+lemma el_push_smul_in_I (a y : R) (I : Ideal (CornerSubring idem_e)) : y ∈ (I.carrier : Set R) → el_push idem_e (a • y) ∈ I := by -- by Maša
+  intro hy
+  obtain ⟨r, ⟨hr1, hr2⟩⟩ := hy
+  obtain ⟨s, hs⟩ := r.2
+  rw [← hr2]
+  have h : e * (a • r) * e = (e * a * e) * r := by
+    calc _ = e * a * r * e := by noncomm_ring
+         _ = e * a * (e * s * e) * e := by rw [hs]
+         _ = e * a *  e * s * (e  * e) := by noncomm_ring
+         _ = e * a * (e * e) * s * e := by rw [idem_e, ← idem_e]
+         _ = e * a * e * (e * s * e) := by noncomm_ring
+         _ = (e * a * e) * r := by rw [← hs]
+  let w : CornerSubring idem_e := ⟨e * a * e, e_x_e_in_corner idem_e a⟩
+  have h' : w * r ∈ I := by
+    have hr : r ∈ I := by exact hr1
+    exact Ideal.mul_mem_left I w hr
+  let v : CornerSubring idem_e := el_push idem_e (a • r)
+  have v_val : v.val = e * (a * r) * e := by
+    unfold el_push at v
+    exact rfl
+  have h'' : v = w * r := by
+    rw [Subtype.ext_iff_val]
+    rw [@NonUnitalSubring.val_mul]
+    simp only [v, w, el_push]
+    exact h
+  rw [← h''] at h'
+  exact h'
+
+
 theorem ideal_push_pull_inclusion (I : Ideal (CornerSubring idem_e)) (x : R) : (x ∈ ideal_lift idem_e I) → (el_push idem_e x) ∈ I := by --by Job and Maša
   intro hx
   induction hx using Submodule.closure_induction with
   | zero => simp [el_push]; exact (Submodule.Quotient.mk_eq_zero I).mp rfl
   | add y z hy hz hyp hyz => rw [←add_el_push_eq_add]; exact (Submodule.add_mem_iff_right I hyp).mpr hyz
-  | smul_mem a y hy => sorry
+  | smul_mem a y hy => exact el_push_smul_in_I idem_e a y I hy
 
 #check Submodule.span_induction
 theorem push_pull (idem_e : IsIdempotentElem e) (I : Ideal (CornerSubring idem_e)) : ideal_push idem_e (ideal_lift idem_e I) = I := by -- Maša
