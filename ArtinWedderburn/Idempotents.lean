@@ -6,6 +6,7 @@ import ArtinWedderburn.PrimeRing
 import ArtinWedderburn.CornerRing
 import ArtinWedderburn.SetProd
 import ArtinWedderburn.MinIdeals
+import ArtinWedderburn.Plan
 
 
 variable {R : Type*} [Ring R]
@@ -340,5 +341,31 @@ lemma sum_orthogonal_idem_is_idem (e f : R) (h : AreOrthogonalIdempotents e f) :
     _ = e + 0 + 0 + f := by rw [idem_e, idem_f, h1, h2]
     _ = e + f := by simp
 
+lemma prod_orthogonal_idem_is_idem (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) (h : IsOrthogonal e f) : IsIdempotentElem (f * (1 - e)) := by --Maša
+  unfold IsIdempotentElem
+  calc _ = (f - (f * e)) * (f - (f * e)) := by noncomm_ring
+      _ = f * f := by rw [h.2]; noncomm_ring
+      _ = f - 0 := by rw[idem_f]; exact Eq.symm (sub_zero f)
+      _ = f - f * e := by rw [h.2]
+      _ = f * (1 - e) := by exact Eq.symm (mul_one_sub f e)
+
+lemma e_f_orhogonal_f_1_sub_e_eq_f (e f : R) (h : IsOrthogonal e f) : f * (1 - e) = f := by --Maša
+  calc _ = f - f * e := by noncomm_ring
+      _ = f := by rw [h.2]; noncomm_ring
+
+
 theorem prime_and_artinian_esists_idem_corner_div (h : IsPrimeRing R) (h' : IsArtinian R R) : -- Maša
-  ∃(e : R), e ≠ 0 ∧ IsIdempotentElem e ∧ IsDivisionSubring (CornerSubringNonUnital e) e := by sorry
+  ∃(e : R), e ≠ 0 ∧ IsIdempotentElem e ∧ IsDivisionSubring (CornerSubringNonUnital e) e := by
+  have hI : ∃ I : Ideal R, IsAtom I := by exact artinian_ring_has_minimal_left_ideal_of_element
+  obtain ⟨I, hI⟩ := hI
+  have I_sq_nonzero : I * I ≠ ⊥ := by
+    unfold IsPrimeRing at h
+    specialize h I I
+    by_contra I_sq_zero
+    specialize h I_sq_zero
+    unfold IsAtom at hI
+    let h1 := hI.1
+    have h2 : I = ⊥ := by aesop
+    contradiction
+  let ⟨e, ⟨h1, h2, ⟨h3, h4, h5⟩⟩⟩ := minimal_ideal_I_sq_nonzero_exists_idem_and_div I hI I_sq_nonzero
+  use e
