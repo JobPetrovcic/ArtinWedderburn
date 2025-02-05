@@ -2,8 +2,13 @@ import Mathlib.RingTheory.Artinian
 import Mathlib.RingTheory.SimpleRing.Basic
 import Mathlib.Algebra.Ring.Idempotents
 import ArtinWedderburn.PrimeRing
-import ArtinWedderburn.MatrixUnits
+<<<<<<< HEAD
 import ArtinWedderburn.CornerRing
+import ArtinWedderburn.MatrixUnits
+=======
+--import ArtinWedderburn.MatrixUnits
+--import ArtinWedderburn.CornerRing
+>>>>>>> ba83987431ef160a7c69624ec6cb1a9a2b85711a
 
 import Mathlib.RingTheory.SimpleModule
 
