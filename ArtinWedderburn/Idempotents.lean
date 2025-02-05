@@ -6,7 +6,6 @@ import ArtinWedderburn.PrimeRing
 import ArtinWedderburn.CornerRing
 import ArtinWedderburn.SetProd
 import ArtinWedderburn.MinIdeals
-import ArtinWedderburn.Plan
 
 
 variable {R : Type*} [Ring R]
@@ -352,6 +351,9 @@ lemma prod_orthogonal_idem_is_idem (e f : R) (idem_e : IsIdempotentElem e) (idem
 lemma e_f_orhogonal_f_1_sub_e_eq_f (e f : R) (h : IsOrthogonal e f) : f * (1 - e) = f := by --Maša
   calc _ = f - f * e := by noncomm_ring
       _ = f := by rw [h.2]; noncomm_ring
+
+-- lemma 2.14
+theorem artinian_ring_has_minimal_left_ideal_of_element [IsArtinian R R] : ∃ I : Ideal R, IsAtom I := by sorry -- Mikita
 
 
 theorem prime_and_artinian_esists_idem_corner_div (h : IsPrimeRing R) (h' : IsArtinian R R) : -- Maša

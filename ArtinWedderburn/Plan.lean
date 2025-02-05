@@ -1,9 +1,9 @@
 import Mathlib.RingTheory.Artinian
---import Mathlib.RingTheory.SimpleRing.Basic
---import Mathlib.Algebra.Ring.Idempotents
+import Mathlib.RingTheory.SimpleRing.Basic
+import Mathlib.Algebra.Ring.Idempotents
 import ArtinWedderburn.PrimeRing
---import ArtinWedderburn.MatrixUnits
---import ArtinWedderburn.CornerRing
+import ArtinWedderburn.MatrixUnits
+import ArtinWedderburn.CornerRing
 
 import Mathlib.RingTheory.SimpleModule
 
@@ -13,9 +13,6 @@ variable (I J : Ideal R) -- Ideals in mathlib are LEFT ideals (defined as Submod
 
 variable (A B C: Set R)
 
-
--- lemma 2.14
-theorem artinian_ring_has_minimal_left_ideal_of_element [IsArtinian R R] : ∃ I : Ideal R, IsAtom I := by sorry -- Mikita
 
 
 variable (e : R)
@@ -30,10 +27,12 @@ variable (idem_e : IsIdempotentElem e)
 -- Finally, the Artin-Wedderburn theorem
 universe u
 
+def corner_ring_of_ideal_has_matrix_units (I : Ideal R) (idem_e : IsIdempotentElem e) (h : I = Ideal.span {e}) : ∃ (n : ℕ), HasMatrixUnits (CornerSubring idem_e) n := by sorry
+
 def ArtinWedderburnForPrime {R : Type u} [Ring R] (h : IsPrimeRing R) [IsArtinian R R] :
     ∃ (n : ℕ) (D : Type u) ( _ : DivisionRing D), Nonempty (R ≃+* Matrix (Fin n) (Fin n) D) := by
   obtain ⟨I, hI⟩ : ∃ I : Ideal R, IsAtom I := artinian_ring_has_minimal_left_ideal_of_element
-  have h_sq_nz : I * I ≠ ⊥ := by 
+  have h_sq_nz : I * I ≠ ⊥ := by
     intro h_sq_zero
     apply h I I at h_sq_zero
     simp at h_sq_zero
