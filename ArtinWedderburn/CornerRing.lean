@@ -7,6 +7,7 @@ import ArtinWedderburn.NonUnitalToUnital
 import Mathlib.Algebra.Ring.MinimalAxioms
 import ArtinWedderburn.PrimeRing
 import Mathlib.RingTheory.Ideal.Span
+import Mathlib.LinearAlgebra.Finsupp.LinearCombination
 
 variable {R : Type*} [Ring R]
 variable {e : R}
@@ -20,6 +21,8 @@ theorem corner_ring_set_mem {x : R} (idem_e : IsIdempotentElem e): x ∈ CornerR
   {intro hx; use x;}
 
 theorem x_in_corner_x_eq_e_y_e {x : R} (h : x ∈ CornerRingSet e): ∃ (y : R), x = e * y * e := by exact h
+
+
 
 -- I would much rather work with this, because this is the definition I used in Lemma 2.12
 instance CornerSubringNonUnital (e : R) : NonUnitalSubring R where -- Done by Matevz
@@ -96,6 +99,25 @@ theorem is_right_unit : ∀ (x : CornerSubring idem_e), x * 1 = x := by -- Done 
   simp only [NonUnitalSubring.val_mul]
   rw [corner_ring_one, right_unit_mul idem_e hx]
 
+lemma e_in_corner_ring : --Maša
+  e ∈ (CornerSubring idem_e) := by
+  rw [subring_mem_idem]
+  rw [IsIdempotentElem.eq idem_e, IsIdempotentElem.eq idem_e]
+
+lemma nonzero (x : CornerSubring idem_e) (hx : x.val ≠ 0): (x : CornerSubring idem_e) ≠ 0 := by
+  by_contra hzero
+  rw [Subtype.ext_iff_val] at hzero
+  exact hx hzero
+
+lemma eq_iff_val (x y z : CornerSubring idem_e) : (x + y).val = z.val ↔ x.val + y.val = z.val := by
+  exact Eq.congr_right rfl
+
+lemma e_x_e_in_corner : ∀(x : R), e * x * e ∈ CornerSubring idem_e := by
+  intro x
+  rw [subring_mem_idem, eq_comm]
+  calc _ = (e * e) * x * (e * e) := by noncomm_ring
+        _ = e * x * e := by rw [idem_e]
+
 -- The corner ring is a ring
 instance CornerRingIsRing (idem_e : IsIdempotentElem e) : Ring (CornerSubring idem_e) := non_unital_w_e_is_ring 1 (is_left_unit idem_e) (is_right_unit idem_e) -- Done by Job
 
@@ -117,41 +139,84 @@ theorem lift_monotonicity (I J : Ideal (CornerSubring idem_e)) : I ≤ J → (id
   apply Ideal.span_mono
   exact Set.image_mono I_leq_J
 
-
+def el_push (x : R) : CornerSubring idem_e := ⟨e * x * e, e_x_e_in_corner idem_e x⟩
 
 def ideal_push (idem_e : IsIdempotentElem e) (J : Ideal R) : Ideal (CornerSubring idem_e) where -- Maša
-  carrier := {x | ∃ y ∈ J, x = e * y * e}
+  carrier := {el_push idem_e x | x ∈ J}
   zero_mem' := by
     use 0
     constructor
     · exact Submodule.zero_mem J
-    · simp
+    · simp only [el_push]
+      noncomm_ring
+      rfl
   add_mem' := by
     rintro x y ⟨r, ⟨hr_mem, hr⟩⟩ ⟨s, ⟨hs_mem, hs⟩⟩
     use r + s
     constructor
     · exact (Submodule.add_mem_iff_right J hr_mem).mpr hs_mem
-    · simp [hr, hs]
+    · simp only [el_push] at *
+      rw [←hr, ←hs]
       noncomm_ring
+      rfl
   smul_mem' := by
     rintro ⟨c, ⟨a, hc⟩⟩ x ⟨r, ⟨hr_mem, hr⟩⟩
     use a * e  * e * r
     constructor
     · exact Ideal.mul_mem_left J (a * e *e) hr_mem
-    · simp [hc, hr]
+    · simp only [el_push, hc] at *
+      rw [←hr]
+      simp only [smul_eq_mul, MulMemClass.mk_mul_mk, Subtype.mk.injEq]
       noncomm_ring
 
+theorem add_el_push_eq_add (x y : R) : el_push idem_e x + el_push idem_e y = el_push idem_e (x + y) := by
+  simp only [el_push]
+  noncomm_ring
+  simp only [AddMemClass.mk_add_mk]
+
+lemma el_push_smul_in_I (a y : R) (I : Ideal (CornerSubring idem_e)) : y ∈ (I.carrier : Set R) → el_push idem_e (a • y) ∈ I := by -- by Maša
+  intro hy
+  obtain ⟨r, ⟨hr1, hr2⟩⟩ := hy
+  obtain ⟨s, hs⟩ := r.2
+  rw [← hr2]
+  have h : e * (a • r) * e = (e * a * e) * r := by
+    calc _ = e * a * r * e := by noncomm_ring
+         _ = e * a * (e * s * e) * e := by rw [hs]
+         _ = e * a *  e * s * (e  * e) := by noncomm_ring
+         _ = e * a * (e * e) * s * e := by rw [idem_e, ← idem_e]
+         _ = e * a * e * (e * s * e) := by noncomm_ring
+         _ = (e * a * e) * r := by rw [← hs]
+  let w : CornerSubring idem_e := ⟨e * a * e, e_x_e_in_corner idem_e a⟩
+  have h' : w * r ∈ I := by
+    have hr : r ∈ I := by exact hr1
+    exact Ideal.mul_mem_left I w hr
+  let v : CornerSubring idem_e := el_push idem_e (a • r)
+  have v_val : v.val = e * (a * r) * e := by
+    unfold el_push at v
+    exact rfl
+  have h'' : v = w * r := by
+    rw [Subtype.ext_iff_val]
+    rw [@NonUnitalSubring.val_mul]
+    simp only [v, w, el_push]
+    exact h
+  rw [← h''] at h'
+  exact h'
 
 
+theorem ideal_push_pull_inclusion (I : Ideal (CornerSubring idem_e)) (x : R) : (x ∈ ideal_lift idem_e I) → (el_push idem_e x) ∈ I := by --by Job and Maša
+  intro hx
+  induction hx using Submodule.closure_induction with
+  | zero => simp [el_push]; exact (Submodule.Quotient.mk_eq_zero I).mp rfl
+  | add y z hy hz hyp hyz => rw [←add_el_push_eq_add]; exact (Submodule.add_mem_iff_right I hyp).mpr hyz
+  | smul_mem a y hy => exact el_push_smul_in_I idem_e a y I hy
 
+#check Submodule.span_induction
 theorem push_pull (idem_e : IsIdempotentElem e) (I : Ideal (CornerSubring idem_e)) : ideal_push idem_e (ideal_lift idem_e I) = I := by -- Maša
   ext x
   constructor
   · rintro ⟨y, ⟨hy_mem, hy⟩⟩
-    unfold ideal_lift at hy_mem
-
-    sorry
-
+    rw [←hy]
+    exact ideal_push_pull_inclusion idem_e I y hy_mem
   · intro hx
     have h : ↑x ∈ ideal_lift idem_e I := by
       unfold ideal_lift
@@ -164,9 +229,9 @@ theorem push_pull (idem_e : IsIdempotentElem e) (I : Ideal (CornerSubring idem_e
     · obtain ⟨y, hy⟩ := x.2
       have hx : ↑x ∈ CornerRingSet e := by exact Subtype.coe_prop x
       apply (corner_ring_set_mem idem_e).1 at hx
-      exact hx
-
-
+      unfold el_push
+      symm
+      exact SetLike.coe_eq_coe.mp hx
 
 -- I have put this below push_pull, because it can be proven using push_pull and lift_monotonicity
 theorem lift_strict_monotonicity (I J : Ideal (CornerSubring idem_e)) : I < J → (ideal_lift idem_e I) < (ideal_lift idem_e J) := by -- Maša
@@ -259,16 +324,3 @@ theorem corner_ring_prime (hRP : IsPrimeRing R) : IsPrimeRing (CornerSubring ide
   have l := prime_ring_equiv.1 hRP _ _ h_lift
   simp at l
   exact l
-
-lemma e_in_corner_ring : --Maša
-  e ∈ (CornerSubring idem_e) := by
-  rw [subring_mem_idem]
-  rw [IsIdempotentElem.eq idem_e, IsIdempotentElem.eq idem_e]
-
-lemma nonzero (x : CornerSubring idem_e) (hx : x.val ≠ 0): (x : CornerSubring idem_e) ≠ 0 := by
-  by_contra hzero
-  rw [Subtype.ext_iff_val] at hzero
-  exact hx hzero
-
-lemma eq_iff_val (x y z : CornerSubring idem_e) : (x + y).val = z.val ↔ x.val + y.val = z.val := by
-  exact Eq.congr_right rfl
