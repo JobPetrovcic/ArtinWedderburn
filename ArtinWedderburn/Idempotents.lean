@@ -356,16 +356,13 @@ lemma e_f_orhogonal_f_1_sub_e_eq_f (e f : R) (h : IsOrthogonal e f) : f * (1 - e
 
 theorem prime_and_artinian_esists_idem_corner_div (h : IsPrimeRing R) (h' : IsArtinian R R) : -- Maša
   ∃(e : R), e ≠ 0 ∧ IsIdempotentElem e ∧ IsDivisionSubring (CornerSubringNonUnital e) e := by
-  have hI : ∃ I : Ideal R, IsAtom I := by exact artinian_ring_has_minimal_left_ideal_of_element
-  obtain ⟨I, hI⟩ := hI
+  have ⟨I, hI⟩ : ∃ I : Ideal R, IsAtom I := by exact artinian_ring_has_minimal_left_ideal_of_element
   have I_sq_nonzero : I * I ≠ ⊥ := by
-    unfold IsPrimeRing at h
     specialize h I I
     by_contra I_sq_zero
     specialize h I_sq_zero
-    unfold IsAtom at hI
-    let h1 := hI.1
-    have h2 : I = ⊥ := by aesop
+    let I_neq_zero := hI.1
+    have I_eq_zero : I = ⊥ := by aesop
     contradiction
   let ⟨e, ⟨h1, h2, ⟨h3, h4, h5⟩⟩⟩ := minimal_ideal_I_sq_nonzero_exists_idem_and_div I hI I_sq_nonzero
   use e
