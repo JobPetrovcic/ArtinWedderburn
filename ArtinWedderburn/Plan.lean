@@ -30,7 +30,14 @@ variable (idem_e : IsIdempotentElem e)
 universe u
 
 def ArtinWedderburnForPrime {R : Type u} [Ring R] (h : IsPrimeRing R) [IsArtinian R R] :
-  ∃ (n : ℕ) (D : Type u) ( _ : DivisionRing D), Nonempty (R ≃+* Matrix (Fin n) (Fin n) D) := by sorry -- Leave for now, split into multiple lemmas
+    ∃ (n : ℕ) (D : Type u) ( _ : DivisionRing D), Nonempty (R ≃+* Matrix (Fin n) (Fin n) D) := by
+  obtain ⟨I, hI⟩ : ∃ I : Ideal R, IsAtom I := artinian_ring_has_minimal_left_ideal_of_element
+  have h_sq_nz : I * I ≠ ⊥ := by 
+    intro h_sq_zero
+    apply h I I at h_sq_zero
+    simp at h_sq_zero
+    exact hI.1 h_sq_zero
+  sorry -- Leave for now, split into multiple lemmas
 
 def ArtinWedderburnForSimple {R : Type u} [Ring R] [IsSimpleRing R] :
   ∃ (n : ℕ) (D : Type u) ( _ :DivisionRing D), Nonempty (R ≃+* Matrix (Fin n) (Fin n) D) := by sorry -- Just an application
