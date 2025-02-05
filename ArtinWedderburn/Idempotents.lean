@@ -353,10 +353,11 @@ lemma e_f_orhogonal_f_1_sub_e_eq_f (e f : R) (h : IsOrthogonal e f) : f * (1 - e
       _ = f := by rw [h.2]; noncomm_ring
 
 -- lemma 2.14
-theorem artinian_ring_has_minimal_left_ideal_of_element [IsArtinian R R] : ∃ I : Ideal R, IsAtom I := by sorry -- Mikita
+theorem artinian_ring_has_minimal_left_ideal_of_element [IsArtinian R R] [Nontrivial R] : ∃ I : Ideal R, IsAtom I := by
+  exact IsAtomic.exists_atom (Ideal R)
 
 
-theorem prime_and_artinian_esists_idem_corner_div (h : IsPrimeRing R) (h' : IsArtinian R R) : -- Maša
+theorem prime_and_artinian_esists_idem_corner_div [Nontrivial R] (h : IsPrimeRing R) (h' : IsArtinian R R) : -- Maša
   ∃(e : R), e ≠ 0 ∧ IsIdempotentElem e ∧ IsDivisionSubring (CornerSubringNonUnital e) e := by
   have ⟨I, hI⟩ : ∃ I : Ideal R, IsAtom I := by exact artinian_ring_has_minimal_left_ideal_of_element
   have I_sq_nonzero : I * I ≠ ⊥ := by
