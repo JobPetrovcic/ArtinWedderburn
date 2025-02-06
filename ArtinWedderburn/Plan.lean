@@ -21,9 +21,17 @@ universe u
 
 def IdemIdeal (I : Ideal R) : Prop := ∃ (e : R), IsIdempotentElem e ∧  I = Ideal.span {e}
 
-def OrtIdem (R : Type u) [Ring R] : Prop := ∃ (n : ℕ) (ι : Fin n → R) , ∀ i, IsIdempotentElem (ι i) ∧  (∑ i, ι i = 1) ∧ ∀ i j, IsOrthogonal (ι i) (ι j)
+def OrtIdem (R : Type u) [Ring R] : Prop := ∃ (n : ℕ) (ι : Fin n → R) (h : Fin n → IsIdempotentElem ι), (∑ i, ι i = 1) ∧ ∀ i j, IsOrthogonal (ι i) (ι j) ∧ ∀ i, IsDivisionRing (CornerSubring (h i))
 
-def NiceIdeal (I : Ideal R) : Prop := IdemIdeal I → ∃ (e : R) (idem : IsIdempotentElem e), Ideal.span {e} = I ∧ OrtIdem (CornerSubring idem) ∧ IsDivisionRing (CornerSubring idem)
+
+def NiceIdeal (I : Ideal R) : Prop := IdemIdeal I → ∃ (e : R) (idem : IsIdempotentElem e), Ideal.span {e} = I ∧ OrtIdem (CornerSubring idem)
+
+theorem subideals_nice_ideal_nice (I : Ideal R) (h : ∀ J, J < I → NiceIdeal J) : NiceIdeal I := by sorry
+
+theorem acc_ideal_nice (I : Ideal R) (h_acc : Acc (fun x y => x < y) I) : NiceIdeal I := by
+  induction h_acc with
+  | intro J h_acc_J hJ =>
+    exact subideals_nice_ideal_nice J hJ
 
 /-
 theorem corner_ring_of_ideal_has_matrix_units (I : Ideal R) (h : ∃ (e : R), IsIdempotentElem e ∧  I = Ideal.span {e}) (I_acc : Acc (fun x y => x < y) I) (h_nontriv : Nontrivial R) (h_prime : IsPrimeRing R) (h_artinian : IsArtinian R R): ∃ (n : ℕ), HasMatrixUnits (CornerSubring idem_e) n := by
