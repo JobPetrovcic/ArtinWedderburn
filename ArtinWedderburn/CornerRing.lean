@@ -104,10 +104,15 @@ lemma e_in_corner_ring : --Maša
   rw [subring_mem_idem]
   rw [IsIdempotentElem.eq idem_e, IsIdempotentElem.eq idem_e]
 
-lemma nonzero (x : CornerSubring idem_e) (hx : x.val ≠ 0): (x : CornerSubring idem_e) ≠ 0 := by
-  by_contra hzero
-  rw [Subtype.ext_iff_val] at hzero
-  exact hx hzero
+lemma nonzero (x : CornerSubring idem_e): (x : CornerSubring idem_e) ≠ 0 ↔ x.val ≠ 0 := by
+  constructor
+  · intro hnz hz
+    apply hnz
+    exact Subtype.ext hz
+  · intro hnz hz
+    rw [Subtype.ext_iff_val] at hz
+    exact hnz hz
+
 
 lemma eq_iff_val (x y z : CornerSubring idem_e) : (x + y).val = z.val ↔ x.val + y.val = z.val := by
   exact Eq.congr_right rfl

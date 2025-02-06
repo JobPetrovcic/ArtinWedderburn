@@ -61,6 +61,11 @@ theorem one_sub_e_larger_span_on_sub_e_sub_f (e f : R) (ef_ort_idem : AreOrthogo
     contradiction
   exact leq_neq_lt (Ideal.span {1 - e - f}) (Ideal.span {1 - e}) hleq hneq
 
+theorem e_span_larger_e_sub_f (e f : R) (h : AreOrthogonalIdempotents (1 - e) f) (fnz : f ≠ 0): Ideal.span {e - f} <  Ideal.span {e} := by -- Maša
+  have h' := one_sub_e_larger_span_on_sub_e_sub_f (1 - e) f h fnz
+  simp at h'
+  exact h'
+
 def HasMatrixUnits (R : Type*) [Ring R] (n : ℕ) : Prop := ∃ (es : Fin n → Fin n → R), (∑ i, es i i = 1) ∧ (∀ i j k l, es i j * es k l = (if j = k then es i l else 0)) -- Done by Job (as class - see above) and rewritten by Matevz (as def)
 
 variable (e : R)
@@ -157,7 +162,7 @@ lemma corner_ring_division_e_nonzero --Maša
   exact hx (h_zero x)
 
 --multiplication with e and f preserves both_mul e f
-lemma nevem (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) :
+lemma both_mul_e_f (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) :
   ∀ x ∈ both_mul e f, e * x = x ∧ x * f = x := by
   rintro x ⟨y, hy⟩
   have he : e * x = x := by
@@ -220,7 +225,7 @@ theorem lemma_2_19 -- Maša
   have x_val_eq : x.val = e * a * f * b * e := by rfl
 
   have x_nonzero : (x : CornerSubring idem_e) ≠ 0 := by
-    apply nonzero
+    rw [nonzero]
     rw [x_val_eq]
     exact hb
 
@@ -255,8 +260,8 @@ theorem lemma_2_19 -- Maša
     have _ : f * b * e * c * e = f * (b * e * c) * e := by noncomm_ring
     use (b * e * c)
 
-  have fv_eq_v : f * v = (v : R) := by exact (nevem f idem_f idem_e v hv).1
-  have ve_eq_v : v * e = v := by exact (nevem f idem_f idem_e v hv).2
+  have fv_eq_v : f * v = (v : R) := by exact (both_mul_e_f f idem_f idem_e v hv).1
+  have ve_eq_v : v * e = v := by exact (both_mul_e_f f idem_f idem_e v hv).2
 
   have uv_eq_e : u * v = e := by
     calc e * a * f * (f * b * e * c * e) = e * a * (f * f) * b * e * c * e := by noncomm_ring
@@ -294,7 +299,7 @@ theorem lemma_2_19 -- Maša
         let w : CornerSubring idem_f := ⟨v * u - f, h_mem⟩
         have w_val_eq : w.val = v * u - f := by exact rfl
         have h_inv : ∃(a : CornerSubring idem_f), a * w = (1 : CornerSubring idem_f) := by
-          obtain ⟨a, ⟨h1, h2⟩⟩ := hfRf.2 w (nonzero idem_f w h_nonzero)
+          obtain ⟨a, ⟨h1, h2⟩⟩ := hfRf.2 w (by rw [nonzero]; exact h_nonzero)
           use a
         obtain ⟨a, ha⟩ := h_inv
         have wv_eq_zero : w * v = 0 := by
@@ -312,27 +317,20 @@ theorem lemma_2_19 -- Maša
               _ = 0 := by rw[v_eq_zero]; noncomm_ring
         exact he e_eq_zero
 
--- lemma one_sub_e_idem (e : R) (idem_e : IsIdempotentElem e): IsIdempotentElem (1 - e) := by sorry
 
-theorem f_in_corner_othogonal (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) --Maša
-  (f_mem : f ∈ both_mul (1 - e) (1 - e)) : AreOrthogonalIdempotents e f := by
+theorem f_in_corner_othogonal (e f : R) (idem_e : IsIdempotentElem e) --Maša
+  (f_mem : f ∈ both_mul (1 - e) (1 - e)) : IsOrthogonal e f := by
   obtain ⟨x, hx⟩ := f_mem
-  have ef_orhogonal : IsOrthogonal e f := by
-    constructor
-    · rw [hx]
-      calc _ = (e - e * e) * x * (1 - e) := by noncomm_ring
-          _ = (e - e) * x * (1 - e) := by rw [idem_e]
-          _ = 0 := by noncomm_ring
-    · rw [hx]
-      calc _ = (1 - e) * x * (e - e * e) := by noncomm_ring
-          _ = (1 - e) * x * (e - e) := by rw [idem_e]
-          _ = 0 := by noncomm_ring
-  exact ⟨idem_e, idem_f, ef_orhogonal⟩
+  constructor
+  · rw [hx]
+    calc _ = (e - e * e) * x * (1 - e) := by noncomm_ring
+        _ = (e - e) * x * (1 - e) := by rw [idem_e]
+        _ = 0 := by noncomm_ring
+  · rw [hx]
+    calc _ = (1 - e) * x * (e - e * e) := by noncomm_ring
+        _ = (1 - e) * x * (e - e) := by rw [idem_e]
+        _ = 0 := by noncomm_ring
 
-lemma e_idem_to_one_sub_e_idem (e : R) (idem_e : IsIdempotentElem e) : IsIdempotentElem (1 - e) := by --Maša
-  unfold IsIdempotentElem
-  calc _ = 1 - 2 * e + e * e := by noncomm_ring
-      _ = 1 - e := by rw [idem_e]; noncomm_ring
 
 lemma sum_orthogonal_idem_is_idem (e f : R) (h : AreOrthogonalIdempotents e f) : IsIdempotentElem (e + f) := by --Maša
   let ⟨idem_e, idem_f, h1, h2⟩ := h
@@ -354,7 +352,7 @@ lemma e_f_orhogonal_f_1_sub_e_eq_f (e f : R) (h : IsOrthogonal e f) : f * (1 - e
       _ = f := by rw [h.2]; noncomm_ring
 
 -- lemma 2.14
-theorem artinian_ring_has_minimal_left_ideal_of_element [IsArtinian R R] [Nontrivial R] : ∃ I : Ideal R, IsAtom I := by
+theorem artinian_ring_has_minimal_left_ideal_of_element [IsArtinian R R] [Nontrivial R] : ∃ I : Ideal R, IsAtom I := by -- Maša
   exact IsAtomic.exists_atom (Ideal R)
 
 
