@@ -6,6 +6,7 @@ import ArtinWedderburn.PrimeRing
 import ArtinWedderburn.CornerRing
 import ArtinWedderburn.MatrixUnits
 import ArtinWedderburn.Idempotents
+import ArtinWedderburn.NiceIdeals
 
 import Mathlib.RingTheory.SimpleModule
 
@@ -25,82 +26,6 @@ universe u
 -- Lema OrtIdem -> HasMatrixUnits?
 -- Lema HasMatrixUnits -> statement izreka?
 
-def IdemIdeal (I : Ideal R) : Prop := ∃ (e : R), IsIdempotentElem e ∧ I = Ideal.span {e}
-
-def OrtIdem (R : Type u) [Ring R] : Prop := ∃ (n : ℕ) (ι : Fin n → R) (h : (i : Fin n) → IsIdempotentElem (ι i)), (∑ i, ι i = 1) ∧ (∀ i j, IsOrthogonal (ι i) (ι j)) ∧ (∀ i, IsDivisionRing (CornerSubring (h i)))
-
-def NiceIdeal (I : Ideal R) : Prop := IdemIdeal I → ∃ (e : R) (idem : IsIdempotentElem e), I = Ideal.span {e} ∧ OrtIdem (CornerSubring idem)
-
-def NiceIdeal' (I : Ideal R) : Prop := IdemIdeal I → ∀ (e : R) (enz : e ≠ 0) (idem : IsIdempotentElem e), I = Ideal.span {e} →  OrtIdem (CornerSubring idem)
-
-lemma corner_nontrivial (R : Type u) [Ring R] {e : R} (idem_e : IsIdempotentElem e) (e_nonzero : e ≠ 0) : Nontrivial (CornerSubring idem_e) := by
-  constructor
-  use ⟨e, by exact e_in_corner_ring idem_e⟩
-  use 0
-  exact (nonzero idem_e ⟨e, e_in_corner_ring idem_e⟩).mpr e_nonzero
-
-theorem OrtIdem_HasMatrixUnits (R : Type u) [Ring R] (ort_idem : OrtIdem R) : ∃ (n : ℕ), HasMatrixUnits R n := by sorry
-
-theorem subideals_nice_ideal_nice' [Nontrivial R] (h_prime : IsPrimeRing R) (h_art : IsArtinian R R) (I : Ideal R) (h : ∀ J, J < I → NiceIdeal' J) : NiceIdeal' I := by
-  intro h_idem_I e enz idem_e I_span_e
-  have e_nonzero : e ≠ 0 := by sorry
-  have corner_nontriv : Nontrivial (CornerSubring idem_e) := by exact corner_nontrivial R idem_e e_nonzero
-  have corner_prime : IsPrimeRing (CornerSubring idem_e) := by exact corner_ring_prime idem_e h_prime
-  have corner_artinian : IsArtinian (CornerSubring idem_e) (CornerSubring idem_e) := by exact corner_ring_artinian idem_e
-  obtain ⟨f, ⟨fnz, idem_f, div_f⟩⟩ := prime_and_artinian_esists_idem_corner_div corner_prime corner_artinian
-  have fnzR : (f.val : R) ≠ 0 := by exact (nonzero idem_e f).mp fnz
-
-  have idem_one_sub_e : IsIdempotentElem (1 - e) := by exact IsIdempotentElem.one_sub idem_e
-  have f_mem : f.val ∈ both_mul e e := by exact Subtype.coe_prop f
-  have idem_f_val : IsIdempotentElem f.val := by
-    unfold IsIdempotentElem
-    calc _ = (f * f).val := by exact rfl
-        _ = f.val := by exact congrArg Subtype.val idem_f
-
-  have one_sub_e_f_orthogonal : IsOrthogonal (1 - e) f := by
-    have h' := f_in_corner_othogonal (1- e) f idem_one_sub_e (by simp)
-    exact h'
-
-  have ef_eq_f : e * f = f := by exact left_unit_mul idem_e f_mem
-  have hfRf : (both_mul f f) = both_mul (f : R) (f : R) := by exact both_mul_lift idem_e f f
-
-  have idem_e_sub_f : IsIdempotentElem (e - f) := by
-    unfold IsIdempotentElem
-    calc _ = (e * e) - e * f + (f * f) - f * e   := by noncomm_ring
-        _ = e - f + f - f * e := by rw [idem_e, ef_eq_f]; sorry
-        _ = e - f + f * (1 - e) := by noncomm_ring
-        _ = e - f := by rw [one_sub_e_f_orthogonal.2]; noncomm_ring
-
-  let J : Ideal R := Ideal.span {e - f}
-  #check J
-  have J_sub_I : J < I := by
-    rw [I_span_e]
-    apply e_span_larger_e_sub_f e f ⟨idem_one_sub_e, idem_f_val, one_sub_e_f_orthogonal⟩ fnzR
-
-  have J_nice := h J J_sub_I
-  have J_idem : IdemIdeal J := by use e - f
-  specialize J_nice J_idem (e - f) (by sorry) idem_e_sub_f (by rfl)
-
-  unfold OrtIdem at *
-  let ⟨n, h, h_idem, h_sum, ⟨h_ort, h_div⟩⟩ := J_nice
-  use (n + 1)
-  --have h'' : ∀ i, (h i) ∈ CornerSubring idem_e := by sorry
-
-  --have h_sum' : f + ∑ i, h i = 1 := by sorry
-  --have h_ort' : ∀ i, IsOrthogonal (h i) f := by sorry
-  --have h_div' : ∀ i, IsDivisionRing (CornerSubring (h i)) := by sorry
-
-  --use (λ i =>  if i = n then f else h (Fin.castLT i (by sorry))
-  --use (λ i => if i = n then idem_f else h_idem (Fin.castLT i (by sorry)))
-
-  sorry
-
-
-theorem acc_ideal_nice [Nontrivial R] (h_prime : IsPrimeRing R) (h_art : IsArtinian R R) (I : Ideal R) (h_acc : Acc (fun x y => x < y) I) : NiceIdeal' I := by
-  induction h_acc with
-  | intro J h_acc_J hJ =>
-    exact subideals_nice_ideal_nice' h_prime h_art J hJ
-
 
 def ArtinWedderburnForPrime {R : Type u} [Ring R] [Nontrivial R] (h_prime : IsPrimeRing R) (h_artinian : IsArtinian R R) :
   ∃ (n : ℕ) (D : Type u) ( _ : DivisionRing D), Nonempty (R ≃+* Matrix (Fin n) (Fin n) D) := by
@@ -112,7 +37,7 @@ def ArtinWedderburnForPrime {R : Type u} [Ring R] [Nontrivial R] (h_prime : IsPr
     constructor
     · exact IsIdempotentElem.one
     · exact Eq.symm Ideal.span_singleton_one
-  specialize R_nice R_idem 1 (by exact one_ne_zero) IsIdempotentElem.one (by exact Eq.symm Ideal.span_singleton_one)
+  specialize R_nice R_idem 1 IsIdempotentElem.one (by exact Eq.symm Ideal.span_singleton_one)
   unfold OrtIdem at *
   have R_ort_idem : OrtIdem R := by sorry
   have h_matrix_units : ∃(n : ℕ), HasMatrixUnits R n := by exact OrtIdem_HasMatrixUnits R R_ort_idem
