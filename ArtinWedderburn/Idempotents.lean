@@ -351,6 +351,19 @@ lemma e_f_orhogonal_f_1_sub_e_eq_f (e f : R) (h : IsOrthogonal e f) : f * (1 - e
   calc _ = f - f * e := by noncomm_ring
       _ = f := by rw [h.2]; noncomm_ring
 
+lemma f_mem_corner_e_e_sub_f_idem (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) (f_mem : f ∈ CornerSubring idem_e) : IsIdempotentElem (e - f) := by --Maša
+  have idem_one_sub_e : IsIdempotentElem (1 - e) := by exact IsIdempotentElem.one_sub idem_e
+
+  have one_sub_e_f_orthogonal : IsOrthogonal (1 - e) f := by exact f_in_corner_othogonal (1- e) f idem_one_sub_e (by simp; exact f_mem)
+
+  have ef_eq_f : e * f = f := by exact left_unit_mul idem_e f_mem
+
+  unfold IsIdempotentElem
+  calc _ = (e * e) - e * f + (f * f) - f * e   := by noncomm_ring
+      _ = e - f + f - f * e := by rw [idem_e, ef_eq_f, idem_f]
+      _ = e - f + f * (1 - e) := by noncomm_ring
+      _ = e - f := by rw [one_sub_e_f_orthogonal.2]; noncomm_ring
+
 -- lemma 2.14
 theorem artinian_ring_has_minimal_left_ideal_of_element [IsArtinian R R] [Nontrivial R] : ∃ I : Ideal R, IsAtom I := by -- Maša
   exact IsAtomic.exists_atom (Ideal R)
@@ -367,4 +380,5 @@ theorem prime_and_artinian_esists_idem_corner_div [Nontrivial R] (h : IsPrimeRin
     have I_eq_zero : I = ⊥ := by aesop
     contradiction
   let ⟨e, ⟨h1, h2, ⟨h3, h4, h5⟩⟩⟩ := minimal_ideal_I_sq_nonzero_exists_idem_and_div I hI I_sq_nonzero
+
   use e
