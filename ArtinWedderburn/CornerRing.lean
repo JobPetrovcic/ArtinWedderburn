@@ -114,6 +114,13 @@ lemma nonzero (x : CornerSubring idem_e): (x : CornerSubring idem_e) ≠ 0 ↔ x
     exact hnz hz
 
 
+lemma corner_nontrivial (R : Type*) [Ring R] {e : R} (idem_e : IsIdempotentElem e) (e_nonzero : e ≠ 0) : Nontrivial (CornerSubring idem_e) := by --Maša
+  constructor
+  use ⟨e, by exact e_in_corner_ring idem_e⟩
+  use 0
+  exact (nonzero idem_e ⟨e, e_in_corner_ring idem_e⟩).mpr e_nonzero
+
+
 lemma eq_iff_val (x y z : CornerSubring idem_e) : (x + y).val = z.val ↔ x.val + y.val = z.val := by
   exact Eq.congr_right rfl
 
@@ -126,6 +133,15 @@ lemma e_x_e_in_corner : ∀(x : R), e * x * e ∈ CornerSubring idem_e := by
 -- The corner ring is a ring
 instance CornerRingIsRing (idem_e : IsIdempotentElem e) : Ring (CornerSubring idem_e) := non_unital_w_e_is_ring 1 (is_left_unit idem_e) (is_right_unit idem_e) -- Done by Job
 
+def coercion_to_eRe (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) (f_mem : f ∈ CornerSubring idem_e) (x : CornerSubring idem_f): CornerSubring idem_e := by -- Maša and Job
+  use x.val
+  have h : x.val ∈ both_mul e e := by
+    let ⟨y, hy⟩ := f_mem
+    let ⟨z, hz⟩ := x.property
+    rw [hz, hy]
+    use (y * e * z * e * y)
+    noncomm_ring
+  exact h
 
 -- coercions from Sets of CornerSubrings to Set of R
 instance : CoeOut (Set (CornerSubring idem_e)) (Set R) := {coe := fun X => Set.image Subtype.val X}
@@ -291,7 +307,7 @@ theorem corner_ring_both_mul_mem' (x y : CornerSubring idem_e) (w : R) : x * w *
   exact x.property
   exact y.property
 
--- if a and b in eRe, then a (e R e) = a R b as sets
+-- if a and b in eRe, then a (e R e) b = a R b as sets
 theorem both_mul_lift (x y : CornerSubring idem_e) : (both_mul (x : CornerSubring idem_e)  y) = both_mul (x : R) (y : R) := by
   ext a
   constructor
