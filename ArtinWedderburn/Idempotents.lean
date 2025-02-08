@@ -478,10 +478,10 @@ theorem prime_and_artinian_esists_idem_corner_div [Nontrivial R] (h : IsPrimeRin
   use e
 
 
-
-
-
-
+lemma e_idem_to_e_val_idem {e : R} {idem_e : IsIdempotentElem e} {x : CornerSubring idem_e} (idem_x : IsIdempotentElem x): IsIdempotentElem x.val := by
+  have pl := congrArg Subtype.val idem_x
+  simp only [NonUnitalSubring.val_mul] at pl
+  exact pl
 
 
 
@@ -491,14 +491,14 @@ theorem prime_and_artinian_esists_idem_corner_div [Nontrivial R] (h : IsPrimeRin
 def OrtIdem (R : Type*) [Ring R] : Prop := ∃ (n : ℕ) (ι : Fin n → R) (h : (i : Fin n) → IsIdempotentElem (ι i)), (∑ i, ι i = 1) ∧ (∀ i j, i ≠ j → IsOrthogonal (ι i) (ι j)) ∧ (∀ i, IsDivisionRing (CornerSubring (h i)))
 -/
 
-class OrtIdem (R : Type*) [Ring R] where -- Job and Maša
+structure OrtIdem (R : Type*) [Ring R] where -- Job and Maša
   (n : ℕ)
   (f : Fin n → R)
   (h : (i : Fin n) → IsIdempotentElem (f i))
   (sum_one : ∑ i, f i = 1)
   (orthogonal: ∀ i j, i ≠ j → IsOrthogonal (f i) (f j))
 
-class OrtIdemDiv (R : Type*) [Ring R] extends OrtIdem R where
+structure OrtIdemDiv (R : Type*) [Ring R] extends OrtIdem R where
   (div : ∀ i, IsDivisionRing (CornerSubring (h i)))
 
 -- missing is application of lemma 2.17
