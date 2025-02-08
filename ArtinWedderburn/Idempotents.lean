@@ -6,6 +6,9 @@ import ArtinWedderburn.PrimeRing
 import ArtinWedderburn.CornerRing
 import ArtinWedderburn.SetProd
 import ArtinWedderburn.MinIdeals
+import Init
+
+#check Classical.choice
 
 
 variable {R : Type*} [Ring R]
@@ -121,7 +124,6 @@ theorem OrtIdem_imply_MatUnits {n : ℕ} (hn : 0 < n) -- Done by Matevz
 
 
 
-
 -- If e and f are nonzero elements then corner ring eRf contains nonzero element
 lemma eRf_nonzero --Maša
   (h : IsPrimeRing R) (e f : R) (he : e ≠ 0) (hf : f ≠ 0) :
@@ -209,7 +211,7 @@ class two_nice_idempotents (e f : R) where
 -- Lemma 2.19 (a)
 theorem lemma_2_19 -- Maša
   (h : IsPrimeRing R)
-  (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) (ort : IsOrthogonal e f)
+  (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f)
   (heRe : IsDivisionRing (CornerSubring idem_e)) (hfRf : IsDivisionRing (CornerSubring idem_f)) :
   ∃ u v : R, u ∈ both_mul e f ∧ v ∈ both_mul f e ∧ u * v = e ∧ v * u = f := by
   have he : e ≠ 0 := by exact corner_ring_division_e_nonzero idem_e heRe
@@ -401,3 +403,34 @@ theorem prime_and_artinian_esists_idem_corner_div [Nontrivial R] (h : IsPrimeRin
   let ⟨e, ⟨h1, h2, ⟨h3, h4, h5⟩⟩⟩ := minimal_ideal_I_sq_nonzero_exists_idem_and_div I hI I_sq_nonzero
 
   use e
+
+
+
+
+
+
+
+
+
+
+
+
+def OrtIdem (R : Type*) [Ring R] : Prop := ∃ (n : ℕ) (ι : Fin n → R) (h : (i : Fin n) → IsIdempotentElem (ι i)), (∑ i, ι i = 1) ∧ (∀ i j, i ≠ j → IsOrthogonal (ι i) (ι j)) ∧ (∀ i, IsDivisionRing (CornerSubring (h i)))
+
+-- missing is application of lemma 2.17
+theorem lemma_2_20_full (prime : IsPrimeRing R) (ort_idem : OrtIdem R) : ∃ (e : R) (idem : IsIdempotentElem e) (n : ℕ), Nonempty (R ≃+* Matrix (Fin n) (Fin n) (CornerSubring idem)) := sorry  -- by Matevz
+
+
+theorem lemma_2_20 (prime : IsPrimeRing R) (ort_idem : OrtIdem R) : ∃ (e : R) (idem : IsIdempotentElem e) (n : ℕ), HasMatrixUnits R n := by
+  obtain ⟨n, diag, h, sum_eq_one, ort, div⟩ := ort_idem -- by Matevz
+  have n_pos : 0 < n := sorry -- missing hypotesys that R is nontrivial
+  let e := diag ⟨0, n_pos⟩
+  use e, h ⟨0, n_pos⟩, n
+  let proof_uv := fun i => lemma_2_19 prime (diag ⟨0, n_pos⟩) (diag i) (h ⟨0, n_pos⟩) (h i) (div ⟨0, n_pos⟩) (div i)
+  let p : Fin n → R → Prop := fun i => (fun u => ∃ v,
+    u ∈ both_mul (diag ⟨0, n_pos⟩) (diag i) ∧
+    v ∈ both_mul (diag i) (diag ⟨0, n_pos⟩) ∧ u * v = diag ⟨0, n_pos⟩ ∧ v * u = diag i)
+
+  have row_es : Fin n → R := fun i => by sorry
+  have out := OrtIdem_imply_MatUnits n_pos diag h ort sum_eq_one row_es sorry sorry sorry sorry sorry
+  exact out
