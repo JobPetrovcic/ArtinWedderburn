@@ -18,16 +18,6 @@ universe u
 
 def IdemIdeal (I : Ideal R) : Prop := ∃ (e : R), IsIdempotentElem e ∧ I = Ideal.span {e}
 
-class OrtIdem (R : Type u) [Ring R] where -- Job and Maša
-  (n : ℕ)
-  (ι : Fin n → R)
-  (h : (i : Fin n) → IsIdempotentElem (ι i))
-  (sum_one : ∑ i, ι i = 1)
-  (orthogonal: ∀ i j, IsOrthogonal (ι i) (ι j))
-
-class OrtIdemDiv (R : Type u) [Ring R] extends OrtIdem R where
-  (div : ∀ i, IsDivisionRing (CornerSubring (h i)))
-
 lemma idem_lift_is_idem {e : R} {idem_e : IsIdempotentElem e} (f : CornerSubring idem_e)(hf : IsIdempotentElem f) : IsIdempotentElem (f : R) := by
   unfold IsIdempotentElem at *
   nth_rewrite 3 [←hf]
