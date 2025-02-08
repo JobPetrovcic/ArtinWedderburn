@@ -122,7 +122,7 @@ theorem OrtIdem_imply_MatUnits {n : ℕ} (hn : 0 < n) -- Done by Matevz
 
 
 
--- If e and f are nonzero elements then corner ring eRf contains nonzero element
+-- If e and f are nonzero elements and R is prime then eRf contains nonzero element
 lemma eRf_nonzero --Maša
   (h : IsPrimeRing R) (e f : R) (he : e ≠ 0) (hf : f ≠ 0) :
   ∃(a : R), e * a * f ≠ 0 := by
@@ -206,8 +206,9 @@ class two_nice_idempotents (e f : R) where
   (u_mul_v : u * v = e)
   (v_mul_u : v * u = f)
 
+/-
 def lemma_2_19'(h : IsPrimeRing R)
-  (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) (ort : IsOrthogonal e f)
+  (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f)
   (heRe : IsDivisionRing (CornerSubring idem_e)) (hfRf : IsDivisionRing (CornerSubring idem_f)) : two_nice_idempotents e f := by
   have he : e ≠ 0 := by exact corner_ring_division_e_nonzero idem_e heRe
   have hf : f ≠ 0 := by exact corner_ring_division_e_nonzero idem_f hfRf
