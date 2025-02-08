@@ -201,6 +201,7 @@ lemma both_mul_mul : ∀ (x y : R), x ∈ both_mul e f → y ∈ both_mul f e �
   noncomm_ring
 
 
+
 -- Lemma 2.19 (a)
 theorem lemma_2_19 -- Maša
   (h : IsPrimeRing R)
