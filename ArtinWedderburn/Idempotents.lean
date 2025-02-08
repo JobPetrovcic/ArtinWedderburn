@@ -279,6 +279,7 @@ def lemma_2_19'(h : IsPrimeRing R)
         _ = v := by exact ve_eq_v
   sorry
 
+
 -- Lemma 2.19 (a)
 theorem lemma_2_19 -- Maša
   (h : IsPrimeRing R)
