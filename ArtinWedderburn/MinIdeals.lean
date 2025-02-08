@@ -250,7 +250,23 @@ def IsDivisionSubring (S : NonUnitalSubring R) (e : R) : Prop := (∃ x : R, x �
 def IsDivisionRing (R : Type*) [Ring R] : Prop := (∃ x : R, x ≠ 0) ∧ (∀ x : R, x ≠ 0 → ∃ y : R, y * x = 1 ∧ x * y = 1) -- Done by Matevz
 
 -- If at some point we decide to define division ring as a ring in which every nonzero element has a two sided inverse
---theorem left_inv_implies_divring (h : ∀ x : R, x ≠ 0 → ∃ y : R, y * x = 0) : IsDivisionRing R := by trivial -- Done by Matevz
+theorem left_inv_implies_divring [Nontrivial R] (h : ∀ x : R, x ≠ 0 → ∃ y : R, y * x = 1) : IsDivisionRing R := by -- Maša
+  unfold IsDivisionRing
+  constructor
+  · exact exists_ne 0
+  · intro x x_nz
+    let ⟨y, hy⟩ := h x x_nz
+    have y_nz : y ≠ 0 := by exact left_ne_zero_of_mul_eq_one hy
+    let ⟨z, hz⟩ := h y y_nz
+    have x_eq_z : x = z := by
+      calc x = (z * y) * x := by rw [hz]; noncomm_ring
+          _ = z * (y * x) := by noncomm_ring
+          _ = z := by rw [hy]; noncomm_ring
+    use y
+    constructor
+    · exact hy
+    · rw [x_eq_z]
+      exact hz
 
 -- Lemma 2.12
 -- hypothesis: I^2 ≠ ⊥ and I is a minimal left ideal
@@ -306,3 +322,18 @@ theorem minimal_ideal_I_sq_nonzero_exists_idem_and_div (h_atom_I : IsAtom I) (hI
       · constructor
         · trivial
         · exact corner_ring_div (Ideal.span {e}) h_atom_I e he henz he_idem
+
+
+theorem div_subring_to_div_ring (e : R) (idem_e : IsIdempotentElem e) (h : IsDivisionSubring (CornerSubringNonUnital e) e) : IsDivisionRing (CornerSubring idem_e) := by --Maša
+  obtain ⟨⟨a, ⟨a_mem, a_nz⟩⟩, h_inv⟩ := h
+  have corner_nontrivial : Nontrivial (CornerSubring idem_e) := by
+    use (⟨a, a_mem⟩ : CornerSubring idem_e), ⟨0, by exact NonUnitalSubring.zero_mem (CornerSubring idem_e)⟩
+    simp_all
+  apply left_inv_implies_divring
+  clear a a_mem a_nz
+  intro x x_nz
+  let ⟨y, ⟨y_mem, hy⟩⟩ := h_inv x (by exact SetLike.coe_mem x) (by exact (nonzero idem_e x).mp x_nz)
+  use ⟨y, y_mem⟩
+  rw [Subtype.ext_iff_val]
+  simp
+  exact hy
