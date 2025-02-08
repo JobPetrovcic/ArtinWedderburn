@@ -31,7 +31,7 @@ def OrtIdem (R : Type u) [Ring R] : Prop := ∃ (n : ℕ) (ι : Fin n → R) (h 
 
 def NiceIdeal (I : Ideal R) : Prop := IdemIdeal I → ∃ (e : R) (idem : IsIdempotentElem e), I = Ideal.span {e} ∧ OrtIdem (CornerSubring idem)
 
-def NiceIdeal' (I : Ideal R) : Prop := IdemIdeal I → ∀ (e : R) (enz : e ≠ 0) (idem : IsIdempotentElem e), I = Ideal.span {e} →  OrtIdem (CornerSubring idem)
+def NiceIdeal' (I : Ideal R) : Prop := IdemIdeal I → ∀ (e : R) (idem : IsIdempotentElem e), I = Ideal.span {e} →  OrtIdem (CornerSubring idem)
 
 lemma corner_nontrivial (R : Type u) [Ring R] {e : R} (idem_e : IsIdempotentElem e) (e_nonzero : e ≠ 0) : Nontrivial (CornerSubring idem_e) := by
   constructor
