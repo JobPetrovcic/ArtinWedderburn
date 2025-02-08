@@ -4,6 +4,7 @@ import Mathlib.Algebra.Ring.Idempotents
 import Init.Data.Fin.Basic
 import ArtinWedderburn.PrimeRing
 import ArtinWedderburn.CornerRing
+import Mathlib.Algebra.Group.Basic
 --import ArtinWedderburn.MatrixUnits
 import ArtinWedderburn.Idempotents
 
@@ -78,11 +79,28 @@ def extension_of_ort_idem (e : R) (idem_e : IsIdempotentElem e) (oi : OrtIdem (C
   n := oi.n + 1,
   ι := idempotents e (fun (i : Fin oi.n) => oi.ι i),
   h := sorry--extend_idempotents e idem_e oi.ι oi.h,
-  sum_one := by sorry
+  sum_one := by
+    rw [Fin.sum_univ_succ]
+    rw [idempotents_first]
+    apply add_eq_of_eq_sub'
+    #check oi.sum_one
+    have one_sub_e_unit : 1 - e = (1 : CornerSubring (IsIdempotentElem.one_sub idem_e)) := by rfl
+
+    rw [one_sub_e_unit]
+    --rw [idempotents_rest]
+    --rw [oi.sum_one]
+
+    sorry
     --have h_sum := oi.sum_one
     --rw [← idempotents_first e oi.ι, ← idempotents_rest e oi.ι] at h_sum
     --exact h_sum,
-  orthogonal := by sorry
+  orthogonal := by
+    intro i j
+    by_cases (i = 0)
+    sorry
+
+
+    sorry
     --intro i j
     --have h_ort := oi.orthogonal i j
     --rw [← idempotents_first e oi.ι, ← idempotents_rest e oi.ι] at h_ort
