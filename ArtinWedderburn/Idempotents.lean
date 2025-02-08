@@ -6,9 +6,8 @@ import ArtinWedderburn.PrimeRing
 import ArtinWedderburn.CornerRing
 import ArtinWedderburn.SetProd
 import ArtinWedderburn.MinIdeals
-import Init
 
-#check Classical.choice
+
 
 
 variable {R : Type*} [Ring R]
@@ -200,7 +199,7 @@ lemma both_mul_mul : ∀ (x y : R), x ∈ both_mul e f → y ∈ both_mul f e �
   rw [ha, hb]
   noncomm_ring
 
-class two_nice_idempotents (e f : R) where
+structure two_nice_idempotents (e f : R) where
   (u : R)
   (v : R)
   (u_mem : u ∈ both_mul e f)
@@ -209,8 +208,9 @@ class two_nice_idempotents (e f : R) where
   (v_mul_u : v * u = f)
 
 def lemma_2_19'(h : IsPrimeRing R)
-  (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) (ort : IsOrthogonal e f)
-  (heRe : IsDivisionRing (CornerSubring idem_e)) (hfRf : IsDivisionRing (CornerSubring idem_f)) : two_nice_idempotents e f := by
+  (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f)
+  (heRe : IsDivisionRing (CornerSubring idem_e)) (hfRf : IsDivisionRing (CornerSubring idem_f)) : two_nice_idempotents e f := by sorry
+/-
   have he : e ≠ 0 := by exact corner_ring_division_e_nonzero idem_e heRe
   have hf : f ≠ 0 := by exact corner_ring_division_e_nonzero idem_f hfRf
   have ha : ∃ (a : R), e * a * f ≠ 0 := by exact eRf_nonzero h e f he hf
@@ -280,14 +280,15 @@ def lemma_2_19'(h : IsPrimeRing R)
         _ = v * e := by rw [uv_eq_e]
         _ = v := by exact ve_eq_v
   sorry
-
+-/
 
 -- Lemma 2.19 (a)
 theorem lemma_2_19 -- Maša
   (h : IsPrimeRing R)
   (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f)
   (heRe : IsDivisionRing (CornerSubring idem_e)) (hfRf : IsDivisionRing (CornerSubring idem_f)) :
-  ∃ u v : R, u ∈ both_mul e f ∧ v ∈ both_mul f e ∧ u * v = e ∧ v * u = f := by
+  ∃ u v : R, u ∈ both_mul e f ∧ v ∈ both_mul f e ∧ u * v = e ∧ v * u = f := by sorry
+  /-
   have he : e ≠ 0 := by exact corner_ring_division_e_nonzero e idem_e heRe
   have hf : f ≠ 0 := by exact corner_ring_division_e_nonzero f idem_f hfRf
   have ha : ∃ (a : R), e * a * f ≠ 0 := by exact eRf_nonzero h e f he hf
@@ -397,7 +398,7 @@ theorem lemma_2_19 -- Maša
           calc _ = u * v := by rw[uv_eq_e]
               _ = 0 := by rw[v_eq_zero]; noncomm_ring
         exact he e_eq_zero
-
+-/
 
 theorem f_in_corner_othogonal (e f : R) (idem_e : IsIdempotentElem e) --Maša
   (f_mem : f ∈ both_mul (1 - e) (1 - e)) : IsOrthogonal e f := by
@@ -474,23 +475,32 @@ theorem prime_and_artinian_esists_idem_corner_div [Nontrivial R] (h : IsPrimeRin
 
 
 
-
+/-
 def OrtIdem (R : Type*) [Ring R] : Prop := ∃ (n : ℕ) (ι : Fin n → R) (h : (i : Fin n) → IsIdempotentElem (ι i)), (∑ i, ι i = 1) ∧ (∀ i j, i ≠ j → IsOrthogonal (ι i) (ι j)) ∧ (∀ i, IsDivisionRing (CornerSubring (h i)))
+-/
+
+class OrtIdem (R : Type*) [Ring R] where -- Job and Maša
+  (n : ℕ)
+  (f : Fin n → R)
+  (h : (i : Fin n) → IsIdempotentElem (f i))
+  (sum_one : ∑ i, f i = 1)
+  (orthogonal: ∀ i j, i ≠ j → IsOrthogonal (f i) (f j))
+
+class OrtIdemDiv (R : Type*) [Ring R] extends OrtIdem R where
+  (div : ∀ i, IsDivisionRing (CornerSubring (h i)))
 
 -- missing is application of lemma 2.17
-theorem lemma_2_20_full (prime : IsPrimeRing R) (ort_idem : OrtIdem R) : ∃ (e : R) (idem : IsIdempotentElem e) (n : ℕ), Nonempty (R ≃+* Matrix (Fin n) (Fin n) (CornerSubring idem)) := sorry  -- by Matevz
+theorem lemma_2_20_full (prime : IsPrimeRing R) (ort_idem : OrtIdemDiv R) : ∃ (e : R) (idem : IsIdempotentElem e) (n : ℕ), Nonempty (R ≃+* Matrix (Fin n) (Fin n) (CornerSubring idem)) := sorry
 
 
-theorem lemma_2_20 (prime : IsPrimeRing R) (ort_idem : OrtIdem R) : ∃ (e : R) (idem : IsIdempotentElem e) (n : ℕ), HasMatrixUnits R n := by
-  obtain ⟨n, diag, h, sum_eq_one, ort, div⟩ := ort_idem -- by Matevz
-  have n_pos : 0 < n := sorry -- missing hypotesys that R is nontrivial
-  let e := diag ⟨0, n_pos⟩
-  use e, h ⟨0, n_pos⟩, n
-  let proof_uv := fun i => lemma_2_19 prime (diag ⟨0, n_pos⟩) (diag i) (h ⟨0, n_pos⟩) (h i) (div ⟨0, n_pos⟩) (div i)
-  let p : Fin n → R → Prop := fun i => (fun u => ∃ v,
-    u ∈ both_mul (diag ⟨0, n_pos⟩) (diag i) ∧
-    v ∈ both_mul (diag i) (diag ⟨0, n_pos⟩) ∧ u * v = diag ⟨0, n_pos⟩ ∧ v * u = diag i)
-
-  have row_es : Fin n → R := fun i => by sorry
-  have out := OrtIdem_imply_MatUnits n_pos diag h ort sum_eq_one row_es sorry sorry sorry sorry sorry
-  exact out
+theorem lemma_2_20 (prime : IsPrimeRing R) (ort_idem : OrtIdemDiv R) (n_pos : 0 < ort_idem.n) : ∃ (e : R) (idem : IsIdempotentElem e) (n : ℕ), HasMatrixUnits R n := by --Matevz
+  let e := ort_idem.f ⟨0, n_pos⟩
+  use e, ort_idem.h ⟨0, n_pos⟩, ort_idem.n
+  have proof_uv := fun i => lemma_2_19' prime (ort_idem.f ⟨0, n_pos⟩) (ort_idem.f i) (ort_idem.h ⟨0, n_pos⟩) (ort_idem.h i) (ort_idem.div ⟨0, n_pos⟩) (ort_idem.div i)
+  let row_es : Fin ort_idem.n → R := fun i => (proof_uv i).u
+  let col_es : Fin ort_idem.n → R := fun i => (proof_uv i).v
+  let row_in := fun i => (proof_uv i).u_mem
+  let col_in := fun i => (proof_uv i).v_mem
+  let comp1 := fun i => (proof_uv i).u_mul_v
+  let comp2 := fun i => (proof_uv i).v_mul_u
+  exact OrtIdem_imply_MatUnits n_pos ort_idem.f ort_idem.h ort_idem.orthogonal ort_idem.sum_one row_es row_in col_es col_in comp1 comp2
