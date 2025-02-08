@@ -85,8 +85,14 @@ def extension_of_ort_idem (e : R) (idem_e : IsIdempotentElem e) (oi : OrtIdem (C
     apply add_eq_of_eq_sub'
     #check oi.sum_one
     have one_sub_e_unit : 1 - e = (1 : CornerSubring (IsIdempotentElem.one_sub idem_e)) := by rfl
+    simp [one_sub_e_unit]
+    rw [← oi.sum_one]
+    calc _ = (∑ i : Fin (OrtIdem.n ↥(CornerSubring (IsIdempotentElem.one_sub idem_e))), OrtIdem.ι i) := by sorry
+        _ = ↑(∑ i : Fin (OrtIdem.n ↥(CornerSubring (IsIdempotentElem.one_sub idem_e))), OrtIdem.ι i) := by sorry
+--rw [AddSubmonoidClass.coe_finset_sum (fun i => OrtIdem.ι i) (Finset.univ)]
 
-    rw [one_sub_e_unit]
+
+    --rw [one_sub_e_unit]
     --rw [idempotents_rest]
     --rw [oi.sum_one]
 
@@ -97,6 +103,7 @@ def extension_of_ort_idem (e : R) (idem_e : IsIdempotentElem e) (oi : OrtIdem (C
   orthogonal := by
     intro i j
     by_cases (i = 0)
+
     sorry
 
 
