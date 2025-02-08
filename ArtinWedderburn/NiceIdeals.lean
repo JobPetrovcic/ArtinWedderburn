@@ -4,6 +4,7 @@ import Mathlib.Algebra.Ring.Idempotents
 import Init.Data.Fin.Basic
 import ArtinWedderburn.PrimeRing
 import ArtinWedderburn.CornerRing
+import Mathlib.Algebra.Group.Basic
 --import ArtinWedderburn.MatrixUnits
 import ArtinWedderburn.Idempotents
 
@@ -54,13 +55,10 @@ lemma idempotents_first {α : Type*} {n : ℕ} (x : α) (h : Fin n → α) : ide
 
 lemma idempotents_rest {α : Type*} {n : ℕ} (x : α) (h : Fin n → α) (i : Fin n) : idempotents x h (Fin.succ i) = h i := by exact rfl
 
+-- (Removed duplicate incomplete definition)
 
-def extend_idempotents {n : ℕ} (f : R) (idem_f : IsIdempotentElem f) (es : Fin n → R) (h : (i : Fin n) → IsIdempotentElem (es i)) := Fin.cases idem_f h
-  /-intro j
-  cases j with
-  | 0 => sorry
-  | succ i => exact h i
-  -/
+def extend_idempotents {n : ℕ} (f : R) (idem_f : IsIdempotentElem f) (es : Fin n → R) (h : (i : Fin n) → IsIdempotentElem (es i)) : Fin (n + 1) → R :=
+  Fin.cases f es
 
 lemma bot_eq_span_zero (I : Ideal R) (e : R) (h_bot : I ≠ ⊥) (h_span : I = Ideal.span {e}) : e ≠ 0 := by -- Maša
   intro e_zero
@@ -70,12 +68,36 @@ lemma bot_eq_span_zero (I : Ideal R) (e : R) (h_bot : I ≠ ⊥) (h_span : I = I
 def extension_of_ort_idem (e : R) (idem_e : IsIdempotentElem e) (oi : OrtIdem (CornerSubring (IsIdempotentElem.one_sub idem_e))) : OrtIdem R := {
   n := oi.n + 1,
   ι := idempotents e (fun (i : Fin oi.n) => oi.ι i),
-  h := --extend_idempotents e idem_e oi.ι oi.h,
-  sum_one := by sorry
+  h := sorry--extend_idempotents e idem_e oi.ι oi.h,
+  sum_one := by
+    rw [Fin.sum_univ_succ]
+    rw [idempotents_first]
+    apply add_eq_of_eq_sub'
+    #check oi.sum_one
+    have one_sub_e_unit : 1 - e = (1 : CornerSubring (IsIdempotentElem.one_sub idem_e)) := by rfl
+    simp [one_sub_e_unit]
+    rw [← oi.sum_one]
+    calc _ = (∑ i : Fin (OrtIdem.n ↥(CornerSubring (IsIdempotentElem.one_sub idem_e))), OrtIdem.ι i) := by sorry
+        _ = ↑(∑ i : Fin (OrtIdem.n ↥(CornerSubring (IsIdempotentElem.one_sub idem_e))), OrtIdem.ι i) := by sorry
+--rw [AddSubmonoidClass.coe_finset_sum (fun i => OrtIdem.ι i) (Finset.univ)]
+
+
+    --rw [one_sub_e_unit]
+    --rw [idempotents_rest]
+    --rw [oi.sum_one]
+
+    sorry
     --have h_sum := oi.sum_one
     --rw [← idempotents_first e oi.ι, ← idempotents_rest e oi.ι] at h_sum
     --exact h_sum,
-  orthogonal := by sorry
+  orthogonal := by
+    intro i j
+    by_cases (i = 0)
+
+    sorry
+
+
+    sorry
     --intro i j
     --have h_ort := oi.orthogonal i j
     --rw [← idempotents_first e oi.ι, ← idempotents_rest e oi.ι] at h_ort

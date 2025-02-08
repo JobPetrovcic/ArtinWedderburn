@@ -122,8 +122,7 @@ theorem OrtIdem_imply_MatUnits {n : ℕ} (hn : 0 < n) -- Done by Matevz
         _ = 0 := by rw [(ort j k h).left]; noncomm_ring
 
 
-
--- If e and f are nonzero elements then corner ring eRf contains nonzero element
+-- If e and f are nonzero elements and R is prime then eRf contains nonzero element
 lemma eRf_nonzero --Maša
   (h : IsPrimeRing R) (e f : R) (he : e ≠ 0) (hf : f ≠ 0) :
   ∃(a : R), e * a * f ≠ 0 := by
@@ -207,10 +206,10 @@ structure two_nice_idempotents (e f : R) where
   (u_mul_v : u * v = e)
   (v_mul_u : v * u = f)
 
+/-
 def lemma_2_19'(h : IsPrimeRing R)
   (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f)
-  (heRe : IsDivisionRing (CornerSubring idem_e)) (hfRf : IsDivisionRing (CornerSubring idem_f)) : two_nice_idempotents e f := by sorry
-/-
+  (heRe : IsDivisionRing (CornerSubring idem_e)) (hfRf : IsDivisionRing (CornerSubring idem_f)) : two_nice_idempotents e f := by
   have he : e ≠ 0 := by exact corner_ring_division_e_nonzero idem_e heRe
   have hf : f ≠ 0 := by exact corner_ring_division_e_nonzero idem_f hfRf
   have ha : ∃ (a : R), e * a * f ≠ 0 := by exact eRf_nonzero h e f he hf
@@ -287,10 +286,9 @@ theorem lemma_2_19 -- Maša
   (h : IsPrimeRing R)
   (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f)
   (heRe : IsDivisionRing (CornerSubring idem_e)) (hfRf : IsDivisionRing (CornerSubring idem_f)) :
-  ∃ u v : R, u ∈ both_mul e f ∧ v ∈ both_mul f e ∧ u * v = e ∧ v * u = f := by sorry
-  /-
-  have he : e ≠ 0 := by exact corner_ring_division_e_nonzero e idem_e heRe
-  have hf : f ≠ 0 := by exact corner_ring_division_e_nonzero f idem_f hfRf
+  ∃ u v : R, u ∈ both_mul e f ∧ v ∈ both_mul f e ∧ u * v = e ∧ v * u = f := by
+  have he : e ≠ 0 := by exact corner_ring_division_e_nonzero idem_e heRe
+  have hf : f ≠ 0 := by exact corner_ring_division_e_nonzero idem_f hfRf
   have ha : ∃ (a : R), e * a * f ≠ 0 := by exact eRf_nonzero h e f he hf
   obtain ⟨a, ha⟩ := ha
   have hb : ∃(b : R), e * a * f * b * e ≠ 0 := by exact eRf_nonzero h (e * a * f) e ha he
@@ -342,8 +340,8 @@ theorem lemma_2_19 -- Maša
     have _ : f * b * e * c * e = f * (b * e * c) * e := by noncomm_ring
     use (b * e * c)
 
-  have fv_eq_v : f * v = (v : R) := by exact (both_mul_e_f f idem_f idem_e v hv).1
-  have ve_eq_v : v * e = v := by exact (both_mul_e_f f idem_f idem_e v hv).2
+  have fv_eq_v : f * v = (v : R) := by exact (both_mul_e_f idem_f idem_e v hv).1
+  have ve_eq_v : v * e = v := by exact (both_mul_e_f idem_f idem_e v hv).2
 
   have uv_eq_e : u * v = e := by
     calc e * a * f * (f * b * e * c * e) = e * a * (f * f) * b * e * c * e := by noncomm_ring
@@ -398,7 +396,21 @@ theorem lemma_2_19 -- Maša
           calc _ = u * v := by rw[uv_eq_e]
               _ = 0 := by rw[v_eq_zero]; noncomm_ring
         exact he e_eq_zero
--/
+
+noncomputable
+def lemma_2_19'(h : IsPrimeRing R)
+  (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f)
+  (heRe : IsDivisionRing (CornerSubring idem_e)) (hfRf : IsDivisionRing (CornerSubring idem_f)) : two_nice_idempotents e f := by
+  have h := lemma_2_19 h e f idem_e idem_f heRe hfRf
+  choose u v hu hv h1 h2 using h
+  exact {
+    u := u,
+    v := v,
+    u_mem := hu,
+    v_mem := hv,
+    u_mul_v := h1,
+    v_mul_u := h2
+  }
 
 theorem f_in_corner_othogonal (e f : R) (idem_e : IsIdempotentElem e) --Maša
   (f_mem : f ∈ both_mul (1 - e) (1 - e)) : IsOrthogonal e f := by
