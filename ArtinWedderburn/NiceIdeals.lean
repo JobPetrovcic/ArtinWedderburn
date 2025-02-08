@@ -64,13 +64,10 @@ lemma idempotents_first {α : Type*} {n : ℕ} (x : α) (h : Fin n → α) : ide
 
 lemma idempotents_rest {α : Type*} {n : ℕ} (x : α) (h : Fin n → α) (i : Fin n) : idempotents x h (Fin.succ i) = h i := by exact rfl
 
+-- (Removed duplicate incomplete definition)
 
-def extend_idempotents {n : ℕ} (f : R) (idem_f : IsIdempotentElem f) (es : Fin n → R) (h : (i : Fin n) → IsIdempotentElem (es i)) := Fin.cases idem_f h
-  /-intro j
-  cases j with
-  | 0 => sorry
-  | succ i => exact h i
-  -/
+def extend_idempotents {n : ℕ} (f : R) (idem_f : IsIdempotentElem f) (es : Fin n → R) (h : (i : Fin n) → IsIdempotentElem (es i)) : Fin (n + 1) → R :=
+  Fin.cases f es
 
 lemma bot_eq_span_zero (I : Ideal R) (e : R) (h_bot : I ≠ ⊥) (h_span : I = Ideal.span {e}) : e ≠ 0 := by -- Maša
   intro e_zero
@@ -80,7 +77,7 @@ lemma bot_eq_span_zero (I : Ideal R) (e : R) (h_bot : I ≠ ⊥) (h_span : I = I
 def extension_of_ort_idem (e : R) (idem_e : IsIdempotentElem e) (oi : OrtIdem (CornerSubring (IsIdempotentElem.one_sub idem_e))) : OrtIdem R := {
   n := oi.n + 1,
   ι := idempotents e (fun (i : Fin oi.n) => oi.ι i),
-  h := --extend_idempotents e idem_e oi.ι oi.h,
+  h := sorry--extend_idempotents e idem_e oi.ι oi.h,
   sum_one := by sorry
     --have h_sum := oi.sum_one
     --rw [← idempotents_first e oi.ι, ← idempotents_rest e oi.ι] at h_sum
