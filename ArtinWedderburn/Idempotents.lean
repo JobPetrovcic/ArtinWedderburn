@@ -325,9 +325,9 @@ theorem lemma_2_19 -- Maša
 
 noncomputable
 def lemma_2_19'(h : IsPrimeRing R)
-  (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) (ort : IsOrthogonal e f)
+  (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f)
   (heRe : IsDivisionRing (CornerSubring idem_e)) (hfRf : IsDivisionRing (CornerSubring idem_f)) : two_nice_idempotents e f := by
-  have h := lemma_2_19 h e f idem_e idem_f ort heRe hfRf
+  have h := lemma_2_19 h e f idem_e idem_f heRe hfRf
   choose u v hu hv h1 h2 using h
   exact {
     u := u,
