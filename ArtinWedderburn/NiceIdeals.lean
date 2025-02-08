@@ -67,8 +67,8 @@ lemma idempotents_rest {α : Type*} {n : ℕ} (x : α) (h : Fin n → α) (i : F
 
 -- (Removed duplicate incomplete definition)
 
-def extend_idempotents {n : ℕ} (f : R) (idem_f : IsIdempotentElem f) (es : Fin n → R) (h : (i : Fin n) → IsIdempotentElem (es i)) : Fin (n + 1) → R :=
-  Fin.cases f es
+def extend_idempotents {n : ℕ} (f : R) (idem_f : IsIdempotentElem f) (es : Fin n → R) (h : (i : Fin n) → IsIdempotentElem (es i)) : (i : Fin (n+1)) → (IsIdempotentElem ((idempotents f es) i)) :=
+  Fin.cases idem_f h
 
 lemma bot_eq_span_zero (I : Ideal R) (e : R) (h_bot : I ≠ ⊥) (h_span : I = Ideal.span {e}) : e ≠ 0 := by -- Maša
   intro e_zero
@@ -87,8 +87,8 @@ def extension_of_ort_idem (e : R) (idem_e : IsIdempotentElem e) (oi : OrtIdem (C
     have one_sub_e_unit : 1 - e = (1 : CornerSubring (IsIdempotentElem.one_sub idem_e)) := by rfl
     simp [one_sub_e_unit]
     rw [← oi.sum_one]
-    calc _ = (∑ i : Fin (OrtIdem.n ↥(CornerSubring (IsIdempotentElem.one_sub idem_e))), OrtIdem.ι i) := by sorry
-        _ = ↑(∑ i : Fin (OrtIdem.n ↥(CornerSubring (IsIdempotentElem.one_sub idem_e))), OrtIdem.ι i) := by sorry
+    --calc _ = (∑ i : Fin (OrtIdem.n ↥(CornerSubring (IsIdempotentElem.one_sub idem_e))), OrtIdem.ι i) := by sorry
+        --_ = ↑(∑ i : Fin (OrtIdem.n ↥(CornerSubring (IsIdempotentElem.one_sub idem_e))), OrtIdem.ι i) := by sorry
 --rw [AddSubmonoidClass.coe_finset_sum (fun i => OrtIdem.ι i) (Finset.univ)]
 
 
@@ -103,6 +103,9 @@ def extension_of_ort_idem (e : R) (idem_e : IsIdempotentElem e) (oi : OrtIdem (C
   orthogonal := by
     intro i j
     by_cases (i = 0)
+
+
+
 
     sorry
 
