@@ -26,7 +26,7 @@ universe u
 
 set_option pp.proofs true
 
-def ArtinWedderburnForPrime {R : Type u} [Ring R] [Nontrivial R] (h_prime : IsPrimeRing R) (h_artinian : IsArtinian R R) :
+def ArtinWedderburnForPrime {R : Type u} [Ring R] [h_nontriv : Nontrivial R] (h_prime : IsPrimeRing R) (h_artinian : IsArtinian R R) :
   ∃ (n : ℕ) (D : Type u) ( _ : DivisionRing D), Nonempty (R ≃+* Matrix (Fin n) (Fin n) D) := by
   have R_acc : Acc (fun x y => x < y) (⊤ : Ideal R) := by exact IsWellFounded.apply (fun x y ↦ x < y) ⊤
   have R_nice := acc_ideal_nice h_prime h_artinian ⊤ R_acc
@@ -51,10 +51,7 @@ def ArtinWedderburnForPrime {R : Type u} [Ring R] [Nontrivial R] (h_prime : IsPr
     specialize top_nice top_idem 1 IsIdempotentElem.one (Eq.symm Ideal.span_singleton_one)
     apply isomorphic_OrtIdemDiv (iso_corner_one)
     exact top_nice
-  --let ⟨e, idem_e, n, ⟨h_div, h_iso⟩⟩ := lemma_2_20_full R h_prime R_ort_idem
-  --use n, (CornerSubring idem_e)
-  --use IsDivisionRing_to_DivisionRing h_div
-  have n_pos : 0 < R_ort_idem.n := by exact nontrivial_OrtIdem_n_pos R R_ort_idem
+  have n_pos : 0 < R_ort_idem.n := by exact nontrivial_ortidem_n_pos R h_nontriv R_ort_idem
   let ⟨mat_units, h⟩ := lemma_2_20' R h_prime R_ort_idem n_pos
   use R_ort_idem.n, (CornerSubring (R_ort_idem.h ⟨0, n_pos⟩)), (IsDivisionRing_to_DivisionRing (R_ort_idem.div ⟨0,n_pos⟩))
   apply Nonempty.intro

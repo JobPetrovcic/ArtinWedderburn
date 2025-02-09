@@ -7,6 +7,7 @@ import ArtinWedderburn.CornerRing
 import Mathlib.Algebra.Group.Basic
 --import ArtinWedderburn.MatrixUnits
 import ArtinWedderburn.Idempotents
+import ArtinWedderburn.CornerCornerLemma
 
 import Mathlib.RingTheory.Ideal.Span
 import Mathlib.Algebra.Ring.Defs
@@ -136,14 +137,10 @@ def extension_of_OrtIdemDiv (e : R) (idem_e : IsIdempotentElem e) (div_e : IsDiv
     have h1 : oid.f k = (extension_of_ort_idem e idem_e oid.toOrtIdem).f i := by rw [hk]; rfl
 
     apply @isomorphic_rings_div_iff (CornerSubring (oid.h k)) _ (CornerSubring ((extension_of_ort_idem e idem_e oid.toOrtIdem).h i)) _
-    sorry
-    --have h_eq : (CornerSubring (oid.h k)) = (CornerSubring ((extension_of_ort_idem e idem_e oid.toOrtIdem).h i)) := by sorry
 
-    --have h : (extension_of_ort_idem e idem_e oid.toOrtIdem).h i = oid.h k := by sorry
-    #check oid.div
-
-    --exact oid.div k
+    apply corner_ring_unital_eq
     sorry
+    exact oid.div k
 }
 -- f(1 - e)R(1 - e)f = fRf
 -- { x : ↥(CornerSubring (IsIdempotentElem.one_sub idem_e)) // x ∈ CornerSubring (oid.h k) } : Prop = { x : R // x ∈ CornerSubring ((extension_of_ort_idem e idem_e oid.toOrtIdem).h i) }
@@ -203,8 +200,9 @@ def subideals_nice_ideal_nice [Nontrivial R] (h_prime : IsPrimeRing R) (h_art : 
 
   apply extension_of_OrtIdemDiv
   exact f_div
-
-  sorry
+  #check idem_e_sub_f
+  have h: (CornerSubring (IsIdempotentElem.one_sub idem_f)) ≃+* ↥(CornerSubring idem_e_sub_f) := by sorry
+  exact isomorphic_OrtIdemDiv (id h.symm) (hi J J_sub_I J_idem (e - f) idem_e_sub_f rfl)
 
 
   --let ⟨Joi, Jdiv⟩ := J_nice

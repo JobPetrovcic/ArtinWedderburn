@@ -199,10 +199,31 @@ lemma corner_ring_division_e_nonzero --Maša
 
 
 
-def equal_el_iso_matrix_rings (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) (e_eq_f : e = f) (n : ℕ) : Matrix (Fin n) (Fin n) (CornerSubringNonUnital e) ≃+* Matrix (Fin n) (Fin n) (CornerSubringNonUnital f) := by
-  let ψ : (CornerSubringNonUnital e) ≃+* (CornerSubringNonUnital f) := by sorry
-  apply?
-  sorry
+def equal_el_iso_matrix_rings' (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) (e_eq_f : e = f) (n : ℕ) : Matrix (Fin n) (Fin n) (CornerSubring idem_e) ≃+* Matrix (Fin n) (Fin n) (CornerSubring idem_f) := by  --Maša
+  let ψ : (CornerSubring idem_e) ≃+* (CornerSubring idem_f) := {
+      toFun := fun x => ⟨x.val, by
+        let ⟨y, hy⟩ := x.property
+        have h : x = (f : R) * y * f := by rw [← e_eq_f]; exact hy
+        use y⟩,
+      invFun := fun x => ⟨x.val, by
+        let ⟨y, hy⟩ := x.property
+        have h : x = (e : R) * y * e := by rw [e_eq_f]; exact hy
+        use y⟩,
+      left_inv := fun x => rfl,
+      right_inv := fun x => rfl,
+      map_mul' := fun x y => rfl,
+      map_add' := fun x y => rfl,
+  }
+  exact RingEquiv.mapMatrix ψ
+
+
+def equal_el_iso_matrix_rings (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) (e_eq_f : e = f) (n : ℕ) : Matrix (Fin n) (Fin n) (CornerSubringNonUnital e) ≃+* Matrix (Fin n) (Fin n) (CornerSubringNonUnital f) := by --Maša and Job
+  let ψ : (CornerSubringNonUnital e) ≃+* (CornerSubringNonUnital f) := by rw [e_eq_f]
+  apply equal_el_iso_matrix_rings'
+  exact idem_e
+  exact idem_f
+  exact e_eq_f
+
 --mapMatrix
 
 --TODO: ↥(CornerSubring idem_e_sub_f) = (CornerSubring (IsIdempotentElem.one_sub idem_f)) in eRe

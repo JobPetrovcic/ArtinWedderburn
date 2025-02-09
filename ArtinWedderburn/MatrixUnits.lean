@@ -368,16 +368,7 @@ def ring_with_matrix_units_isomorphic_to_matrix_ring (n : ℕ) (hn : 0 < n)(mu :
   R ≃+* Matrix (Fin n) (Fin n) (@e00_cornerring R _ n hn mu) := ring_to_matrix_iso R
 
 
-set_option pp.proofs true
 
-lemma nontrivial_OrtIdem_n_pos [Nontrivial R] (ort_idem : OrtIdemDiv R) : 0 < ort_idem.n := by
-  refine Nat.pos_of_ne_zero ?_
-  by_contra n_zero
-  have zero_eq_one : 0 = 1 := by
-    have h : ∑ i : Fin ort_idem.n, ort_idem.f i = 0 := by
-      sorry
-    sorry
-  sorry
 
 noncomputable
 def HasMatrixUnits_to_hasMatrixUnits (mu : HasMatrixUnits R n) : hasMatrixUnits R n := by
@@ -420,7 +411,7 @@ theorem lemma_2_20' (prime : IsPrimeRing R) (ort_idem : OrtIdemDiv R) (n_pos : 0
   exact OrtIdem_imply_MatUnits n_pos ort_idem.f ort_idem.h ort_idem.orthogonal ort_idem.sum_one row_es row_in col_es col_in comp1 comp2
 -/
 
-
+/-
 -- missing is application of lemma 2.17
 theorem lemma_2_20_full [Nontrivial R] (prime : IsPrimeRing R) (ort_idem : OrtIdemDiv R) : ∃ (e : R) (idem : IsIdempotentElem e) (n : ℕ), IsDivisionRing (CornerSubring idem) ∧ Nonempty (R ≃+* Matrix (Fin n) (Fin n) (CornerSubring idem)) := by
   have n_pos : 0 < ort_idem.n := by exact nontrivial_OrtIdem_n_pos R ort_idem
