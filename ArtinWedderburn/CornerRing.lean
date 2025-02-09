@@ -2,12 +2,13 @@ import Mathlib.RingTheory.Artinian
 import Mathlib.Algebra.Field.Defs
 import Mathlib.RingTheory.SimpleRing.Basic
 import Mathlib.Algebra.Ring.Idempotents
-import ArtinWedderburn.PrimeRing
-import ArtinWedderburn.NonUnitalToUnital
 import Mathlib.Algebra.Ring.MinimalAxioms
-import ArtinWedderburn.PrimeRing
 import Mathlib.RingTheory.Ideal.Span
 import Mathlib.LinearAlgebra.Finsupp.LinearCombination
+import ArtinWedderburn.PrimeRing
+import ArtinWedderburn.NonUnitalToUnital
+
+import ArtinWedderburn.Auxiliary
 
 variable {R : Type*} [Ring R]
 variable {e : R}
@@ -150,6 +151,23 @@ def coercion_to_eRe (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempote
     use (y * e * z * e * y)
     noncomm_ring
   exact h
+
+-- If eRe is a division ring then e is nonzero
+lemma corner_ring_division_e_nonzero --Maša
+  (idem_e : IsIdempotentElem e) (heRe : IsDivisionRing (CornerSubring idem_e)) : e ≠ 0 := by
+  by_contra he
+  have ha : ∀(a : R), e * a * e = 0 := by exact fun a ↦ mul_eq_zero_of_right (e * a) he
+  have h_zero : ∀(x : CornerSubring idem_e), x = 0 := by
+    intro ⟨x, hx⟩
+    apply x_in_corner_x_eq_e_y_e at hx
+    obtain ⟨y, hy⟩ := hx
+    specialize ha y
+    rw [ha] at hy
+    exact (NonUnitalSubring.coe_eq_zero_iff (CornerSubring idem_e)).mp hy
+  obtain ⟨⟨x, hx⟩, _⟩ := heRe
+  exact hx (h_zero x)
+
+
 
 --TODO: 1R1 = R
 --theorem corner_one_eq_R : CornerSubring (IsIdempotentElem.one) = (R : NonUnitalSubring R) := by sorry
@@ -367,3 +385,18 @@ theorem corner_ring_prime (hRP : IsPrimeRing R) : IsPrimeRing (CornerSubring ide
   have l := prime_ring_equiv.1 hRP _ _ h_lift
   simp at l
   exact l
+
+
+theorem div_subring_to_div_ring (e : R) (idem_e : IsIdempotentElem e) (h : IsDivisionSubring (CornerSubringNonUnital e) e) : IsDivisionRing (CornerSubring idem_e) := by --Maša
+  obtain ⟨⟨a, ⟨a_mem, a_nz⟩⟩, h_inv⟩ := h
+  have corner_nontrivial : Nontrivial (CornerSubring idem_e) := by
+    use (⟨a, a_mem⟩ : CornerSubring idem_e), ⟨0, by exact NonUnitalSubring.zero_mem (CornerSubring idem_e)⟩
+    simp_all
+  apply left_inv_implies_divring
+  clear a a_mem a_nz
+  intro x x_nz
+  let ⟨y, ⟨y_mem, hy⟩⟩ := h_inv x (by exact SetLike.coe_mem x) (by exact (nonzero idem_e x).mp x_nz)
+  use ⟨y, y_mem⟩
+  rw [Subtype.ext_iff_val]
+  simp
+  exact hy
