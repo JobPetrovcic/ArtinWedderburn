@@ -45,9 +45,16 @@ instance CornerSubringNonUnital (e : R) : NonUnitalSubring R where -- Done by Ma
     rw [hr, hs]
     noncomm_ring
 
+theorem el_in_corner_ring (x : R) : x ∈ both_mul e e ↔  x ∈ CornerSubringNonUnital e := by rfl
+
+theorem eq_carrier_eq_corner (x y : R) (h : both_mul x x = both_mul y y) : CornerSubringNonUnital x = CornerSubringNonUnital y := by
+  apply NonUnitalSubring.ext
+  simp only [← el_in_corner_ring, h, implies_true]
+
 
 def CornerSubring (idem_e : IsIdempotentElem e) := CornerSubringNonUnital e
 
+theorem CornerSubringEq (idem_e idem_e' : IsIdempotentElem e) : CornerSubring idem_e = CornerSubring idem_e' := by exact rfl
 variable (idem_e : IsIdempotentElem e)
 
 variable {x : R}
