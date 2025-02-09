@@ -137,12 +137,17 @@ def extension_of_OrtIdemDiv (e : R) (idem_e : IsIdempotentElem e) (div_e : IsDiv
     have h1 : oid.f k = (extension_of_ort_idem e idem_e oid.toOrtIdem).f i := by rw [hk]; rfl
 
     apply @isomorphic_rings_div_iff (CornerSubring (oid.h k)) _ (CornerSubring ((extension_of_ort_idem e idem_e oid.toOrtIdem).h i)) _
+    symm
+    have eq_el : (extension_of_ort_idem e idem_e oid.toOrtIdem).f i = oid.f k := by exact id (Eq.symm h1)
 
-    apply corner_ring_unital_eq
+    calc _ ≃+* CornerSubring (e_idem_to_e_val_idem (oid.h k)) := (eq_el_iso_corner ((extension_of_ort_idem e idem_e oid.toOrtIdem).f i) (oid.f k) ((extension_of_ort_idem e idem_e oid.toOrtIdem).h i) (e_idem_to_e_val_idem (oid.h k)) eq_el)
+         _ ≃+* ↑(CornerSubring (oid.h k)) := by sorry
+
+    --apply corner_ring_unital_eq
     sorry
     exact oid.div k
 }
--- f(1 - e)R(1 - e)f = fRf
+-- f(1 - e)R(1 - e)f = fRf  corner_ring_unital_eq
 -- { x : ↥(CornerSubring (IsIdempotentElem.one_sub idem_e)) // x ∈ CornerSubring (oid.h k) } : Prop = { x : R // x ∈ CornerSubring ((extension_of_ort_idem e idem_e oid.toOrtIdem).h i) }
 
 noncomputable
