@@ -6,6 +6,7 @@ import ArtinWedderburn.PrimeRing
 import ArtinWedderburn.CornerRing
 import ArtinWedderburn.Idempotents
 
+import Mathlib.Algebra.BigOperators.Group.Finset
 
 -- TODO: maybe split this up into multiple definitions
 class hasMatrixUnits (R : Type*) [Ring R] (n : ℕ) where -- Done by Job
@@ -16,6 +17,19 @@ class hasMatrixUnits (R : Type*) [Ring R] (n : ℕ) where -- Done by Job
 open hasMatrixUnits
 
 variable (R : Type*) [Ring R]
+
+theorem nontrivial_zero_not_one (nontriv : Nontrivial R) : (0 : R) ≠ (1 : R) := by
+  intro h
+  obtain ⟨x, y, x_neq_y⟩ := nontriv.exists_pair_ne
+  have x_eq_y : x = y := by calc
+    x = x * 1 := by noncomm_ring
+    _ = x * 0 := by rw [←h]
+    _ = y * 0 := by noncomm_ring
+    _ = y * 1 := by rw [h]
+    _ = y := by noncomm_ring
+  exact x_neq_y x_eq_y
+
+
 
 
 theorem OrtIdem_imply_MatUnits' {n : ℕ} (hn : 0 < n) -- Done by Matevz
@@ -383,7 +397,7 @@ theorem lemma_2_20 (prime : IsPrimeRing R) (ort_idem : OrtIdemDiv R) (n_pos : 0 
   sorry
 
 
-
+/-
 theorem lemma_2_20' (prime : IsPrimeRing R) (ort_idem : OrtIdemDiv R) (n_pos : 0 < ort_idem.n) : ∃ (e : R) (idem : IsIdempotentElem e) (n : ℕ) (he : e = ort_idem.f ⟨0, n_pos⟩) (n_pos : 0 < n) , HasMatrixUnits R n := by --Matevz
   let e := ort_idem.f ⟨0, n_pos⟩
   use e, ort_idem.h ⟨0, n_pos⟩, ort_idem.n, rfl, n_pos
@@ -395,6 +409,7 @@ theorem lemma_2_20' (prime : IsPrimeRing R) (ort_idem : OrtIdemDiv R) (n_pos : 0
   let comp1 := fun i => (proof_uv i).u_mul_v
   let comp2 := fun i => (proof_uv i).v_mul_u
   exact OrtIdem_imply_MatUnits n_pos ort_idem.f ort_idem.h ort_idem.orthogonal ort_idem.sum_one row_es row_in col_es col_in comp1 comp2
+-/
 
 /-
 -- missing is application of lemma 2.17
