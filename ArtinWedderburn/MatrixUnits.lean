@@ -4,6 +4,8 @@ import Mathlib.RingTheory.SimpleRing.Basic
 import Mathlib.Algebra.Ring.Idempotents
 import ArtinWedderburn.PrimeRing
 import ArtinWedderburn.CornerRing
+import ArtinWedderburn.Idempotents
+
 
 -- TODO: maybe split this up into multiple definitions
 class hasMatrixUnits (R : Type*) [Ring R] (n : ℕ) where -- Done by Job
@@ -276,3 +278,49 @@ def ring_to_matrix_iso [mu : hasMatrixUnits R n] : R ≃+* Matrix (Fin n) (Fin n
 noncomputable
 def ring_with_matrix_units_isomorphic_to_matrix_ring (n : ℕ) (hn : 0 < n)(mu : hasMatrixUnits R n) :
   R ≃+* Matrix (Fin n) (Fin n) (@e00_cornerring R _ n hn mu) := ring_to_matrix_iso R
+
+
+set_option pp.proofs true
+
+lemma nontrivial_OrtIdem_n_pos [Nontrivial R] (ort_idem : OrtIdemDiv R) : 0 < ort_idem.n := by
+  refine Nat.pos_of_ne_zero ?_
+  by_contra n_zero
+  have zero_eq_one : 0 = 1 := by
+    have h : ∑ i : Fin ort_idem.n, ort_idem.f i = 0 := by
+      sorry
+    sorry
+  sorry
+
+
+def HasMatrixUnits_to_hasMatrixUnist (mu : HasMatrixUnits R n) : hasMatrixUnits R n := {
+    es := by sorry
+    diag_sum_eq_one := sorry,
+    mul_ij_kl_eq_kron_delta_jk_mul_es_il := sorry
+
+}
+
+
+
+theorem lemma_2_20 (prime : IsPrimeRing R) (ort_idem : OrtIdemDiv R) (n_pos : 0 < ort_idem.n) : ∃ (e : R) (idem : IsIdempotentElem e) (n : ℕ) (he : e = ort_idem.f ⟨0, n_pos⟩) (n_pos : 0 < n) , HasMatrixUnits R n := by --Matevz
+  let e := ort_idem.f ⟨0, n_pos⟩
+  use e, ort_idem.h ⟨0, n_pos⟩, ort_idem.n, rfl, n_pos
+  have proof_uv := fun i => lemma_2_19' prime (ort_idem.f ⟨0, n_pos⟩) (ort_idem.f i) (ort_idem.h ⟨0, n_pos⟩) (ort_idem.h i) (ort_idem.div ⟨0, n_pos⟩) (ort_idem.div i)
+  let row_es : Fin ort_idem.n → R := fun i => (proof_uv i).u
+  let col_es : Fin ort_idem.n → R := fun i => (proof_uv i).v
+  let row_in := fun i => (proof_uv i).u_mem
+  let col_in := fun i => (proof_uv i).v_mem
+  let comp1 := fun i => (proof_uv i).u_mul_v
+  let comp2 := fun i => (proof_uv i).v_mul_u
+  exact OrtIdem_imply_MatUnits n_pos ort_idem.f ort_idem.h ort_idem.orthogonal ort_idem.sum_one row_es row_in col_es col_in comp1 comp2
+
+-- missing is application of lemma 2.17
+theorem lemma_2_20_full [Nontrivial R] (prime : IsPrimeRing R) (ort_idem : OrtIdemDiv R) : ∃ (e : R) (idem : IsIdempotentElem e) (n : ℕ), IsDivisionRing (CornerSubring idem) ∧ Nonempty (R ≃+* Matrix (Fin n) (Fin n) (CornerSubring idem)) := by
+  have n_pos : 0 < ort_idem.n := by exact nontrivial_OrtIdem_n_pos R ort_idem
+  let ⟨e, idem_e, n, he, n_pos', mu⟩ := lemma_2_20 R prime ort_idem n_pos
+  let mu := (HasMatrixUnits_to_hasMatrixUnist R mu)
+  use (ort_idem.f ⟨0, n_pos⟩), (ort_idem.h ⟨0, n_pos⟩), n
+  constructor
+  · exact ort_idem.div ⟨0, n_pos⟩
+  · let f :=  ring_with_matrix_units_isomorphic_to_matrix_ring R n n_pos' mu
+    sorry
+    --exact Nonempty.intro f
