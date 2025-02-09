@@ -543,11 +543,7 @@ def ring_iso_to_corner_iso (R' : Type*) [Ring R'] (φ : R ≃+* R') (e : R) (ide
 
 def isomorphic_OrtIdemDiv (R' : Type*) [Ring R'] (φ : R ≃+* R') (hoi : OrtIdemDiv R) : OrtIdemDiv R' := {
   toOrtIdem := isomorphic_OrtIdem R' φ hoi.toOrtIdem,
-  div := fun i =>
-    -- Use the induced ring isomorphism between CornerSubring (hoi.h i) and
-    -- CornerSubring (iso_idem_to_idem R' φ (hoi.f i) (hoi.h i)) to transfer the division ring structure.
-    -- Complete the proof by constructing this ring isomorphism and applying
-    -- the fact that division rings are preserved under isomorphism.
-    sorry }
-
---isomorphic_rings_div_iff
+  div := fun i => by
+    let ψ : (CornerSubring (hoi.h i))  ≃+* (CornerSubring ((isomorphic_OrtIdem R' φ hoi.toOrtIdem).h i)):= ring_iso_to_corner_iso R' φ (hoi.f i) (hoi.h i)
+    apply isomorphic_rings_div_iff ↥(CornerSubring ((isomorphic_OrtIdem R' φ hoi.toOrtIdem).h i)) ψ (hoi.div i)
+}

@@ -113,6 +113,25 @@ lemma e_in_corner_ring : --Maša
   rw [subring_mem_idem]
   rw [IsIdempotentElem.eq idem_e, IsIdempotentElem.eq idem_e]
 
+theorem both_mul_one_one_eq_R : both_mul (1 : R) 1 = ⊤ := by
+  ext x
+  constructor
+  · intro ⟨y, hy⟩
+    trivial
+  · intro hx
+    use x
+    noncomm_ring
+
+def top_subring_equiv_ring (S : NonUnitalSubring R) (h : S.carrier = ⊤) : S ≃+* R := by
+
+  sorry
+
+def iso_corner_one : CornerSubring ((IsIdempotentElem.one : IsIdempotentElem (1 : R))) ≃+* R := by
+  apply top_subring_equiv_ring
+  rw [corner_ring_carrier]
+
+
+
 lemma nonzero (x : CornerSubring idem_e): (x : CornerSubring idem_e) ≠ 0 ↔ x.val ≠ 0 := by --Maša
   constructor
   · intro hnz hz
@@ -169,8 +188,6 @@ lemma corner_ring_division_e_nonzero --Maša
 
 
 
---TODO: 1R1 = R
---theorem corner_one_eq_R : CornerSubring (IsIdempotentElem.one) = (R : NonUnitalSubring R) := by sorry
 
 --TODO: ↥(CornerSubring idem_e_sub_f) = (CornerSubring (IsIdempotentElem.one_sub idem_f)) in eRe
 
