@@ -99,6 +99,7 @@ theorem is_right_unit : ∀ (x : CornerSubring idem_e), x * 1 = x := by -- Done 
   simp only [NonUnitalSubring.val_mul]
   rw [corner_ring_one, right_unit_mul idem_e hx]
 
+
 lemma e_in_corner_ring : --Maša
   e ∈ (CornerSubring idem_e) := by
   rw [subring_mem_idem]
@@ -114,17 +115,17 @@ lemma nonzero (x : CornerSubring idem_e): (x : CornerSubring idem_e) ≠ 0 ↔ x
     exact hnz hz
 
 
-lemma corner_nontrivial (R : Type*) [Ring R] {e : R} (idem_e : IsIdempotentElem e) (e_nonzero : e ≠ 0) : Nontrivial (CornerSubring idem_e) := by --Maša
+lemma e_nonzero_corner_nontrivial (R : Type*) [Ring R] {e : R} (idem_e : IsIdempotentElem e) (e_nonzero : e ≠ 0) : Nontrivial (CornerSubring idem_e) := by --Maša
   constructor
   use ⟨e, by exact e_in_corner_ring idem_e⟩
   use 0
   exact (nonzero idem_e ⟨e, e_in_corner_ring idem_e⟩).mpr e_nonzero
 
 
-lemma eq_iff_val (x y z : CornerSubring idem_e) : (x + y).val = z.val ↔ x.val + y.val = z.val := by
+lemma eq_iff_val (x y z : CornerSubring idem_e) : (x + y).val = z.val ↔ x.val + y.val = z.val := by --Maša
   exact Eq.congr_right rfl
 
-lemma e_x_e_in_corner : ∀(x : R), e * x * e ∈ CornerSubring idem_e := by
+lemma e_x_e_in_corner : ∀ (x : R), e * x * e ∈ CornerSubring idem_e := by --Maša
   intro x
   rw [subring_mem_idem, eq_comm]
   calc _ = (e * e) * x * (e * e) := by noncomm_ring
@@ -145,6 +146,17 @@ def coercion_to_eRe (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempote
 
 --TODO: 1R1 = R
 --theorem corner_one_eq_R : CornerSubring (IsIdempotentElem.one) = (R : NonUnitalSubring R) := by sorry
+
+--TODO: ↥(CornerSubring idem_e_sub_f) = (CornerSubring (IsIdempotentElem.one_sub idem_f)) in eRe
+
+--lemma corner_eq (e : R) (idem_e : IsIdempotentElem e) (f : CornerSubring idem_e) (idem_f : IsIdempotentElem f) : CornerSubring (idem_f) = CornerSubring (idem_f) := by sorry
+
+/-
+theorem corner_equal (e : R) (idem_e : IsIdempotentElem e) (f : CornerSubring idem_e) (idem_f : IsIdempotentElem f): CornerSubring (f_mem_corner_e_e_sub_f_idem e idem_e f idem_f) = CornerSubring (IsIdempotentElem.one_sub idem_f) := by
+
+  sorry
+-/
+
 
 -- coercions from Sets of CornerSubrings to Set of R
 instance : CoeOut (Set (CornerSubring idem_e)) (Set R) := {coe := fun X => Set.image Subtype.val X}

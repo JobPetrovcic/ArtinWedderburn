@@ -345,11 +345,11 @@ theorem lemma_2_19 -- Maša
 
   have uv_eq_e : u * v = e := by
     calc e * a * f * (f * b * e * c * e) = e * a * (f * f) * b * e * c * e := by noncomm_ring
-                                          _ = e * a *  f * b * e * c * e := by rw [IsIdempotentElem.eq idem_f]
-                                          _ = e * a * f * b * (e * e) * c * e := by rw [IsIdempotentElem.eq idem_e]
-                                          _ = (e * a * f * b * e) * (e * c * e) := by noncomm_ring
-                                          _ = x * y := by rw [x_val_eq, y_val_eq]
-                                          _ = e := by exact hxy
+                                       _ = e * a *  f * b * e * c * e := by rw [IsIdempotentElem.eq idem_f]
+                                       _ = e * a * f * b * (e * e) * c * e := by rw [IsIdempotentElem.eq idem_e]
+                                       _ = (e * a * f * b * e) * (e * c * e) := by noncomm_ring
+                                       _ = x * y := by rw [x_val_eq, y_val_eq]
+                                       _ = e := by exact hxy
 
   have vuv_eq_v : v * u * v = v := by
     calc _ = v * (u * v) := by noncomm_ring
@@ -460,12 +460,12 @@ lemma f_mem_corner_e_e_sub_f_idem (e : R) (idem_e : IsIdempotentElem e) (f : Cor
       _ = e - f + f * (1 - e) := by noncomm_ring
       _ = e - f := by rw [one_sub_e_f_orthogonal.2]; noncomm_ring
 
-lemma ort_comm (e f : R) (ort : IsOrthogonal e f) : IsOrthogonal f e := by
+lemma ort_comm (e f : R) (ort : IsOrthogonal e f) : IsOrthogonal f e := by --Maša
   unfold IsOrthogonal at *
   rw [and_comm]
   exact ort
 
-lemma orth_coercion (e : R) (idem_e : IsIdempotentElem e) (x y : CornerSubring idem_e) (ort : IsOrthogonal x y) : IsOrthogonal x.val y.val := by
+lemma orth_coercion (e : R) (idem_e : IsIdempotentElem e) (x y : CornerSubring idem_e) (ort : IsOrthogonal x y) : IsOrthogonal x.val y.val := by --Maša
   let ⟨h1, h2⟩ := ort
   constructor
   · exact (AddSubmonoid.mk_eq_zero (CornerSubring idem_e).toAddSubmonoid).mp h1

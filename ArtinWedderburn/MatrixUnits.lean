@@ -291,15 +291,12 @@ lemma nontrivial_OrtIdem_n_pos [Nontrivial R] (ort_idem : OrtIdemDiv R) : 0 < or
     sorry
   sorry
 
-
 def HasMatrixUnits_to_hasMatrixUnist (mu : HasMatrixUnits R n) : hasMatrixUnits R n := {
     es := by sorry
     diag_sum_eq_one := sorry,
     mul_ij_kl_eq_kron_delta_jk_mul_es_il := sorry
 
 }
-
-
 
 theorem lemma_2_20 (prime : IsPrimeRing R) (ort_idem : OrtIdemDiv R) (n_pos : 0 < ort_idem.n) : ∃ (e : R) (idem : IsIdempotentElem e) (n : ℕ) (he : e = ort_idem.f ⟨0, n_pos⟩) (n_pos : 0 < n) , HasMatrixUnits R n := by --Matevz
   let e := ort_idem.f ⟨0, n_pos⟩

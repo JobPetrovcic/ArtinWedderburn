@@ -133,19 +133,15 @@ def extension_of_OrtIdemDiv (e : R) (idem_e : IsIdempotentElem e) (div_e : IsDiv
     exact div_e
 
     have ⟨k, hk⟩ := i_nonzero_succ i (by exact hi)
-
+    --have h : (extension_of_ort_idem e idem_e oid.toOrtIdem).h i = oid.h k := by sorry
     #check oid.div
+    exact oid.div k
     sorry
-    --exact oid.div i
+    --exact oid.div k
 }
 
---
-lemma corner_eq (e : R) (idem_e : IsIdempotentElem e) (f : CornerSubring idem_e) (idem_f : IsIdempotentElem f) : CornerSubring (idem_f) = CornerSubring (idem_f) := by sorry
-/-
-theorem corner_equal (e : R) (idem_e : IsIdempotentElem e) (f : CornerSubring idem_e) (idem_f : IsIdempotentElem f): CornerSubring (f_mem_corner_e_e_sub_f_idem e idem_e f idem_f) = CornerSubring (IsIdempotentElem.one_sub idem_f) := by
+-- { x : ↥(CornerSubring (IsIdempotentElem.one_sub idem_e)) // x ∈ CornerSubring (oid.h k) } : Prop = { x : R // x ∈ CornerSubring ((extension_of_ort_idem e idem_e oid.toOrtIdem).h i) }
 
-  sorry
--/
 noncomputable
 def subideals_nice_ideal_nice [Nontrivial R] (h_prime : IsPrimeRing R) (h_art : IsArtinian R R) (I : Ideal R) (hi : ∀ J, J < I → NiceIdeal J) : NiceIdeal I := by
   by_cases h_zero : I = ⊥
@@ -156,7 +152,7 @@ def subideals_nice_ideal_nice [Nontrivial R] (h_prime : IsPrimeRing R) (h_art : 
 
   have e_nonzero : e ≠ 0 := by exact bot_eq_span_zero I e h_zero I_span_e
 
-  have corner_nontriv : Nontrivial (CornerSubring idem_e) := by exact corner_nontrivial R idem_e e_nonzero
+  have corner_nontriv : Nontrivial (CornerSubring idem_e) := by exact e_nonzero_corner_nontrivial R idem_e e_nonzero
   have corner_prime : IsPrimeRing (CornerSubring idem_e) := by exact corner_ring_prime idem_e h_prime
   have corner_artinian : IsArtinian (CornerSubring idem_e) (CornerSubring idem_e) := by exact corner_ring_artinian idem_e
 
@@ -201,6 +197,7 @@ def subideals_nice_ideal_nice [Nontrivial R] (h_prime : IsPrimeRing R) (h_art : 
 
   apply extension_of_OrtIdemDiv
   exact f_div
+
   sorry
 
 
