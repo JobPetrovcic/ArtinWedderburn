@@ -268,6 +268,38 @@ theorem left_inv_implies_divring [Nontrivial R] (h : ∀ x : R, x ≠ 0 → ∃ 
     · rw [x_eq_z]
       exact hz
 
+noncomputable
+def IsDivisionRing_to_DivisionRing (div : IsDivisionRing R) : DivisionRing R := by --Maša
+  unfold IsDivisionRing at div
+  have nontriv : Nontrivial R := by
+    let ⟨⟨x, hx⟩, _⟩ := div
+    use x, 0
+  apply DivisionRing.ofIsUnitOrEqZero
+  intro a
+  rw [isUnit_iff_exists]
+  let ⟨_, h⟩ := div
+  by_cases ha : a = 0
+  right
+  exact ha
+  left
+  specialize h a ha
+  obtain ⟨y, ⟨hy1, hy2⟩⟩ := h
+  use y
+
+theorem div_subring_to_div_ring (e : R) (idem_e : IsIdempotentElem e) (h : IsDivisionSubring (CornerSubringNonUnital e) e) : IsDivisionRing (CornerSubring idem_e) := by --Maša
+  obtain ⟨⟨a, ⟨a_mem, a_nz⟩⟩, h_inv⟩ := h
+  have corner_nontrivial : Nontrivial (CornerSubring idem_e) := by
+    use (⟨a, a_mem⟩ : CornerSubring idem_e), ⟨0, by exact NonUnitalSubring.zero_mem (CornerSubring idem_e)⟩
+    simp_all
+  apply left_inv_implies_divring
+  clear a a_mem a_nz
+  intro x x_nz
+  let ⟨y, ⟨y_mem, hy⟩⟩ := h_inv x (by exact SetLike.coe_mem x) (by exact (nonzero idem_e x).mp x_nz)
+  use ⟨y, y_mem⟩
+  rw [Subtype.ext_iff_val]
+  simp
+  exact hy
+
 -- Lemma 2.12
 -- hypothesis: I^2 ≠ ⊥ and I is a minimal left ideal
 -- conclusion: there exists an idempotent e in I such that I = Re and eRe is a Division Ring (TODO) Dude this has to be divided into multiple lemmas
@@ -322,18 +354,3 @@ theorem minimal_ideal_I_sq_nonzero_exists_idem_and_div (h_atom_I : IsAtom I) (hI
       · constructor
         · trivial
         · exact corner_ring_div (Ideal.span {e}) h_atom_I e he henz he_idem
-
-
-theorem div_subring_to_div_ring (e : R) (idem_e : IsIdempotentElem e) (h : IsDivisionSubring (CornerSubringNonUnital e) e) : IsDivisionRing (CornerSubring idem_e) := by --Maša
-  obtain ⟨⟨a, ⟨a_mem, a_nz⟩⟩, h_inv⟩ := h
-  have corner_nontrivial : Nontrivial (CornerSubring idem_e) := by
-    use (⟨a, a_mem⟩ : CornerSubring idem_e), ⟨0, by exact NonUnitalSubring.zero_mem (CornerSubring idem_e)⟩
-    simp_all
-  apply left_inv_implies_divring
-  clear a a_mem a_nz
-  intro x x_nz
-  let ⟨y, ⟨y_mem, hy⟩⟩ := h_inv x (by exact SetLike.coe_mem x) (by exact (nonzero idem_e x).mp x_nz)
-  use ⟨y, y_mem⟩
-  rw [Subtype.ext_iff_val]
-  simp
-  exact hy
