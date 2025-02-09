@@ -17,6 +17,7 @@ open hasMatrixUnits
 
 variable (R : Type*) [Ring R]
 
+
 theorem OrtIdem_imply_MatUnits' {n : ℕ} (hn : 0 < n) -- Done by Matevz
   (diag_es : Fin n → R)
   (idem : (∀ i : Fin n, IsIdempotentElem (diag_es i))) -- idempotent
@@ -66,6 +67,18 @@ theorem OrtIdem_imply_MatUnits' {n : ℕ} (hn : 0 < n) -- Done by Matevz
     mat_units.es ⟨0, hn⟩ ⟨0, hn⟩ = col_es ⟨0, hn⟩ * row_es ⟨0, hn⟩ := by rfl
     _ = diag_es ⟨0, hn⟩ := by simp_rw [comp2]
 
+
+theorem lemma_2_20' (prime : IsPrimeRing R) (ort_idem : OrtIdemDiv R) (n_pos : 0 < ort_idem.n) : ∃ mat_units : hasMatrixUnits R ort_idem.n, mat_units.es ⟨0, n_pos⟩ ⟨0, n_pos⟩ = ort_idem.f ⟨0, n_pos⟩ := by --Matevz
+  let e := ort_idem.f ⟨0, n_pos⟩
+  have proof_uv := fun i => lemma_2_19' prime (ort_idem.f ⟨0, n_pos⟩) (ort_idem.f i) (ort_idem.h ⟨0, n_pos⟩) (ort_idem.h i) (ort_idem.div ⟨0, n_pos⟩) (ort_idem.div i)
+  let row_es : Fin ort_idem.n → R := fun i => (proof_uv i).u
+  let col_es : Fin ort_idem.n → R := fun i => (proof_uv i).v
+  let row_in := fun i => (proof_uv i).u_mem
+  let col_in := fun i => (proof_uv i).v_mem
+  let comp1 := fun i => (proof_uv i).u_mul_v
+  let comp2 := fun i => (proof_uv i).v_mul_u
+  have mat_units := @OrtIdem_imply_MatUnits' R _ ort_idem.n n_pos ort_idem.f ort_idem.h ort_idem.orthogonal ort_idem.sum_one row_es row_in col_es col_in comp1 comp2
+  exact mat_units
 
 
 variable {n : ℕ} {hn : 0 < n} [mu : hasMatrixUnits R n]
