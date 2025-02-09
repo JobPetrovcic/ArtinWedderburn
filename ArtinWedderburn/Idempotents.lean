@@ -3,10 +3,10 @@ import Mathlib.Algebra.Field.Defs
 import Mathlib.RingTheory.SimpleRing.Basic
 import Mathlib.Algebra.Ring.Idempotents
 import ArtinWedderburn.PrimeRing
-import ArtinWedderburn.CornerRing
 import ArtinWedderburn.SetProd
+import ArtinWedderburn.CornerRing
 import ArtinWedderburn.MinIdeals
-
+import ArtinWedderburn.Auxiliary
 
 
 
@@ -143,21 +143,6 @@ lemma eRf_nonzero --Maša
   | inl h => exact he h
   | inr h => exact hf h
 
-
--- If eRe is a division ring then e is nonzero
-lemma corner_ring_division_e_nonzero --Maša
-  (idem_e : IsIdempotentElem e) (heRe : IsDivisionRing (CornerSubring idem_e)) : e ≠ 0 := by
-  by_contra he
-  have ha : ∀(a : R), e * a * e = 0 := by exact fun a ↦ mul_eq_zero_of_right (e * a) he
-  have h_zero : ∀(x : CornerSubring idem_e), x = 0 := by
-    intro ⟨x, hx⟩
-    apply x_in_corner_x_eq_e_y_e at hx
-    obtain ⟨y, hy⟩ := hx
-    specialize ha y
-    rw [ha] at hy
-    exact (NonUnitalSubring.coe_eq_zero_iff (CornerSubring idem_e)).mp hy
-  obtain ⟨⟨x, hx⟩, _⟩ := heRe
-  exact hx (h_zero x)
 
 --multiplication with e and f preserves both_mul e f
 lemma both_mul_e_f (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) : --Maša
@@ -472,8 +457,15 @@ lemma orth_coercion (e : R) (idem_e : IsIdempotentElem e) (x y : CornerSubring i
   · exact (AddSubmonoid.mk_eq_zero (CornerSubring idem_e).toAddSubmonoid).mp h2
 
 
+lemma iso_idem_to_idem (R' : Type*) [Ring R'] (φ : R ≃+* R') (e : R) (idem_e : IsIdempotentElem e): IsIdempotentElem (φ e) := by
+  unfold IsIdempotentElem at *
+  rw [← @RingEquiv.map_mul, idem_e]
 
-
+lemma iso_orthogonal_to_orthogonal (R' : Type*) [Ring R'] (φ : R ≃+* R') (x y : R) (ort : IsOrthogonal x y): IsOrthogonal (φ x) (φ y) := by
+  let ⟨h1, h2⟩ := ort
+  constructor
+  · rw [← @RingEquiv.map_mul, h1, @RingEquiv.map_eq_zero_iff]
+  · rw [← @RingEquiv.map_mul, h2, @RingEquiv.map_eq_zero_iff]
 
 
 
@@ -511,3 +503,51 @@ structure OrtIdem (R : Type*) [Ring R] where -- Job and Maša
 
 structure OrtIdemDiv (R : Type*) [Ring R] extends OrtIdem R where
   (div : ∀ i, IsDivisionRing (CornerSubring (h i)))
+
+set_option pp.proofs true
+
+def isomorphic_OrtIdem (R' : Type*) [Ring R'] (φ : R ≃+* R') (hoi : OrtIdem R) : OrtIdem R' := {
+  n := hoi.n,
+  f := fun i => φ (hoi.f i),
+  h := fun i => iso_idem_to_idem R' φ (hoi.f i) (hoi.h i)
+  sum_one := by
+    simp
+    calc ∑ x : Fin hoi.n, φ (hoi.f x) = φ (∑ x : Fin hoi.n, (hoi.f x)) := by exact Eq.symm (RingEquiv.map_sum φ hoi.f Finset.univ)
+                                    _ = φ (1) := by rw [hoi.sum_one]
+                                    _ = 1 := by exact RingEquiv.map_one φ
+  orthogonal := fun i j hij => by
+    simp
+    apply iso_orthogonal_to_orthogonal
+    exact hoi.orthogonal i j hij
+}
+
+def ring_iso_to_corner_iso (R' : Type*) [Ring R'] (φ : R ≃+* R') (e : R) (idem_e : IsIdempotentElem e): CornerSubring idem_e ≃+* CornerSubring (iso_idem_to_idem R' φ e idem_e) := {
+  toFun := fun x => ⟨φ x.val, by
+    rw [@subring_mem_idem]
+    have hx : x = e * x * e := by apply (corner_ring_set_mem idem_e).mp; exact Subtype.coe_prop x
+    have hx' : φ x  = φ (e * x * e) := by exact congrArg (⇑φ) hx
+    rw [@RingEquiv.map_mul, @RingEquiv.map_mul] at hx'
+    exact hx'⟩,
+  invFun := fun y => ⟨φ.symm y.val, by
+    have h : y = φ e * y * φ e := by apply (corner_ring_set_mem ?idem_e).mp; simp
+    rw [h]
+    have h' : φ.symm (φ e * ↑y * φ e) = e * φ.symm ↑y * e := by
+      rw [@RingEquiv.map_mul, @RingEquiv.map_mul]
+      rw [RingEquiv.symm_apply_apply φ e]
+    use φ.symm ↑y⟩,
+  left_inv := fun ⟨x, hx⟩ => by simp,
+  right_inv := fun ⟨x, hx⟩ => by simp,
+  map_mul' := by intro x y; simp,
+  map_add' := by intro x y; simp,
+  }
+
+def isomorphic_OrtIdemDiv (R' : Type*) [Ring R'] (φ : R ≃+* R') (hoi : OrtIdemDiv R) : OrtIdemDiv R' := {
+  toOrtIdem := isomorphic_OrtIdem R' φ hoi.toOrtIdem,
+  div := fun i =>
+    -- Use the induced ring isomorphism between CornerSubring (hoi.h i) and
+    -- CornerSubring (iso_idem_to_idem R' φ (hoi.f i) (hoi.h i)) to transfer the division ring structure.
+    -- Complete the proof by constructing this ring isomorphism and applying
+    -- the fact that division rings are preserved under isomorphism.
+    sorry }
+
+--isomorphic_rings_div_iff

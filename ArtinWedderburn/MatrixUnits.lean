@@ -16,6 +16,71 @@ class hasMatrixUnits (R : Type*) [Ring R] (n : ℕ) where -- Done by Job
 open hasMatrixUnits
 
 variable (R : Type*) [Ring R]
+
+
+theorem OrtIdem_imply_MatUnits' {n : ℕ} (hn : 0 < n) -- Done by Matevz
+  (diag_es : Fin n → R)
+  (idem : (∀ i : Fin n, IsIdempotentElem (diag_es i))) -- idempotent
+  (ort : (∀ i j : Fin n, i ≠ j → PairwiseOrthogonal (diag_es i) (diag_es j))) -- pairwise orthogonal
+  (sum_eq_one : ∑ i, diag_es i = 1) -- sum of diagonal elements is 1
+  -- first row
+  (row_es : Fin n -> R)
+  (row_in : ∀ i : Fin n, row_es i ∈ both_mul (diag_es ⟨0, hn⟩) (diag_es i))
+  -- first column
+  (col_es : Fin n -> R)
+  (col_in : ∀ i : Fin n, col_es i ∈ both_mul (diag_es i) (diag_es ⟨0, hn⟩))
+  -- they are compatible
+  (comp1 : ∀ i, row_es i * col_es i = diag_es ⟨0, hn⟩)
+  (comp2 : ∀ i, col_es i * row_es i = diag_es i)
+  : ∃ mat_units : hasMatrixUnits R n, mat_units.es ⟨0, hn⟩ ⟨0, hn⟩ = diag_es ⟨0, hn⟩ := by
+  let es := fun i j => (col_es i) * (row_es j)
+  let diag_sum_eq_one : ∑ i, es i i = 1 := by
+    calc ∑ i, es i i = ∑ i, col_es i * row_es i := by rfl
+     _ = ∑ i, diag_es i := by simp_rw [comp2]
+     _ = 1 := by exact sum_eq_one
+  let delta : ∀ i j k l, es i j * es k l = (if j = k then es i l else 0) := by
+    intro i j k l
+    split_ifs with h
+    · rw [h]
+      have col_mul_diag : col_es i * diag_es ⟨0, hn⟩ = col_es i := by
+        obtain ⟨r, hr⟩ := col_in i
+        calc
+          col_es i * diag_es ⟨0, hn⟩ = diag_es i * r * (diag_es ⟨0, hn⟩ * diag_es ⟨0, hn⟩) := by rw [hr]; noncomm_ring
+          _ = diag_es i * r * diag_es ⟨0, hn⟩ := by rw [idem ⟨0, hn⟩]
+          _ = col_es i := by rw [hr]
+      calc
+        (col_es i * row_es k) * (col_es k * row_es l) = col_es i * (row_es k * col_es k) * row_es l := by noncomm_ring
+        _ = col_es i * diag_es ⟨0, hn⟩ * row_es l := by rw [comp1 k]
+        _ = col_es i * row_es l := by rw [col_mul_diag]
+    · obtain ⟨r, hr⟩ := row_in j
+      obtain ⟨s, hs⟩ := col_in k
+      calc
+        (col_es i * row_es j) * (col_es k * row_es l) = col_es i * (diag_es ⟨0, hn⟩ * r * (diag_es j * diag_es k) * s * diag_es ⟨0, hn⟩) * row_es l := by rw [hr, hs]; noncomm_ring
+        _ = 0 := by rw [(ort j k h).left]; noncomm_ring
+  let mat_units : hasMatrixUnits R n := {
+    es := es,
+    diag_sum_eq_one := diag_sum_eq_one,
+    mul_ij_kl_eq_kron_delta_jk_mul_es_il := delta
+  }
+  use mat_units
+  calc
+    mat_units.es ⟨0, hn⟩ ⟨0, hn⟩ = col_es ⟨0, hn⟩ * row_es ⟨0, hn⟩ := by rfl
+    _ = diag_es ⟨0, hn⟩ := by simp_rw [comp2]
+
+
+theorem lemma_2_20' (prime : IsPrimeRing R) (ort_idem : OrtIdemDiv R) (n_pos : 0 < ort_idem.n) : ∃ mat_units : hasMatrixUnits R ort_idem.n, mat_units.es ⟨0, n_pos⟩ ⟨0, n_pos⟩ = ort_idem.f ⟨0, n_pos⟩ := by --Matevz
+  let e := ort_idem.f ⟨0, n_pos⟩
+  have proof_uv := fun i => lemma_2_19' prime (ort_idem.f ⟨0, n_pos⟩) (ort_idem.f i) (ort_idem.h ⟨0, n_pos⟩) (ort_idem.h i) (ort_idem.div ⟨0, n_pos⟩) (ort_idem.div i)
+  let row_es : Fin ort_idem.n → R := fun i => (proof_uv i).u
+  let col_es : Fin ort_idem.n → R := fun i => (proof_uv i).v
+  let row_in := fun i => (proof_uv i).u_mem
+  let col_in := fun i => (proof_uv i).v_mem
+  let comp1 := fun i => (proof_uv i).u_mul_v
+  let comp2 := fun i => (proof_uv i).v_mul_u
+  have mat_units := @OrtIdem_imply_MatUnits' R _ ort_idem.n n_pos ort_idem.f ort_idem.h ort_idem.orthogonal ort_idem.sum_one row_es row_in col_es col_in comp1 comp2
+  exact mat_units
+
+
 variable {n : ℕ} {hn : 0 < n} [mu : hasMatrixUnits R n]
 
 abbrev e00_idem : IsIdempotentElem (mu.es ⟨0, hn⟩ ⟨0, hn⟩) := mu.mul_ij_kl_eq_kron_delta_jk_mul_es_il ⟨0, hn⟩ ⟨0, hn⟩ ⟨0, hn⟩ ⟨0, hn⟩
@@ -291,14 +356,35 @@ lemma nontrivial_OrtIdem_n_pos [Nontrivial R] (ort_idem : OrtIdemDiv R) : 0 < or
     sorry
   sorry
 
-def HasMatrixUnits_to_hasMatrixUnist (mu : HasMatrixUnits R n) : hasMatrixUnits R n := {
-    es := by sorry
-    diag_sum_eq_one := sorry,
-    mul_ij_kl_eq_kron_delta_jk_mul_es_il := sorry
+noncomputable
+def HasMatrixUnits_to_hasMatrixUnits (mu : HasMatrixUnits R n) : hasMatrixUnits R n := by
+  let es := Classical.choose mu
+  let h := Classical.choose_spec mu
+  obtain ⟨h_sum, h_diag⟩ := h
 
-}
+  exact {
+    es := es
+    diag_sum_eq_one := h_sum,
+    mul_ij_kl_eq_kron_delta_jk_mul_es_il := h_diag
+  }
 
-theorem lemma_2_20 (prime : IsPrimeRing R) (ort_idem : OrtIdemDiv R) (n_pos : 0 < ort_idem.n) : ∃ (e : R) (idem : IsIdempotentElem e) (n : ℕ) (he : e = ort_idem.f ⟨0, n_pos⟩) (n_pos : 0 < n) , HasMatrixUnits R n := by --Matevz
+theorem lemma_2_20 (prime : IsPrimeRing R) (ort_idem : OrtIdemDiv R) (n_pos : 0 < ort_idem.n) : ∃ mat_unit : hasMatrixUnits R ort_idem.n, mat_unit.es ⟨0, n_pos⟩ ⟨0, n_pos⟩ = ort_idem.f ⟨0, n_pos⟩ := by --Matevz
+  let e := ort_idem.f ⟨0, n_pos⟩
+  --use e, ort_idem.h ⟨0, n_pos⟩, ort_idem.n, rfl, n_pos
+  have proof_uv := fun i => lemma_2_19' prime (ort_idem.f ⟨0, n_pos⟩) (ort_idem.f i) (ort_idem.h ⟨0, n_pos⟩) (ort_idem.h i) (ort_idem.div ⟨0, n_pos⟩) (ort_idem.div i)
+  let row_es : Fin ort_idem.n → R := fun i => (proof_uv i).u
+  let col_es : Fin ort_idem.n → R := fun i => (proof_uv i).v
+  let row_in := fun i => (proof_uv i).u_mem
+  let col_in := fun i => (proof_uv i).v_mem
+  let comp1 := fun i => (proof_uv i).u_mul_v
+  let comp2 := fun i => (proof_uv i).v_mul_u
+  let mat_unit := HasMatrixUnits_to_hasMatrixUnits R (OrtIdem_imply_MatUnits n_pos ort_idem.f ort_idem.h ort_idem.orthogonal ort_idem.sum_one row_es row_in col_es col_in comp1 comp2)
+  use mat_unit
+  sorry
+
+
+
+theorem lemma_2_20' (prime : IsPrimeRing R) (ort_idem : OrtIdemDiv R) (n_pos : 0 < ort_idem.n) : ∃ (e : R) (idem : IsIdempotentElem e) (n : ℕ) (he : e = ort_idem.f ⟨0, n_pos⟩) (n_pos : 0 < n) , HasMatrixUnits R n := by --Matevz
   let e := ort_idem.f ⟨0, n_pos⟩
   use e, ort_idem.h ⟨0, n_pos⟩, ort_idem.n, rfl, n_pos
   have proof_uv := fun i => lemma_2_19' prime (ort_idem.f ⟨0, n_pos⟩) (ort_idem.f i) (ort_idem.h ⟨0, n_pos⟩) (ort_idem.h i) (ort_idem.div ⟨0, n_pos⟩) (ort_idem.div i)
@@ -310,6 +396,7 @@ theorem lemma_2_20 (prime : IsPrimeRing R) (ort_idem : OrtIdemDiv R) (n_pos : 0 
   let comp2 := fun i => (proof_uv i).v_mul_u
   exact OrtIdem_imply_MatUnits n_pos ort_idem.f ort_idem.h ort_idem.orthogonal ort_idem.sum_one row_es row_in col_es col_in comp1 comp2
 
+/-
 -- missing is application of lemma 2.17
 theorem lemma_2_20_full [Nontrivial R] (prime : IsPrimeRing R) (ort_idem : OrtIdemDiv R) : ∃ (e : R) (idem : IsIdempotentElem e) (n : ℕ), IsDivisionRing (CornerSubring idem) ∧ Nonempty (R ≃+* Matrix (Fin n) (Fin n) (CornerSubring idem)) := by
   have n_pos : 0 < ort_idem.n := by exact nontrivial_OrtIdem_n_pos R ort_idem
@@ -319,5 +406,7 @@ theorem lemma_2_20_full [Nontrivial R] (prime : IsPrimeRing R) (ort_idem : OrtId
   constructor
   · exact ort_idem.div ⟨0, n_pos⟩
   · let f :=  ring_with_matrix_units_isomorphic_to_matrix_ring R n n_pos' mu
+
     sorry
     --exact Nonempty.intro f
+-/
