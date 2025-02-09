@@ -45,6 +45,7 @@ instance CornerSubringNonUnital (e : R) : NonUnitalSubring R where -- Done by Ma
     rw [hr, hs]
     noncomm_ring
 
+theorem corner_ring_carrier : (CornerSubringNonUnital e).carrier = both_mul e e  := by rfl
 theorem el_in_corner_ring (x : R) : x ∈ both_mul e e ↔  x ∈ CornerSubringNonUnital e := by rfl
 
 theorem eq_carrier_eq_corner (x y : R) (h : both_mul x x = both_mul y y) : CornerSubringNonUnital x = CornerSubringNonUnital y := by
