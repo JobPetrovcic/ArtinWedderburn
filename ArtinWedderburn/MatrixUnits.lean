@@ -6,6 +6,7 @@ import ArtinWedderburn.PrimeRing
 import ArtinWedderburn.CornerRing
 import ArtinWedderburn.Idempotents
 
+import Mathlib.Algebra.BigOperators.Group.Finset
 
 -- TODO: maybe split this up into multiple definitions
 class hasMatrixUnits (R : Type*) [Ring R] (n : ℕ) where -- Done by Job
@@ -16,6 +17,28 @@ class hasMatrixUnits (R : Type*) [Ring R] (n : ℕ) where -- Done by Job
 open hasMatrixUnits
 
 variable (R : Type*) [Ring R]
+
+theorem nontrivial_zero_not_one (nontriv : Nontrivial R) : (0 : R) ≠ (1 : R) := by -- Done by Matevz
+  intro h
+  obtain ⟨x, y, x_neq_y⟩ := nontriv.exists_pair_ne
+  have x_eq_y : x = y := by calc
+    x = x * 1 := by noncomm_ring
+    _ = x * 0 := by rw [←h]
+    _ = y * 0 := by noncomm_ring
+    _ = y * 1 := by rw [h]
+    _ = y := by noncomm_ring
+  exact x_neq_y x_eq_y
+
+
+theorem nontrivial_ortidem_n_pos (nontriv : Nontrivial R) (ort_idem : OrtIdemDiv R) : 0 < ort_idem.n := by
+  refine Nat.pos_of_ne_zero ?_
+  by_contra n_zero
+  have not_less_zero (n : ℕ) : ¬ n < ort_idem.n := by rw [n_zero]; exact Nat.not_lt_zero n
+  have fin_empty : IsEmpty (Fin ort_idem.n) := isEmpty_iff.mpr (fun ⟨n, hn⟩ => not_less_zero n hn)
+  have zero_eq_one : (1 : R) = (0 : R) := by calc
+    1 = ∑ i : Fin ort_idem.n, ort_idem.f i := by exact Eq.symm ort_idem.sum_one
+    _ = 0 := by refine @Fintype.sum_empty _ _ _ fin_empty _ ort_idem.f
+  exact nontrivial_zero_not_one R nontriv (Eq.symm zero_eq_one)
 
 
 theorem OrtIdem_imply_MatUnits' {n : ℕ} (hn : 0 < n) -- Done by Matevz
@@ -395,6 +418,7 @@ theorem lemma_2_20' (prime : IsPrimeRing R) (ort_idem : OrtIdemDiv R) (n_pos : 0
   let comp1 := fun i => (proof_uv i).u_mul_v
   let comp2 := fun i => (proof_uv i).v_mul_u
   exact OrtIdem_imply_MatUnits n_pos ort_idem.f ort_idem.h ort_idem.orthogonal ort_idem.sum_one row_es row_in col_es col_in comp1 comp2
+-/
 
 
 -- missing is application of lemma 2.17
