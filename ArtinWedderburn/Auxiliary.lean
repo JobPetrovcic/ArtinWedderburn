@@ -47,7 +47,7 @@ def IsDivisionRing_to_DivisionRing (div : IsDivisionRing R) : DivisionRing R := 
   use y
 
 
-theorem isomorphic_rings_div_iff {R' : Type*} [Ring R'] (f : R ≃+* R') (h_div : IsDivisionRing R) : IsDivisionRing R' := by
+theorem isomorphic_ring_div {R' : Type*} [Ring R'] (f : R ≃+* R') (h_div : IsDivisionRing R) : IsDivisionRing R' := by --Maša
   unfold IsDivisionRing at *
   let ⟨⟨x, hx⟩, h⟩ := h_div
   let ⟨y, hy⟩ := h x hx

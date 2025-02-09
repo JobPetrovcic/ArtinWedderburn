@@ -114,7 +114,7 @@ lemma e_in_corner_ring : --Maša
   rw [subring_mem_idem]
   rw [IsIdempotentElem.eq idem_e, IsIdempotentElem.eq idem_e]
 
-theorem both_mul_one_one_eq_R : both_mul (1 : R) 1 = ⊤ := by
+theorem both_mul_one_one_eq_R : both_mul (1 : R) 1 = ⊤ := by -- Maša
   ext x
   constructor
   · intro ⟨y, hy⟩
@@ -123,7 +123,7 @@ theorem both_mul_one_one_eq_R : both_mul (1 : R) 1 = ⊤ := by
     use x
     noncomm_ring
 
-def top_subring_equiv_ring (S : NonUnitalSubring R) (h : S.carrier = ⊤) : S ≃+* R := {
+def top_subring_equiv_ring (S : NonUnitalSubring R) (h : S.carrier = ⊤) : S ≃+* R := { -- Maša
   toFun := fun a => a,
   invFun := fun a => ⟨a, by
     have ha : a ∈ S.carrier := by rw [h]; exact trivial
@@ -135,7 +135,7 @@ def top_subring_equiv_ring (S : NonUnitalSubring R) (h : S.carrier = ⊤) : S �
   map_add' := by intro a b; simp
 }
 
-def iso_corner_one : CornerSubring ((IsIdempotentElem.one : IsIdempotentElem (1 : R))) ≃+* R := by
+def iso_corner_one : CornerSubring ((IsIdempotentElem.one : IsIdempotentElem (1 : R))) ≃+* R := by -- Maša
   apply top_subring_equiv_ring
   unfold CornerSubring
   rw [corner_ring_carrier]
@@ -169,8 +169,10 @@ lemma e_x_e_in_corner : ∀ (x : R), e * x * e ∈ CornerSubring idem_e := by --
   calc _ = (e * e) * x * (e * e) := by noncomm_ring
         _ = e * x * e := by rw [idem_e]
 
+
 -- The corner ring is a ring
 instance CornerRingIsRing (idem_e : IsIdempotentElem e) : Ring (CornerSubring idem_e) := non_unital_w_e_is_ring 1 (is_left_unit idem_e) (is_right_unit idem_e) -- Done by Job
+
 
 def coercion_to_eRe (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) (f_mem : f ∈ CornerSubring idem_e) (x : CornerSubring idem_f): CornerSubring idem_e := by -- Maša and Job
   use x.val
@@ -197,7 +199,7 @@ lemma corner_ring_division_e_nonzero --Maša
   obtain ⟨⟨x, hx⟩, _⟩ := heRe
   exact hx (h_zero x)
 
-def eq_el_iso_corner (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) (e_eq_f : e = f) : (CornerSubring idem_e) ≃+* (CornerSubring idem_f) := {
+def eq_el_iso_corner (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) (e_eq_f : e = f) : (CornerSubring idem_e) ≃+* (CornerSubring idem_f) := { -- Maša
       toFun := fun x => ⟨x.val, by
         let ⟨y, hy⟩ := x.property
         have h : x = (f : R) * y * f := by rw [← e_eq_f]; exact hy
@@ -223,17 +225,8 @@ def equal_el_iso_matrix_rings (e f : R) (idem_e : IsIdempotentElem e) (idem_f : 
   exact idem_f
   exact e_eq_f
 
---mapMatrix
 
---TODO: ↥(CornerSubring idem_e_sub_f) = (CornerSubring (IsIdempotentElem.one_sub idem_f)) in eRe
 
---lemma corner_eq (e : R) (idem_e : IsIdempotentElem e) (f : CornerSubring idem_e) (idem_f : IsIdempotentElem f) : CornerSubring (idem_f) = CornerSubring (idem_f) := by sorry
-
-/-
-theorem corner_equal (e : R) (idem_e : IsIdempotentElem e) (f : CornerSubring idem_e) (idem_f : IsIdempotentElem f): CornerSubring (f_mem_corner_e_e_sub_f_idem e idem_e f idem_f) = CornerSubring (IsIdempotentElem.one_sub idem_f) := by
-
-  sorry
--/
 
 
 -- coercions from Sets of CornerSubrings to Set of R

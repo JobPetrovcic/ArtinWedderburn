@@ -158,7 +158,7 @@ lemma both_mul_e_f (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) :
         _ = x := by exact id (Eq.symm hy)
   exact ⟨he, hf⟩
 
--- both_mul is closed for addition and multiplication
+-- both_mul is closed for addition, multiplication and additive inverses
 lemma both_mul_add : ∀ (x y : R), x ∈ both_mul e f → y ∈ both_mul e f → x + y ∈ both_mul e f := by --Maša
   intro x y ⟨a, ha⟩ ⟨b, hb⟩
   use (a + b)
@@ -206,8 +206,7 @@ theorem lemma_2_19 -- Maša
   obtain ⟨b, hb⟩ := hb
 
   have hx : e * a * f * b * e ∈ CornerSubring idem_e := by
-    rw [subring_mem_idem]
-    rw [eq_comm]
+    rw [subring_mem_idem, eq_comm]
     calc e * (e * a * f * b * e) * e = (e * e) * a * f * b * (e * e) := by noncomm_ring
         _ = e * a * f * b * e := by rw [IsIdempotentElem.eq idem_e]
         _ = e * a * f * b * e := by exact rfl
@@ -216,8 +215,7 @@ theorem lemma_2_19 -- Maša
   have x_val_eq : x.val = e * a * f * b * e := by rfl
 
   have x_nonzero : (x : CornerSubring idem_e) ≠ 0 := by
-    rw [nonzero]
-    rw [x_val_eq]
+    rw [nonzero, x_val_eq]
     exact hb
 
   have x_inv : ∃ (y : CornerSubring idem_e), x * y = (1 : CornerSubring idem_e) := by
@@ -229,22 +227,18 @@ theorem lemma_2_19 -- Maša
   obtain ⟨y, hy⟩ := x_inv
 
   let e_corner : CornerSubring idem_e := ⟨e, by exact e_in_corner_ring idem_e⟩
-  have hxy : e_corner = (1 : CornerSubring idem_e) := by exact rfl
   have hxy : x * y = (e_corner : R):= by
-    have hxy' : x * y = (e_corner : CornerSubring idem_e) := by exact hy
-    rw [Subtype.ext_iff_val] at hxy'
-    exact hxy'
+    rw [Subtype.ext_iff_val] at hy
+    exact hy
 
   have hc : ∃ (c : R), y = e * c * e := by
     apply x_in_corner_x_eq_e_y_e y.2
   obtain ⟨c, hc⟩ := hc
-
   have y_val_eq : y.val = e * c * e := by exact hc
 
   let v := f * b * e * c * e
   let u := e * a * f
-  use u
-  use v
+  use u, v
 
   have hu : u ∈ both_mul e f := by use a
   have hv : v ∈ both_mul f e := by
@@ -267,7 +261,6 @@ theorem lemma_2_19 -- Maša
         _ = v * e := by rw [uv_eq_e]
         _ = v := by exact ve_eq_v
 
-
   constructor
   · exact hu
   · constructor
@@ -278,26 +271,22 @@ theorem lemma_2_19 -- Maša
         push_neg at h_neq
         have h_nonzero : v * u - f ≠ 0 := by exact sub_ne_zero_of_ne h_neq
         have h_mem : v * u - f ∈ CornerSubring idem_f := by
-          have vu_mem : v * u ∈ both_mul f f := by
-            apply both_mul_mul
-            exact hv
-            exact hu
-          have f_mem : f ∈ both_mul f f := by
-            apply e_in_corner_ring idem_f
           apply both_mul_sub
-          exact vu_mem
-          exact f_mem
+          apply both_mul_mul
+          exact hv
+          exact hu
+          exact e_in_corner_ring idem_f
+
         let w : CornerSubring idem_f := ⟨v * u - f, h_mem⟩
         have w_val_eq : w.val = v * u - f := by exact rfl
-        have h_inv : ∃(a : CornerSubring idem_f), a * w = (1 : CornerSubring idem_f) := by
+        have ⟨a, ha⟩ : ∃(a : CornerSubring idem_f), a * w = (1 : CornerSubring idem_f) := by
           obtain ⟨a, ⟨h1, h2⟩⟩ := hfRf.2 w (by rw [nonzero]; exact h_nonzero)
           use a
-        obtain ⟨a, ha⟩ := h_inv
+
         have wv_eq_zero : w * v = 0 := by
           calc _ = (v * u - f) * v := by exact rfl
               _ = v * u * v - f * v := by noncomm_ring
               _ = 0 := by rw[vuv_eq_v, fv_eq_v]; simp
-
         have v_eq_zero : v = 0 := by
           calc _ = (1 : CornerSubring idem_f) * v := by exact id (Eq.symm fv_eq_v)
               _ = (a * w) * v := by rw [← ha]; simp
@@ -383,11 +372,11 @@ lemma orth_coercion (e : R) (idem_e : IsIdempotentElem e) (x y : CornerSubring i
   · exact (AddSubmonoid.mk_eq_zero (CornerSubring idem_e).toAddSubmonoid).mp h2
 
 
-lemma iso_idem_to_idem (R' : Type*) [Ring R'] (φ : R ≃+* R') (e : R) (idem_e : IsIdempotentElem e): IsIdempotentElem (φ e) := by
+lemma iso_idem_to_idem (R' : Type*) [Ring R'] (φ : R ≃+* R') (e : R) (idem_e : IsIdempotentElem e): IsIdempotentElem (φ e) := by -- Maša
   unfold IsIdempotentElem at *
   rw [← @RingEquiv.map_mul, idem_e]
 
-lemma iso_orthogonal_to_orthogonal (R' : Type*) [Ring R'] (φ : R ≃+* R') (x y : R) (ort : IsOrthogonal x y): IsOrthogonal (φ x) (φ y) := by
+lemma iso_orthogonal_to_orthogonal (R' : Type*) [Ring R'] (φ : R ≃+* R') (x y : R) (ort : IsOrthogonal x y): IsOrthogonal (φ x) (φ y) := by -- Maša
   let ⟨h1, h2⟩ := ort
   constructor
   · rw [← @RingEquiv.map_mul, h1, @RingEquiv.map_eq_zero_iff]
@@ -400,7 +389,7 @@ lemma iso_orthogonal_to_orthogonal (R' : Type*) [Ring R'] (φ : R ≃+* R') (x y
 theorem artinian_ring_has_minimal_left_ideal_of_element [IsArtinian R R] [Nontrivial R] : ∃ I : Ideal R, IsAtom I := by -- Maša
   exact IsAtomic.exists_atom (Ideal R)
 
-
+-- obtain an element to extend OrtIdem
 theorem prime_and_artinian_esists_idem_corner_div [Nontrivial R] (h : IsPrimeRing R) (h' : IsArtinian R R) : -- Maša
   ∃(e : R), e ≠ 0 ∧ IsIdempotentElem e ∧ IsDivisionSubring (CornerSubringNonUnital e) e := by
   have ⟨I, hI⟩ : ∃ I : Ideal R, IsAtom I := by exact artinian_ring_has_minimal_left_ideal_of_element
@@ -412,13 +401,11 @@ theorem prime_and_artinian_esists_idem_corner_div [Nontrivial R] (h : IsPrimeRin
     have I_eq_zero : I = ⊥ := by aesop
     contradiction
   let ⟨e, ⟨h1, h2, ⟨h3, h4, h5⟩⟩⟩ := minimal_ideal_I_sq_nonzero_exists_idem_and_div I hI I_sq_nonzero
-
   use e
 
 
-/-
-def OrtIdem (R : Type*) [Ring R] : Prop := ∃ (n : ℕ) (ι : Fin n → R) (h : (i : Fin n) → IsIdempotentElem (ι i)), (∑ i, ι i = 1) ∧ (∀ i j, i ≠ j → IsOrthogonal (ι i) (ι j)) ∧ (∀ i, IsDivisionRing (CornerSubring (h i)))
--/
+
+
 
 structure OrtIdem (R : Type*) [Ring R] where -- Job and Maša
   (n : ℕ)
@@ -432,7 +419,8 @@ structure OrtIdemDiv (R : Type*) [Ring R] extends OrtIdem R where
 
 set_option pp.proofs true
 
-def isomorphic_OrtIdem (R' : Type*) [Ring R'] (φ : R ≃+* R') (hoi : OrtIdem R) : OrtIdem R' := {
+-- A ring, isomorphic to OrtIdem ring, is itself OrtIdem
+def isomorphic_OrtIdem (R' : Type*) [Ring R'] (φ : R ≃+* R') (hoi : OrtIdem R) : OrtIdem R' := { -- Maša
   n := hoi.n,
   f := fun i => φ (hoi.f i),
   h := fun i => iso_idem_to_idem R' φ (hoi.f i) (hoi.h i)
@@ -447,7 +435,8 @@ def isomorphic_OrtIdem (R' : Type*) [Ring R'] (φ : R ≃+* R') (hoi : OrtIdem R
     exact hoi.orthogonal i j hij
 }
 
-def ring_iso_to_corner_iso (R' : Type*) [Ring R'] (φ : R ≃+* R') (e : R) (idem_e : IsIdempotentElem e): CornerSubring idem_e ≃+* CornerSubring (iso_idem_to_idem R' φ e idem_e) := {
+-- canonical isomorphism between corner rings
+def ring_iso_to_corner_iso (R' : Type*) [Ring R'] (φ : R ≃+* R') (e : R) (idem_e : IsIdempotentElem e): CornerSubring idem_e ≃+* CornerSubring (iso_idem_to_idem R' φ e idem_e) := { -- Maša
   toFun := fun x => ⟨φ x.val, by
     rw [@subring_mem_idem]
     have hx : x = e * x * e := by apply (corner_ring_set_mem idem_e).mp; exact Subtype.coe_prop x
@@ -467,9 +456,10 @@ def ring_iso_to_corner_iso (R' : Type*) [Ring R'] (φ : R ≃+* R') (e : R) (ide
   map_add' := by intro x y; simp,
   }
 
-def isomorphic_OrtIdemDiv {R' : Type*} [Ring R'] (φ : R ≃+* R') (hoi : OrtIdemDiv R) : OrtIdemDiv R' := {
+-- A ring, isomorphic to OrtIdemDiv ring, is itself OrtIdemDiv
+def isomorphic_OrtIdemDiv {R' : Type*} [Ring R'] (φ : R ≃+* R') (hoi : OrtIdemDiv R) : OrtIdemDiv R' := {  -- Maša
   toOrtIdem := isomorphic_OrtIdem R' φ hoi.toOrtIdem,
   div := fun i => by
     let ψ : (CornerSubring (hoi.h i))  ≃+* (CornerSubring ((isomorphic_OrtIdem R' φ hoi.toOrtIdem).h i)):= ring_iso_to_corner_iso R' φ (hoi.f i) (hoi.h i)
-    apply isomorphic_rings_div_iff ψ (hoi.div i)
+    apply isomorphic_ring_div ψ (hoi.div i)
 }
