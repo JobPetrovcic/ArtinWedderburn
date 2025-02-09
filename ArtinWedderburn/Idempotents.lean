@@ -521,47 +521,29 @@ def isomorphic_OrtIdem (R' : Type*) [Ring R'] (φ : R ≃+* R') (hoi : OrtIdem R
     exact hoi.orthogonal i j hij
 }
 
+def ring_iso_to_corner_iso (R' : Type*) [Ring R'] (φ : R ≃+* R') (e : R) (idem_e : IsIdempotentElem e): CornerSubring idem_e ≃+* CornerSubring (iso_idem_to_idem R' φ e idem_e) := {
+  toFun := fun x => ⟨φ x.val, by
+    rw [@subring_mem_idem]
+    have hx : x = e * x * e := by apply (corner_ring_set_mem idem_e).mp; exact Subtype.coe_prop x
+    have hx' : φ x  = φ (e * x * e) := by exact congrArg (⇑φ) hx
+    rw [@RingEquiv.map_mul, @RingEquiv.map_mul] at hx'
+    exact hx'⟩,
+  invFun := fun y => ⟨φ.symm y.val, by
+    have h : y = φ e * y * φ e := by apply (corner_ring_set_mem ?idem_e).mp; simp
+    rw [h]
+    have h' : φ.symm (φ e * ↑y * φ e) = e * φ.symm ↑y * e := by
+      rw [@RingEquiv.map_mul, @RingEquiv.map_mul]
+      rw [RingEquiv.symm_apply_apply φ e]
+    use φ.symm ↑y⟩,
+  left_inv := fun ⟨x, hx⟩ => by simp,
+  right_inv := fun ⟨x, hx⟩ => by simp,
+  map_mul' := by intro x y; simp,
+  map_add' := by intro x y; simp,
+  }
+
 def isomorphic_OrtIdemDiv (R' : Type*) [Ring R'] (φ : R ≃+* R') (hoi : OrtIdemDiv R) : OrtIdemDiv R' := {
   toOrtIdem := isomorphic_OrtIdem R' φ hoi.toOrtIdem,
   div := fun i => by
-
-    -- Use the induced ring isomorphism between CornerSubring (hoi.h i) and
-    -- CornerSubring (iso_idem_to_idem R' φ (hoi.f i) (hoi.h i)) to transfer the division ring structure.
-    -- Complete the proof by constructing this ring isomorphism and applying
-    -- the fact that division rings are preserved under isomorphism.
-    sorry }
-
---isomorphic_rings_div_iff
-
-
-/-
-def ring_iso_to_corner_iso (R' : Type*) [Ring R'] (φ : R ≃+* R') (e : R) (idem_e : IsIdempotentElem e): CornerSubring idem_e ≃+* CornerSubring (iso_idem_to_idem R' φ e idem_e) := {
-  toFun := fun x =>
-  ⟨φ x.val, by rw [←φ.map_mul, ←φ.map_mul, ←φ.map_mul]; sorry⟩,
-  invFun := fun y =>
-  ⟨φ.symm y.val, by
-    { -- Show that φ.symm y.val ∈ both_mul e e
-    rw [←φ.symm.map_mul, ←φ.symm.map_mul, ←φ.symm.map_mul],
-    sorry
-    }⟩,
-  left_inv := by
-  { intro x,
-    -- Prove that applying invFun to toFun returns x
-    sorry },
-  right_inv := by
-  { intro y,
-    -- Prove that applying toFun to invFun returns y
-    sorry },
-  map_mul' := by
-  { intros x y,
-    -- Prove that the map preserves multiplication
-    sorry },
-  map_add' := by
-  { intros x y,
-    -- Prove that the map preserves addition
-    sorry },
-  map_one' := by
-  { -- Prove that the map sends 1 to 1
-    sorry } }
-  sorry
--/
+    let ψ : (CornerSubring (hoi.h i))  ≃+* (CornerSubring ((isomorphic_OrtIdem R' φ hoi.toOrtIdem).h i)):= ring_iso_to_corner_iso R' φ (hoi.f i) (hoi.h i)
+    apply isomorphic_rings_div_iff ↥(CornerSubring ((isomorphic_OrtIdem R' φ hoi.toOrtIdem).h i)) ψ (hoi.div i)
+}

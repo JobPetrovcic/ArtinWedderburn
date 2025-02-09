@@ -420,7 +420,7 @@ theorem lemma_2_20' (prime : IsPrimeRing R) (ort_idem : OrtIdemDiv R) (n_pos : 0
   exact OrtIdem_imply_MatUnits n_pos ort_idem.f ort_idem.h ort_idem.orthogonal ort_idem.sum_one row_es row_in col_es col_in comp1 comp2
 -/
 
-/-
+
 -- missing is application of lemma 2.17
 theorem lemma_2_20_full [Nontrivial R] (prime : IsPrimeRing R) (ort_idem : OrtIdemDiv R) : ∃ (e : R) (idem : IsIdempotentElem e) (n : ℕ), IsDivisionRing (CornerSubring idem) ∧ Nonempty (R ≃+* Matrix (Fin n) (Fin n) (CornerSubring idem)) := by
   have n_pos : 0 < ort_idem.n := by exact nontrivial_OrtIdem_n_pos R ort_idem

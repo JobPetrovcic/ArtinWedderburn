@@ -7,6 +7,7 @@ import ArtinWedderburn.CornerRing
 import ArtinWedderburn.MatrixUnits
 import ArtinWedderburn.Idempotents
 import ArtinWedderburn.NiceIdeals
+import ArtinWedderburn.Auxiliary
 
 import Mathlib.RingTheory.SimpleModule
 
@@ -48,11 +49,21 @@ def ArtinWedderburnForPrime {R : Type u} [Ring R] [Nontrivial R] (h_prime : IsPr
       exact IsIdempotentElem.one
       exact Eq.symm Ideal.span_singleton_one
     specialize top_nice top_idem 1 IsIdempotentElem.one (Eq.symm Ideal.span_singleton_one)
-
     sorry
-  let ⟨e, idem_e, n, ⟨h_div, h_iso⟩⟩ := lemma_2_20_full R h_prime R_ort_idem
-  use n, (CornerSubring idem_e)
-  use IsDivisionRing_to_DivisionRing h_div
+
+  --let ⟨e, idem_e, n, ⟨h_div, h_iso⟩⟩ := lemma_2_20_full R h_prime R_ort_idem
+  --use n, (CornerSubring idem_e)
+  --use IsDivisionRing_to_DivisionRing h_div
+  have n_pos : 0 < R_ort_idem.n := by sorry
+  let ⟨mat_units, h⟩ := lemma_2_20' R h_prime R_ort_idem n_pos
+  use R_ort_idem.n, (CornerSubring (R_ort_idem.h ⟨0, n_pos⟩)), (IsDivisionRing_to_DivisionRing (R_ort_idem.div ⟨0,n_pos⟩))
+
+  #check (CornerSubring (R_ort_idem.h ⟨0, n_pos⟩))
+
+
+
+
+  sorry
 
 
 
