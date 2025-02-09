@@ -300,6 +300,28 @@ theorem div_subring_to_div_ring (e : R) (idem_e : IsIdempotentElem e) (h : IsDiv
   simp
   exact hy
 
+theorem isomorphic_rings_div_iff (R' : Type*) [Ring R'] (f : R ≃+* R') (h_div : IsDivisionRing R) : IsDivisionRing R' := by
+  unfold IsDivisionRing at *
+  let ⟨⟨x, hx⟩, h⟩ := h_div
+  let ⟨y, hy⟩ := h x hx
+  constructor
+  use f x
+  · rw [RingEquiv.map_ne_zero_iff]
+    exact hx
+  · intro x' hx'
+    let ⟨a, ha⟩ : ∃(a : R), f a = x' := by
+      use f.symm x'
+      exact f.right_inv x'
+    let ⟨b, hb⟩ := h a (by rw [← ha] at hx'; exact (RingEquiv.map_ne_zero_iff f).mp hx')
+    use f b
+    rw [← ha]
+    constructor
+    · rw [map_mul_eq_one]
+      exact hb.1
+    . rw [map_mul_eq_one]
+      exact hb.2
+
+
 -- Lemma 2.12
 -- hypothesis: I^2 ≠ ⊥ and I is a minimal left ideal
 -- conclusion: there exists an idempotent e in I such that I = Re and eRe is a Division Ring (TODO) Dude this has to be divided into multiple lemmas
