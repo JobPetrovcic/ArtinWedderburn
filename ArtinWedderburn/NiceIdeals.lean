@@ -139,13 +139,24 @@ def extension_of_OrtIdemDiv (e : R) (idem_e : IsIdempotentElem e) (div_e : IsDiv
     apply @isomorphic_rings_div_iff (CornerSubring (oid.h k)) _ (CornerSubring ((extension_of_ort_idem e idem_e oid.toOrtIdem).h i)) _
     symm
     have eq_el : (extension_of_ort_idem e idem_e oid.toOrtIdem).f i = oid.f k := by exact id (Eq.symm h1)
+    have hc1 : CornerSubring ((extension_of_ort_idem e idem_e oid.toOrtIdem).h i) ≃+* (CornerSubring (e_idem_to_e_val_idem (oid.h k))):= (eq_el_iso_corner ((extension_of_ort_idem e idem_e oid.toOrtIdem).f i) (oid.f k) ((extension_of_ort_idem e idem_e oid.toOrtIdem).h i) (e_idem_to_e_val_idem (oid.h k)) eq_el)
+    have hc2 : (CornerSubring (e_idem_to_e_val_idem (oid.h k))) ≃+* CornerSubring (oid.h k) := by
+      symm
+      apply @corner_ring_unital_eq R _
 
+
+    exact RingEquiv.trans hc1 hc2
+    --apply corner_ring_unital_eq
+    --sorry
+    exact oid.div k
+    /-
     calc _ ≃+* CornerSubring (e_idem_to_e_val_idem (oid.h k)) := (eq_el_iso_corner ((extension_of_ort_idem e idem_e oid.toOrtIdem).f i) (oid.f k) ((extension_of_ort_idem e idem_e oid.toOrtIdem).h i) (e_idem_to_e_val_idem (oid.h k)) eq_el)
          _ ≃+* ↑(CornerSubring (oid.h k)) := by sorry
 
     --apply corner_ring_unital_eq
     sorry
     exact oid.div k
+    -/
 }
 -- f(1 - e)R(1 - e)f = fRf  corner_ring_unital_eq
 -- { x : ↥(CornerSubring (IsIdempotentElem.one_sub idem_e)) // x ∈ CornerSubring (oid.h k) } : Prop = { x : R // x ∈ CornerSubring ((extension_of_ort_idem e idem_e oid.toOrtIdem).h i) }
@@ -205,8 +216,17 @@ def subideals_nice_ideal_nice [Nontrivial R] (h_prime : IsPrimeRing R) (h_art : 
 
   apply extension_of_OrtIdemDiv
   exact f_div
+  #check IsIdempotentElem.one_sub idem_f
   #check idem_e_sub_f
-  have h: (CornerSubring (IsIdempotentElem.one_sub idem_f)) ≃+* ↥(CornerSubring idem_e_sub_f) := by sorry
+  have h: (CornerSubring (IsIdempotentElem.one_sub idem_f)) ≃+* ↥(CornerSubring idem_e_sub_f) := by
+    have eq_el : (1 : CornerSubring idem_e) - f' = ⟨e, by exact e_in_corner_ring idem_e⟩  - f' := by
+      rw [@Subtype.ext_iff_val, @AddSubgroupClass.coe_sub, corner_ring_one]
+      exact rfl
+    --apply @corner_ring_unital_eq R _
+    #check eq_el_iso_corner (1 - f') ⟨e - f, by sorry⟩ (IsIdempotentElem.one_sub idem_f) ()
+    --have iso1 : (CornerSubring (IsIdempotentElem.one_sub idem_f)) ≃+*
+    --apply eq_el_iso_corner (1 - f') (e - f) (IsIdempotentElem.one_sub idem_f) idem_e_sub_f
+    sorry
   exact isomorphic_OrtIdemDiv (id h.symm) (hi J J_sub_I J_idem (e - f) idem_e_sub_f rfl)
 
 
