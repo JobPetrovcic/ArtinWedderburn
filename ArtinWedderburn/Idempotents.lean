@@ -541,7 +541,7 @@ def ring_iso_to_corner_iso (R' : Type*) [Ring R'] (φ : R ≃+* R') (e : R) (ide
   map_add' := by intro x y; simp,
   }
 
-def isomorphic_OrtIdemDiv (R' : Type*) [Ring R'] (φ : R ≃+* R') (hoi : OrtIdemDiv R) : OrtIdemDiv R' := {
+def isomorphic_OrtIdemDiv {R' : Type*} [Ring R'] (φ : R ≃+* R') (hoi : OrtIdemDiv R) : OrtIdemDiv R' := {
   toOrtIdem := isomorphic_OrtIdem R' φ hoi.toOrtIdem,
   div := fun i => by
     let ψ : (CornerSubring (hoi.h i))  ≃+* (CornerSubring ((isomorphic_OrtIdem R' φ hoi.toOrtIdem).h i)):= ring_iso_to_corner_iso R' φ (hoi.f i) (hoi.h i)

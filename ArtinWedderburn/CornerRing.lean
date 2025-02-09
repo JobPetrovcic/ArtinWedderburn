@@ -123,13 +123,23 @@ theorem both_mul_one_one_eq_R : both_mul (1 : R) 1 = ⊤ := by
     use x
     noncomm_ring
 
-def top_subring_equiv_ring (S : NonUnitalSubring R) (h : S.carrier = ⊤) : S ≃+* R := by
-
-  sorry
+def top_subring_equiv_ring (S : NonUnitalSubring R) (h : S.carrier = ⊤) : S ≃+* R := {
+  toFun := fun a => a,
+  invFun := fun a => ⟨a, by
+    have ha : a ∈ S.carrier := by rw [h]; exact trivial
+    exact ha
+    ⟩,
+  left_inv := by intro a; simp
+  right_inv := by intro a; simp
+  map_mul' := by intro a b; simp
+  map_add' := by intro a b; simp
+}
 
 def iso_corner_one : CornerSubring ((IsIdempotentElem.one : IsIdempotentElem (1 : R))) ≃+* R := by
   apply top_subring_equiv_ring
+  unfold CornerSubring
   rw [corner_ring_carrier]
+  exact both_mul_one_one_eq_R
 
 
 
@@ -189,6 +199,11 @@ lemma corner_ring_division_e_nonzero --Maša
 
 
 
+def equal_el_iso_matrix_rings (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) (e_eq_f : e = f) (n : ℕ) : Matrix (Fin n) (Fin n) (CornerSubringNonUnital e) ≃+* Matrix (Fin n) (Fin n) (CornerSubringNonUnital f) := by
+  let ψ : (CornerSubringNonUnital e) ≃+* (CornerSubringNonUnital f) := by sorry
+  apply?
+  sorry
+--mapMatrix
 
 --TODO: ↥(CornerSubring idem_e_sub_f) = (CornerSubring (IsIdempotentElem.one_sub idem_f)) in eRe
 
