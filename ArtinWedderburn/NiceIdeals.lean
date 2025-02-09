@@ -216,17 +216,20 @@ def subideals_nice_ideal_nice [Nontrivial R] (h_prime : IsPrimeRing R) (h_art : 
 
   apply extension_of_OrtIdemDiv
   exact f_div
-  #check IsIdempotentElem.one_sub idem_f
-  #check idem_e_sub_f
   have h: (CornerSubring (IsIdempotentElem.one_sub idem_f)) ≃+* ↥(CornerSubring idem_e_sub_f) := by
     have eq_el : (1 : CornerSubring idem_e) - f' = ⟨e, by exact e_in_corner_ring idem_e⟩  - f' := by
       rw [@Subtype.ext_iff_val, @AddSubgroupClass.coe_sub, corner_ring_one]
       exact rfl
-    --apply @corner_ring_unital_eq R _
-    #check eq_el_iso_corner (1 - f') ⟨e - f, by sorry⟩ (IsIdempotentElem.one_sub idem_f) ()
-    --have iso1 : (CornerSubring (IsIdempotentElem.one_sub idem_f)) ≃+*
-    --apply eq_el_iso_corner (1 - f') (e - f) (IsIdempotentElem.one_sub idem_f) idem_e_sub_f
-    sorry
+
+    have hc1 : (CornerSubring (IsIdempotentElem.one_sub idem_f)) ≃+* CornerSubring (e_idem_to_e_val_idem (IsIdempotentElem.one_sub idem_f)) := by
+      apply corner_ring_unital_eq
+
+    have hc2 : (CornerSubring idem_e_sub_f) ≃+* CornerSubring (e_idem_to_e_val_idem (IsIdempotentElem.one_sub idem_f)) := by
+      apply eq_el_iso_corner
+      symm
+      exact Eq.symm (Mathlib.Tactic.Ring.sub_pf rfl rfl)
+
+    exact RingEquiv.trans hc1 hc2.symm
   exact isomorphic_OrtIdemDiv (id h.symm) (hi J J_sub_I J_idem (e - f) idem_e_sub_f rfl)
 
 
