@@ -16,6 +16,58 @@ class hasMatrixUnits (R : Type*) [Ring R] (n : ℕ) where -- Done by Job
 open hasMatrixUnits
 
 variable (R : Type*) [Ring R]
+
+theorem OrtIdem_imply_MatUnits' {n : ℕ} (hn : 0 < n) -- Done by Matevz
+  (diag_es : Fin n → R)
+  (idem : (∀ i : Fin n, IsIdempotentElem (diag_es i))) -- idempotent
+  (ort : (∀ i j : Fin n, i ≠ j → PairwiseOrthogonal (diag_es i) (diag_es j))) -- pairwise orthogonal
+  (sum_eq_one : ∑ i, diag_es i = 1) -- sum of diagonal elements is 1
+  -- first row
+  (row_es : Fin n -> R)
+  (row_in : ∀ i : Fin n, row_es i ∈ both_mul (diag_es ⟨0, hn⟩) (diag_es i))
+  -- first column
+  (col_es : Fin n -> R)
+  (col_in : ∀ i : Fin n, col_es i ∈ both_mul (diag_es i) (diag_es ⟨0, hn⟩))
+  -- they are compatible
+  (comp1 : ∀ i, row_es i * col_es i = diag_es ⟨0, hn⟩)
+  (comp2 : ∀ i, col_es i * row_es i = diag_es i)
+  : ∃ mat_units : hasMatrixUnits R n, mat_units.es ⟨0, hn⟩ ⟨0, hn⟩ = diag_es ⟨0, hn⟩ := by
+  let es := fun i j => (col_es i) * (row_es j)
+  let diag_sum_eq_one : ∑ i, es i i = 1 := by
+    calc ∑ i, es i i = ∑ i, col_es i * row_es i := by rfl
+     _ = ∑ i, diag_es i := by simp_rw [comp2]
+     _ = 1 := by exact sum_eq_one
+  let delta : ∀ i j k l, es i j * es k l = (if j = k then es i l else 0) := by
+    intro i j k l
+    split_ifs with h
+    · rw [h]
+      have col_mul_diag : col_es i * diag_es ⟨0, hn⟩ = col_es i := by
+        obtain ⟨r, hr⟩ := col_in i
+        calc
+          col_es i * diag_es ⟨0, hn⟩ = diag_es i * r * (diag_es ⟨0, hn⟩ * diag_es ⟨0, hn⟩) := by rw [hr]; noncomm_ring
+          _ = diag_es i * r * diag_es ⟨0, hn⟩ := by rw [idem ⟨0, hn⟩]
+          _ = col_es i := by rw [hr]
+      calc
+        (col_es i * row_es k) * (col_es k * row_es l) = col_es i * (row_es k * col_es k) * row_es l := by noncomm_ring
+        _ = col_es i * diag_es ⟨0, hn⟩ * row_es l := by rw [comp1 k]
+        _ = col_es i * row_es l := by rw [col_mul_diag]
+    · obtain ⟨r, hr⟩ := row_in j
+      obtain ⟨s, hs⟩ := col_in k
+      calc
+        (col_es i * row_es j) * (col_es k * row_es l) = col_es i * (diag_es ⟨0, hn⟩ * r * (diag_es j * diag_es k) * s * diag_es ⟨0, hn⟩) * row_es l := by rw [hr, hs]; noncomm_ring
+        _ = 0 := by rw [(ort j k h).left]; noncomm_ring
+  let mat_units : hasMatrixUnits R n := {
+    es := es,
+    diag_sum_eq_one := diag_sum_eq_one,
+    mul_ij_kl_eq_kron_delta_jk_mul_es_il := delta
+  }
+  use mat_units
+  calc
+    mat_units.es ⟨0, hn⟩ ⟨0, hn⟩ = col_es ⟨0, hn⟩ * row_es ⟨0, hn⟩ := by rfl
+    _ = diag_es ⟨0, hn⟩ := by simp_rw [comp2]
+
+
+
 variable {n : ℕ} {hn : 0 < n} [mu : hasMatrixUnits R n]
 
 abbrev e00_idem : IsIdempotentElem (mu.es ⟨0, hn⟩ ⟨0, hn⟩) := mu.mul_ij_kl_eq_kron_delta_jk_mul_es_il ⟨0, hn⟩ ⟨0, hn⟩ ⟨0, hn⟩ ⟨0, hn⟩
