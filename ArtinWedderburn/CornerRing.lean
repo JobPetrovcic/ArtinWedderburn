@@ -104,7 +104,7 @@ lemma e_in_corner_ring : --Maša
   rw [subring_mem_idem]
   rw [IsIdempotentElem.eq idem_e, IsIdempotentElem.eq idem_e]
 
-lemma nonzero (x : CornerSubring idem_e): (x : CornerSubring idem_e) ≠ 0 ↔ x.val ≠ 0 := by
+lemma nonzero (x : CornerSubring idem_e): (x : CornerSubring idem_e) ≠ 0 ↔ x.val ≠ 0 := by --Maša
   constructor
   · intro hnz hz
     apply hnz
@@ -142,6 +142,9 @@ def coercion_to_eRe (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempote
     use (y * e * z * e * y)
     noncomm_ring
   exact h
+
+--TODO: 1R1 = R
+--theorem corner_one_eq_R : CornerSubring (IsIdempotentElem.one) = (R : NonUnitalSubring R) := by sorry
 
 -- coercions from Sets of CornerSubrings to Set of R
 instance : CoeOut (Set (CornerSubring idem_e)) (Set R) := {coe := fun X => Set.image Subtype.val X}

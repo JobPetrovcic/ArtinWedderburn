@@ -18,7 +18,7 @@ universe u
 
 def IdemIdeal (I : Ideal R) : Prop := ∃ (e : R), IsIdempotentElem e ∧ I = Ideal.span {e}
 
-lemma idem_lift_is_idem {e : R} {idem_e : IsIdempotentElem e} (f : CornerSubring idem_e)(hf : IsIdempotentElem f) : IsIdempotentElem (f : R) := by
+lemma idem_lift_is_idem {e : R} {idem_e : IsIdempotentElem e} (f : CornerSubring idem_e) (hf : IsIdempotentElem f) : IsIdempotentElem (f : R) := by
   unfold IsIdempotentElem at *
   nth_rewrite 3 [←hf]
   rfl
@@ -62,18 +62,6 @@ def extend_idempotents {n : ℕ} (f : R) (idem_f : IsIdempotentElem f) (es : Fin
 
 lemma i_nonzero_succ {n : ℕ} (i : Fin (n + 1)) (i_nonzero : i ≠ 0): ∃(k : Fin n), i = k.succ := by
       refine Fin.eq_succ_of_ne_zero (by exact i_nonzero)
-
-
-lemma ort_comm (e f : R) (ort : IsOrthogonal e f) : IsOrthogonal f e := by
-  unfold IsOrthogonal at *
-  rw [and_comm]
-  exact ort
-
-lemma orth_coercion (e : R) (idem_e : IsIdempotentElem e) (x y : CornerSubring idem_e) (ort : IsOrthogonal x y) : IsOrthogonal x.val y.val := by
-  let ⟨h1, h2⟩ := ort
-  constructor
-  · exact (AddSubmonoid.mk_eq_zero (CornerSubring idem_e).toAddSubmonoid).mp h1
-  · exact (AddSubmonoid.mk_eq_zero (CornerSubring idem_e).toAddSubmonoid).mp h2
 
 
 lemma bot_eq_span_zero (I : Ideal R) (e : R) (h_bot : I ≠ ⊥) (h_span : I = Ideal.span {e}) : e ≠ 0 := by -- Maša
@@ -131,9 +119,35 @@ def extension_of_ort_idem (e : R) (idem_e : IsIdempotentElem e) (oi : OrtIdem (C
     apply orth_coercion
     exact ort
 }
+set_option pp.proofs true
 
+def extension_of_OrtIdemDiv (e : R) (idem_e : IsIdempotentElem e) (div_e : IsDivisionRing (CornerSubring idem_e)) (oid : OrtIdemDiv (CornerSubring (IsIdempotentElem.one_sub idem_e))) : OrtIdemDiv R := {
+  toOrtIdem := extension_of_ort_idem e idem_e oid.toOrtIdem,
+  div := by
+
+    have hn : (extension_of_ort_idem e idem_e oid.toOrtIdem).n = oid.n + 1 := by rfl
+    intro i
+    change Fin (oid.n + 1) at i
+    by_cases hi : i = 0
+    rw [hi]
+    exact div_e
+
+    have ⟨k, hk⟩ := i_nonzero_succ i (by exact hi)
+
+    #check oid.div
+    sorry
+    --exact oid.div i
+}
+
+--
+lemma corner_eq (e : R) (idem_e : IsIdempotentElem e) (f : CornerSubring idem_e) (idem_f : IsIdempotentElem f) : CornerSubring (idem_f) = CornerSubring (idem_f) := by sorry
+/-
+theorem corner_equal (e : R) (idem_e : IsIdempotentElem e) (f : CornerSubring idem_e) (idem_f : IsIdempotentElem f): CornerSubring (f_mem_corner_e_e_sub_f_idem e idem_e f idem_f) = CornerSubring (IsIdempotentElem.one_sub idem_f) := by
+
+  sorry
+-/
 noncomputable
-def subideals_nice_ideal_nice' [Nontrivial R] (h_prime : IsPrimeRing R) (h_art : IsArtinian R R) (I : Ideal R) (hi : ∀ J, J < I → NiceIdeal J) : NiceIdeal I := by
+def subideals_nice_ideal_nice [Nontrivial R] (h_prime : IsPrimeRing R) (h_art : IsArtinian R R) (I : Ideal R) (hi : ∀ J, J < I → NiceIdeal J) : NiceIdeal I := by
   by_cases h_zero : I = ⊥
   rw [h_zero]
   exact zero_ideal_nice
@@ -161,9 +175,9 @@ def subideals_nice_ideal_nice' [Nontrivial R] (h_prime : IsPrimeRing R) (h_art :
   have f_mem : f ∈ both_mul e e := by exact hf
   have idem_f_val : IsIdempotentElem f := by exact e_idem_to_e_val_idem idem_f
 
-  have one_sub_e_f_orthogonal : IsOrthogonal (1 - e) f := by exact f_in_corner_othogonal (1- e) f idem_one_sub_e (by simp; exact hf)
+  have one_sub_e_f_orthogonal : IsOrthogonal (1 - e) f := by exact f_in_corner_othogonal (1 - e) f idem_one_sub_e (by simp; exact hf)
 
-  have idem_e_sub_f : IsIdempotentElem (e - f) := by exact f_mem_corner_e_e_sub_f_idem e f idem_e idem_f_val hf
+  have idem_e_sub_f : IsIdempotentElem (e - f) := by exact f_mem_corner_e_e_sub_f_idem e idem_e ⟨f, f_mem⟩ idem_f
 
   have e_sub_f_mem : (e - f) ∈ both_mul e e := by
     have e_mem : e ∈ both_mul e e := by use 1; simp; exact Eq.symm (CancelDenoms.derive_trans₂ rfl rfl idem_e)
@@ -181,6 +195,15 @@ def subideals_nice_ideal_nice' [Nontrivial R] (h_prime : IsPrimeRing R) (h_art :
   have J_idem : IdemIdeal J := by use e - f
   specialize J_nice J_idem (e - f) idem_e_sub_f rfl
 
+  have f_div : IsDivisionRing (CornerSubring idem_f) := by
+    apply div_subring_to_div_ring
+    exact div_f
+
+  apply extension_of_OrtIdemDiv
+  exact f_div
+  sorry
+
+
   --let ⟨Joi, Jdiv⟩ := J_nice
   --let ⟨n, es, h_idem, h_sum, ⟨h_ort, h_div⟩⟩ := J_nice
 
@@ -192,16 +215,12 @@ def subideals_nice_ideal_nice' [Nontrivial R] (h_prime : IsPrimeRing R) (h_art :
   --  orthogonal := by sorry
   --  div := by sorry
   --}
-  sorry
 
 noncomputable
 def acc_ideal_nice [Nontrivial R] (h_prime : IsPrimeRing R) (h_art : IsArtinian R R) (I : Ideal R) (h_acc : Acc (fun x y => x < y) I) : NiceIdeal I := by
   induction h_acc with
   | intro J h_acc_J hJ =>
-    exact subideals_nice_ideal_nice' h_prime h_art J hJ
-
-
-theorem OrtIdem_HasMatrixUnits (R : Type*) [Ring R] (ort_idem : OrtIdem R) : ∃ (n : ℕ), HasMatrixUnits R n := by sorry
+    exact subideals_nice_ideal_nice h_prime h_art J hJ
 
 
   --have hfRf : (both_mul (⟨f, hf⟩ : CornerSubring idem_e) ⟨f, hf⟩) = both_mul (f : R) (f : R) := by exact both_mul_lift idem_e ⟨f, hf⟩ ⟨f, hf⟩
