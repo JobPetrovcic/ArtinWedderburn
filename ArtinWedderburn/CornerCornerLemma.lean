@@ -47,7 +47,6 @@ def non_unital_subring_eq
   }
 
 -- with these we can prove the following lemma
--- if e is an idempotent element of R, and f is an idempotent element of the corner ring of e, then the CornerSubringNonUnital of f.val is isomorphic to the CornerSubringNonUnital of f of the corner ring of e
 
 variable {R : Type*} [Ring R]
 variable {e : R}
@@ -56,7 +55,9 @@ variable (f : CornerSubring idem_e)
 
 set_option synthInstance.maxHeartbeats 5000000
 
+-- we want to prove: if e is an idempotent element of R, and f is an idempotent element of the corner ring of e, then the CornerSubringNonUnital of f.val is isomorphic to the CornerSubringNonUnital of f of the corner ring of e
 
+-- the next theorem states that this is indeed true on the level of sets
 theorem double_corner_set_eq : (Subtype.val '' (CornerSubringNonUnital f).carrier) = (CornerSubringNonUnital (f : R)).carrier := by
   rw [corner_ring_carrier, corner_ring_carrier]
   ext x
@@ -81,9 +82,11 @@ theorem double_corner_set_eq : (Subtype.val '' (CornerSubringNonUnital f).carrie
   have hffe : f = f * e := by nth_rewrite 1 [hf1]; rfl
   rw [mul_assoc, mul_assoc, heff, ←mul_assoc, ←mul_assoc, ←hffe]
 
+-- auxiliary lemma since there is  problem with direct application
 def corner_ring_eq_lemma (h : (Subtype.val '' (CornerSubringNonUnital f).carrier) = (CornerSubringNonUnital (f : R)).carrier) : CornerSubringNonUnital f ≃+* CornerSubringNonUnital (f : R) := by
   exact @non_unital_subring_eq R _ (CornerSubring idem_e) _ (by simp) (by simp) (CornerSubringNonUnital f ) (CornerSubringNonUnital (f : R)) h
 
+-- what we wanted to prove
 def corner_ring_non_unital_eq : CornerSubringNonUnital f ≃+* CornerSubringNonUnital (f : R) := by
   apply corner_ring_eq_lemma
   apply double_corner_set_eq
@@ -91,6 +94,7 @@ def corner_ring_non_unital_eq : CornerSubringNonUnital f ≃+* CornerSubringNonU
 variable {f : CornerSubring idem_e}
 variable (idem_f : IsIdempotentElem f)
 
+-- another auxiliary lemma for easier application
 def corner_ring_unital_eq : CornerSubring idem_f ≃+* CornerSubring (e_idem_to_e_val_idem idem_f) := by
   unfold CornerSubring
   apply corner_ring_non_unital_eq
