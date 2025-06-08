@@ -8,7 +8,7 @@ import ArtinWedderburn.Idempotents
 
 import Mathlib.Algebra.BigOperators.Group.Finset
 
--- TODO: maybe split this up into multiple definitions
+-- first we introduce the notion of rings with abstract matrix units
 class hasMatrixUnits (R : Type*) [Ring R] (n : ℕ) where -- Done by Job
   es : Fin n → Fin n → R
   diag_sum_eq_one : ∑ i, es i i = 1
@@ -106,22 +106,21 @@ theorem lemma_2_20' (prime : IsPrimeRing R) (ort_idem : OrtIdemDiv R) (n_pos : 0
 
 variable {n : ℕ} {hn : 0 < n} [mu : hasMatrixUnits R n]
 
+-- abbreviations for the corner ring of the first matrix unit
 abbrev e00_idem : IsIdempotentElem (mu.es ⟨0, hn⟩ ⟨0, hn⟩) := mu.mul_ij_kl_eq_kron_delta_jk_mul_es_il ⟨0, hn⟩ ⟨0, hn⟩ ⟨0, hn⟩ ⟨0, hn⟩
-
 abbrev e00_cornerring := CornerSubring (@e00_idem R _ n hn mu )
 
+-- some trivial rewriting lemmas
 lemma e00_cornerring_1 : (1 : CornerSubring (@e00_idem R _ n hn mu )) = mu.es ⟨0, hn⟩ ⟨0, hn⟩ := by rfl
-
 lemma e00e0i_eq_e_0i (i : Fin n) : mu.es ⟨0, hn⟩ ⟨0, hn⟩ * mu.es ⟨0, hn⟩ i = mu.es ⟨0, hn⟩ i := by rw [mu.mul_ij_kl_eq_kron_delta_jk_mul_es_il];simp
-
 lemma ei0e00_eq_e_ei0 (i : Fin n) : mu.es i ⟨0, hn⟩* mu.es  ⟨0, hn⟩ ⟨0, hn⟩ = mu.es i ⟨0, hn⟩ := by rw [mu.mul_ij_kl_eq_kron_delta_jk_mul_es_il]; simp only [↓reduceIte]
-
 lemma ei0e0j_eq_eij (i j : Fin n) : mu.es i ⟨0, hn⟩ * mu.es ⟨0, hn⟩ j = mu.es i j := by rw [mu.mul_ij_kl_eq_kron_delta_jk_mul_es_il]; simp only [↓reduceIte]
 
+-- the projection of a's "i, j"-th element according to the (abstract) matrix units
 def ij_corner (i j : Fin n) (a : R) : @CornerSubring R _ _ (@e00_idem R _ n hn mu) := ⟨es ⟨0, hn⟩ i  * a * es j ⟨0, hn⟩,
   by rw [subring_mem_idem , ←mul_assoc, ←mul_assoc, e00e0i_eq_e_0i, mul_assoc, mul_assoc, mul_assoc, ei0e00_eq_e_ei0]⟩
 
-
+-- abbreviations for the matrix ring over the corner ring of the first matrix unit
 abbrev matrix_corner := Matrix (Fin n) (Fin n) (@e00_cornerring R _ n hn mu)
 
 -- define the map from R to matrix ring by a ↦ e_{0i}ae_{j0} for all i, j
@@ -149,9 +148,10 @@ theorem one_eq_sum_es_00e_00e (n : ℕ)(hn : 0 < n)(mu : hasMatrixUnits R n) : 1
     exact matrixunit_iz_zi_eq_ii R i
   simp [h]
 
+-- auxiliary lemma for lifting finite sums from the corner ring to R
 theorem _lift_sum (f : Fin n → (@e00_cornerring R _ n hn mu)) : ((∑ i : Fin n, f i : (@e00_cornerring R _ n hn mu)) : R) = ∑ i : Fin n, (f i : R) := by exact AddSubmonoidClass.coe_finset_sum f Finset.univ
 
--- show that this map is multiplicative
+-- show that the map is multiplicative
 theorem ring_to_matrix_ring_multiplicative (a b : R)
   : (ring_to_matrix_ring R n hn mu) (a * b) = (ring_to_matrix_ring R n hn mu) a * (ring_to_matrix_ring R n hn mu) b := by
   ext i j
@@ -182,8 +182,10 @@ theorem ring_to_matrix_ring_multiplicative (a b : R)
   symm
   rw [_lift_sum]
 
+-- auxiliary lemma to rewrite matrix 1
 def matrix_one : (1 : Matrix (Fin n) (Fin n) R) = (fun i j => if i = j then 1 else 0):= by exact rfl
 
+-- a criterion that element is 0 if all its matrix elements are 0
 def corner_matrix_zero_equiv (a : R): (∀ (i j : Fin n), (es i i) * a * (es j j) = 0) ↔ a = 0 := by
   constructor
   {
@@ -209,6 +211,7 @@ def corner_matrix_zero_equiv (a : R): (∀ (i j : Fin n), (es i i) * a * (es j j
     simp only [mul_zero, zero_mul, implies_true]
   }
 
+-- same as previous but in a more applicable form
 def corner_matrix_zero_crit (a : R) : (∀ (i j : Fin n), @ij_corner R _ n hn mu i j a = 0 )→ a = 0 := by
   rw [←(@corner_matrix_zero_equiv R _ n)]
 
@@ -228,7 +231,7 @@ def corner_matrix_zero_crit (a : R) : (∀ (i j : Fin n), @ij_corner R _ n hn mu
   simp  at h''
   exact h''
 
-
+-- the actual definition of the homomorphism
 def ring_to_matrix_ring_hom: R →+* Matrix (Fin n) (Fin n) (@e00_cornerring R _ n hn mu) :=
 {
   toFun := ring_to_matrix_ring R n hn mu,
@@ -269,51 +272,7 @@ lemma right_mul_sum_e0k {k : Fin n} {f : Fin n → R} : (∑ i, f i * mu.es ⟨0
   simp only [hif]
   exact Fintype.sum_ite_eq' k fun j ↦ f k * es ⟨0, hn⟩ ⟨0, hn⟩
 
--- with these two lemmas we can show that matrix_to
-
-
 lemma matrixcorner1 : (1 : Matrix (Fin n) (Fin n) (@e00_cornerring R _ n hn mu)) = (λ i j => if i = j then (1 : (@e00_cornerring R _ n hn mu)) else 0) := by exact rfl
-
---def matrix_to_ring_hom : Matrix (Fin n) (Fin n) (@e00_cornerring R _ n hn mu) →+* R :=
---{
---  toFun := matrix_to_ring R n hn mu,
---  map_one' := by
---    unfold matrix_to_ring
---    have h : ∀ i j, (mu.es i ⟨0, hn⟩) * (if i = j then (1 : R) else 0) * (mu.es ⟨0, hn⟩ j) = if i = j then mu.es i i else 0 := by
---      intro i j
---      split_ifs with h
---      rw [h]
---      simp only [mul_one]
---      rw [mu.mul_ij_kl_eq_kron_delta_jk_mul_es_il j ⟨0, hn⟩ ⟨0, hn⟩ j ]
---      simp only [↓reduceIte]
---      simp only [mul_zero, zero_mul]
---    rw [matrixcorner1]
---    simp only
---    calc
---      _ = ∑ x : Fin n, ∑ x_1 : Fin n, if x = x_1 then mu.es x x_1 else 0 := by
---        apply Finset.sum_congr
---        rfl
---        intro i hj
---        apply Finset.sum_congr
---        rfl
---        intro j hj
---        split_ifs with h''
---        rw [e00_cornerring_1, ei0e00_eq_e_ei0, ei0e0j_eq_eij]
---
---        simp only [ZeroMemClass.coe_zero, mul_zero, zero_mul]
---      _ = ∑ x : Fin n, mu.es x x := by apply Finset.sum_congr ;simp;intro x hx;exact Fintype.sum_ite_eq x (es x)
---      _ = 1 := by exact mu.diag_sum_eq_one
---  map_mul' := by
---    intro A B
---    simp only
---    unfold matrix_to_ring
---    sorry
---  map_add' := by sorry
---  map_zero' := by
---    simp only [RingHom.map_zero]
---    unfold matrix_to_ring
---    simp only [Matrix.zero_apply, ZeroMemClass.coe_zero, mul_zero, zero_mul, Finset.sum_const_zero]
---}
 
 lemma e00_unit (a : @e00_cornerring R _ n hn mu) : mu.es ⟨0, hn⟩ ⟨0, hn⟩ * (a : R) = a := by
   have h : 1 * a = a := by simp only [one_mul]
@@ -324,6 +283,7 @@ lemma unit_e00 (a : @e00_cornerring R _ n hn mu) : (a : R) * mu.es ⟨0, hn⟩ �
   nth_rewrite 2 [←h]
   rfl
 
+-- the main statement of this file: if a ring has matrix units then it is isomorphic to the matrix ring over the corner ring of the first matrix unit (or any other for that matter)
 noncomputable
 def ring_to_matrix_iso [mu : hasMatrixUnits R n] : R ≃+* Matrix (Fin n) (Fin n) (@e00_cornerring R _ n hn mu) := by
 
