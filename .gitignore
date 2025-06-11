@@ -1,1 +1,16 @@
 /.lake
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+.gitignore
+*.pdf
+*.gz
+*.html
+*.js
+*.css
+*.wasm
+*.svg
+*.out
+*.paux
+blueprint/lean_decls

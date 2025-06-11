@@ -74,15 +74,14 @@ def HasMatrixUnits (R : Type*) [Ring R] (n : ℕ) : Prop := ∃ (es : Fin n → 
 def kronecker_delta (n : ℕ) (i j : Fin n) : R :=
   if i = j then 1 else 0
 
+
+def PairwiseOrthogonal (a b : R) : Prop := a * b = 0 ∧ b * a = 0
+
 -- Lemma 2.18
 -- hypothesis: we have a parwise orthogonal idempotent e_ii for each i in {1, ..., n}
 -- and e1i ∈ e11Reii for all i in {2, ..., n}
 -- and e1iei1 = e11 and ei1e1i = eii for all i in {2, ..., n}
 -- conclusion: has matrix units R
-
-def PairwiseOrthogonal (a b : R) : Prop := a * b = 0 ∧ b * a = 0
-
--- if a ring has pairwise orthogonal idempotents then it has matrix units
 theorem OrtIdem_imply_MatUnits {n : ℕ} (hn : 0 < n) -- Done by Matevz
   (diag_es : Fin n → R)
   (idem : (∀ i : Fin n, IsIdempotentElem (diag_es i))) -- idempotent
