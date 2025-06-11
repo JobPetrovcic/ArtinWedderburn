@@ -53,7 +53,7 @@ If time permits, we will work on the uniqueness part of the proof.
 
 \begin{definition}[Prime Ring]
   \label{def:IsPrimeRing}
-  \lean{def:IsPrimeRing}
+  \lean{IsPrimeRing}
   \leanok
   \uses{def:left_right_ideal, def:product_of_ideals}
   A ring is prime if we have $I = 0$ or $J = 0$ whenever $IJ = 0$ for some left ideals $I$ and $J$.
@@ -91,7 +91,7 @@ If time permits, we will work on the uniqueness part of the proof.
 
 \begin{definition}[Simple Ring]
   \label{def:IsSimpleRing}
-  \lean{def:IsSimpleRing}
+  \lean{IsSimpleRing}
   % \leanok % No leanok indicated
   \uses{def:two_sided_ideal}
   A ring is simple if it has no nontrivial two-sided ideals.
@@ -167,7 +167,7 @@ From here on, let $e$ and $f$ denote orthogonal idempotents in $R$.
 
 \begin{theorem}
   \label{thm:characterization_of_corner_ring_elements}
-  \lean{x_in_corner_x_eq_e_x_e}
+  \lean{corner_ring_set_mem}
   \leanok
   \uses{def:corner_ring, thm:characterization_of_corner_elements}
   An element $x$ of $R$ is in the corner ring if and only if $x = e x e$.
@@ -348,7 +348,7 @@ From here on, let $e$ and $f$ denote orthogonal idempotents in $R$.
 
 \begin{theorem}
   \label{thm:criterion_for_matrix_units}
-  \lean{lemma_2_18}
+  \lean{OrtIdem_imply_MatUnits}
   \leanok
   \uses{def:IsOrthogonal, def:corner_ring, thm:characterization_of_corner_elements, def:matrixunits} % Idempotent definition implicit
   If a ring $R$ has a set of pairwise orthogonal idempotents $e_{ii}$ and
