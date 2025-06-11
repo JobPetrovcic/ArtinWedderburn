@@ -5,7 +5,10 @@ import ArtinWedderburn.IdealProd
 import ArtinWedderburn.Idempotents
 import ArtinWedderburn.MatrixUnits
 import ArtinWedderburn.MinIdeals
+import ArtinWedderburn.NiceIdeals
 import ArtinWedderburn.NonUnitalToUnital
-import ArtinWedderburn.Plan
+import ArtinWedderburn.Auxiliary
 import ArtinWedderburn.PrimeRing
 import ArtinWedderburn.SetProd
+import ArtinWedderburn.CornerCornerLemma
+import ArtinWedderburn.ArtinWedderburnTheorem
