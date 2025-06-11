@@ -29,7 +29,6 @@ theorem leq_neq_lt (I J : Ideal R) : I ≤ J → I ≠ J → I < J := by -- Done
     trivial
 
 -- Lemma 2.9
--- #HARDER
 theorem one_sub_e_larger_span_on_sub_e_sub_f (e f : R) (ef_ort_idem : AreOrthogonalIdempotents e f) (fnz : f ≠ 0) : Ideal.span {1 - e - f} < Ideal.span {1 - e} := by -- Done by Matevz
   have hleq : Ideal.span {1 - e - f} ≤ Ideal.span {1 - e} := by
     apply Ideal.span_le.mpr
@@ -83,6 +82,7 @@ def kronecker_delta (n : ℕ) (i j : Fin n) : R :=
 
 def PairwiseOrthogonal (a b : R) : Prop := a * b = 0 ∧ b * a = 0
 
+-- if a ring has pairwise orthogonal idempotents then it has matrix units
 theorem OrtIdem_imply_MatUnits {n : ℕ} (hn : 0 < n) -- Done by Matevz
   (diag_es : Fin n → R)
   (idem : (∀ i : Fin n, IsIdempotentElem (diag_es i))) -- idempotent
@@ -144,7 +144,7 @@ lemma eRf_nonzero --Maša
   | inr h => exact hf h
 
 
---multiplication with e and f preserves both_mul e f
+-- multiplication with e and f preserves both_mul e f
 lemma both_mul_e_f (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) : --Maša
   ∀ x ∈ both_mul e f, e * x = x ∧ x * f = x := by
   rintro x ⟨y, hy⟩
@@ -158,19 +158,21 @@ lemma both_mul_e_f (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) :
         _ = x := by exact id (Eq.symm hy)
   exact ⟨he, hf⟩
 
--- both_mul is closed for addition, multiplication and additive inverses
+-- both_mul is closed for addition
 lemma both_mul_add : ∀ (x y : R), x ∈ both_mul e f → y ∈ both_mul e f → x + y ∈ both_mul e f := by --Maša
   intro x y ⟨a, ha⟩ ⟨b, hb⟩
   use (a + b)
   rw [ha, hb]
   noncomm_ring
 
+-- both_mul is closed for multiplication
 lemma both_mul_neg : ∀ (x : R), x ∈ both_mul e f → -x ∈ both_mul e f := by --Maša
   intro x ⟨a, ha⟩
   use - a
   rw [ha]
   noncomm_ring
 
+-- both_mul is closed for additive inverses
 lemma both_mul_sub : ∀ (x y : R), x ∈ both_mul e f → y ∈ both_mul e f → x - y ∈ both_mul e f := by --Maša
   intro x y ⟨a, ha⟩ ⟨b, hb⟩
   use (a - b)

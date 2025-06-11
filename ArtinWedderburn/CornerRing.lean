@@ -79,7 +79,6 @@ theorem left_unit_mul (idem_e : IsIdempotentElem e) (h : x ∈ CornerSubringNonU
   rw [(corner_ring_set_mem idem_e).1 h]
   rw [←mul_assoc, ←mul_assoc, idem_e]
 
-
 theorem right_unit_mul (idem_e : IsIdempotentElem e) (h : x ∈ CornerSubringNonUnital e): x * e = x := by
   rw [(corner_ring_set_mem idem_e).1 h]
   rw [mul_assoc, mul_assoc, idem_e, mul_assoc]
@@ -176,7 +175,7 @@ lemma e_x_e_in_corner : ∀ (x : R), e * x * e ∈ CornerSubring idem_e := by --
 -- The corner ring is a ring
 instance CornerRingIsRing (idem_e : IsIdempotentElem e) : Ring (CornerSubring idem_e) := non_unital_w_e_is_ring 1 (is_left_unit idem_e) (is_right_unit idem_e) -- Done by Job
 
--- en element in the cornersubring of f ( where f is in eRe) can be lifted to eRe  
+-- en element in the cornersubring of f ( where f is in eRe) can be lifted to eRe
 def coercion_to_eRe (e f : R) (idem_e : IsIdempotentElem e) (idem_f : IsIdempotentElem f) (f_mem : f ∈ CornerSubring idem_e) (x : CornerSubring idem_f): CornerSubring idem_e := by -- Maša and Job
   use x.val
   have h : x.val ∈ both_mul e e := by
@@ -233,7 +232,7 @@ def equal_el_iso_matrix_rings (e f : R) (idem_e : IsIdempotentElem e) (idem_f : 
 
 
 -- coercions from Sets of CornerSubrings to Set of R
-instance : CoeOut (Set (CornerSubring idem_e)) (Set R) := {coe := fun X => Set.image Subtype.val X}
+instance : CoeOut (Set (CornerSubring idem_e)) (Set R) := {coe := fun X => Set.image Subtype.val X} -- Job
 
 
 -- I left ideal in eRe -> RI is a left ideal in R
@@ -281,7 +280,7 @@ def ideal_push (idem_e : IsIdempotentElem e) (J : Ideal R) : Ideal (CornerSubrin
       noncomm_ring
 
 -- pushing is an additive homomorphism
-theorem add_el_push_eq_add (x y : R) : el_push idem_e x + el_push idem_e y = el_push idem_e (x + y) := by
+theorem add_el_push_eq_add (x y : R) : el_push idem_e x + el_push idem_e y = el_push idem_e (x + y) := by -- Job
   simp only [el_push]
   noncomm_ring
   simp only [AddMemClass.mk_add_mk]
@@ -346,7 +345,6 @@ theorem push_pull (idem_e : IsIdempotentElem e) (I : Ideal (CornerSubring idem_e
       symm
       exact SetLike.coe_eq_coe.mp hx
 
--- I have put this below push_pull, because it can be proven using push_pull and lift_monotonicity
 theorem lift_strict_monotonicity (I J : Ideal (CornerSubring idem_e)) : I < J → (ideal_lift idem_e I) < (ideal_lift idem_e J) := by -- Maša
   intro I_leq_J
   have I_neq_J : I ≠ J := by exact ne_of_lt I_leq_J
@@ -394,13 +392,13 @@ theorem corner_ring_artinian [h_ar : IsArtinian R R] : IsArtinian (CornerSubring
   exact WellFounded.intro allacc
 
 -- if we have two elements x y in the corners subring, then any element of the form x w y is also in the corner
-theorem corner_ring_both_mul_mem' (x y : CornerSubring idem_e) (w : R) : x * w * y ∈ CornerSubring idem_e := by
+theorem corner_ring_both_mul_mem' (x y : CornerSubring idem_e) (w : R) : x * w * y ∈ CornerSubring idem_e := by -- Job
   apply corner_ring_both_mul_mem
   exact x.property
   exact y.property
 
 -- if a and b in eRe, then a (e R e) b = a R b as sets
-theorem both_mul_lift (x y : CornerSubring idem_e) : (both_mul (x : CornerSubring idem_e)  y) = both_mul (x : R) (y : R) := by
+theorem both_mul_lift (x y : CornerSubring idem_e) : (both_mul (x : CornerSubring idem_e)  y) = both_mul (x : R) (y : R) := by -- Job
   ext a
   constructor
   {

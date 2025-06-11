@@ -9,9 +9,9 @@ import ArtinWedderburn.Auxiliary
 variable {R : Type*} [Ring R]
 variable (I J : Ideal R)
 
+-- the set Ia
 def sub_ideal_set (I : Ideal R) (a : R) : Set R := {r | ∃ x ∈ I, r = x * a}
 
--- Maybe a different name would be more appropriate as sub_ideal I a is not a necesarily contained in I
 def sub_ideal (I : Ideal R) (a : R) : Ideal R := {  -- Done by Matevz
   carrier := sub_ideal_set I a,
   zero_mem' := by
@@ -42,7 +42,7 @@ theorem sub_ideal_le_ideal (I : Ideal R) (a : R) (h : a ∈ I) : sub_ideal I a �
 
 open Pointwise Set
 
-
+-- IJ is nonzero, then there are x in I and y in J, such that x * y ≠ 0
 theorem mul_ne_zero_imply_set_ne_zero (I J : Ideal R) (h : I * J ≠ ⊥) : ∃ x ∈ I, ∃ y ∈ J, x * y ≠ 0 := by -- Done by Matevz
   have hnzz : ∃ z, z ∈ (↑I : Set R) * (↑J : Set R) ∧ z ≠ 0 := not_subset.mp ((not_iff_not.mpr Ideal.span_eq_bot).mp h)
   obtain ⟨z, ⟨⟨x, ⟨hx, ⟨y, ⟨hy, hz⟩⟩⟩⟩, hnz⟩⟩ := hnzz
@@ -56,7 +56,7 @@ theorem mul_ne_zero_imply_set_ne_zero (I J : Ideal R) (h : I * J ≠ ⊥) : ∃ 
       rw [hz]
       exact hnz
 
-
+-- if I*I is nonzero, then there is y in I, such that Iy is nonzero
 theorem ideal_sq_ne_bot_imply_subideal_ne_bot (I : Ideal R) (h : I * I ≠ ⊥) : ∃ y ∈ I, sub_ideal I y ≠ ⊥ := by -- Done by Matevz
   obtain ⟨x, hx, y, hy, hxy⟩ := mul_ne_zero_imply_set_ne_zero I I h
   use y
@@ -68,6 +68,7 @@ theorem ideal_sq_ne_bot_imply_subideal_ne_bot (I : Ideal R) (h : I * I ≠ ⊥) 
     · use x
     · exact hxy
 
+-- if I*I is nonzero, then there is y in I, such that Iy is nonzero and y ≠ 0
 theorem ideal_sq_ne_bot_imply_subideal_ne_bot2 (I : Ideal R) (h : I * I ≠ ⊥) : ∃ y ∈ I, y ≠ 0 ∧ sub_ideal I y ≠ ⊥ := by -- Done by Matevz
   obtain ⟨x, hx, y, hy, hxy⟩ := mul_ne_zero_imply_set_ne_zero I I h
   use y
@@ -84,12 +85,13 @@ theorem ideal_sq_ne_bot_imply_subideal_ne_bot2 (I : Ideal R) (h : I * I ≠ ⊥)
       · use x
       · exact hxy
 
+-- if I <= J and not I < J, then I = J
 theorem le_and_not_lt_eq (I J : Ideal R) (h1 : I ≤ J) (h2 : ¬ (I < J)) : I = J := by -- Done by Matevz
   rw [lt_iff_le_and_ne] at h2
   push_neg at h2
   exact h2 h1
 
-
+-- if I is an atom, then there exists a nonzero element y in I, such that sub_ideal I y = I
 theorem minimal_ideal_I_sq_nonzero_exists_el (hI : IsAtom I) (hII : I * I ≠ ⊥) : ∃ y : R, y ∈ I ∧ sub_ideal I y = I := by -- Done by Matevz
   obtain ⟨y, ⟨hy, hyI⟩⟩ := ideal_sq_ne_bot_imply_subideal_ne_bot I hII
   use y
@@ -100,6 +102,7 @@ theorem minimal_ideal_I_sq_nonzero_exists_el (hI : IsAtom I) (hII : I * I ≠ �
     have h2 := fun b => hyI (hsi (sub_ideal I y) b)
     exact le_and_not_lt_eq (sub_ideal I y) I h1 h2
 
+-- if I is an atom, then there exists a nonzero element y in I, such that sub_ideal I y = I and y is nonzero
 theorem minimal_ideal_I_sq_nonzero_exists_el2 (hI : IsAtom I) (hII : I * I ≠ ⊥) : ∃ y : R, y ∈ I ∧ y ≠ 0 ∧ sub_ideal I y = I := by -- Done by Matevz
   obtain ⟨y, ⟨hy, ynz, hyI⟩⟩ := ideal_sq_ne_bot_imply_subideal_ne_bot2 I hII
   use y
@@ -111,6 +114,7 @@ theorem minimal_ideal_I_sq_nonzero_exists_el2 (hI : IsAtom I) (hII : I * I ≠ �
       have h1 := sub_ideal_le_ideal I y hy
       have h2 := fun b => hyI (hsi (sub_ideal I y) b)
       exact le_and_not_lt_eq (sub_ideal I y) I h1 h2
+
 
 theorem minimal_ideal_I_sq_nonzero_exists_els2 (hI : IsAtom I) (hII : I * I ≠ ⊥) : ∃ y : R, y ∈ I ∧ y ≠ 0 ∧ sub_ideal I y = I ∧ ∃ e ∈ I, e ≠ 0 ∧ y = e * y := by -- Done by Matevz
   obtain ⟨y, ⟨hy, ynz, hI⟩⟩ := minimal_ideal_I_sq_nonzero_exists_el2 I hI hII

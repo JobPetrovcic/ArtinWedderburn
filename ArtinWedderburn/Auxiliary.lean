@@ -9,7 +9,7 @@ def IsDivisionSubring (S : NonUnitalSubring R) (e : R) : Prop := (∃ x : R, x �
 
 def IsDivisionRing (R : Type*) [Ring R] : Prop := (∃ x : R, x ≠ 0) ∧ (∀ x : R, x ≠ 0 → ∃ y : R, y * x = 1 ∧ x * y = 1) -- Done by Matevz
 
--- If at some point we decide to define division ring as a ring in which every nonzero element has a two sided inverse
+-- if every nonzero element has a left inverse then the ring is a division ring
 theorem left_inv_implies_divring [Nontrivial R] (h : ∀ x : R, x ≠ 0 → ∃ y : R, y * x = 1) : IsDivisionRing R := by -- Maša
   unfold IsDivisionRing
   constructor
@@ -46,7 +46,7 @@ def IsDivisionRing_to_DivisionRing (div : IsDivisionRing R) : DivisionRing R := 
   obtain ⟨y, ⟨hy1, hy2⟩⟩ := h
   use y
 
-
+-- a ring isomorphic to a division ring is itself a division ring
 theorem isomorphic_ring_div {R' : Type*} [Ring R'] (f : R ≃+* R') (h_div : IsDivisionRing R) : IsDivisionRing R' := by --Maša
   unfold IsDivisionRing at *
   let ⟨⟨x, hx⟩, h⟩ := h_div

@@ -7,7 +7,10 @@ import ArtinWedderburn.IdealProd
 
 variable {R : Type*} [Ring R] (a b : R)
 
+-- left_mul a is the set Ra
 def left_mul (a : R) : Set R := {x | ∃ r : R, x = r * a}
+
+-- right_mul a is the set aR
 def right_mul (a : R) : Set R := {x | ∃ r : R, x = a * r}
 
 theorem left_mul_zero_impl_mul_zero : both_mul a b = {0} → a * b = 0 := by
