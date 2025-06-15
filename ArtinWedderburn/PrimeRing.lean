@@ -147,17 +147,40 @@ theorem prime_ring_implies_prime_by_two_sided : IsPrimeRing R → ∀ (I J : Two
 
 
 
-theorem prime_for_two_sided_implies_condition2 : ∀ (I J : TwoSidedIdeal R), I * J = ⊥ → (I = ⊥ ∨ J = ⊥ → ∀ (a b : R), both_mul a b = {0} → a = 0 ∨ b = 0) := by
+theorem two_sided_span_bot_el_zero (a : R) : TwoSidedIdeal.span {a} = ⊥ → a = 0 := by -- Matevz
+  intro h
+  have ha : a ∈ TwoSidedIdeal.span {a} :=
+    TwoSidedIdeal.mem_span_iff.mpr fun I a_1 ↦ a_1 rfl
+  rw [h] at ha
+  exact ha
+
+
+
+theorem bothmul_zero_implies_prod_zero (a b : R) : both_mul a b = {0} → TwoSidedIdeal.span {a} * TwoSidedIdeal.span {b} = ⊥ := by
+  intro hab
   sorry
+
+theorem prime_for_two_sided_implies_condition2 : (∀ (I J : TwoSidedIdeal R), I * J = ⊥ → I = ⊥ ∨ J = ⊥) → (∀ (a b : R), both_mul a b = {0} → a = 0 ∨ b = 0) := by -- Matevz
+  rintro hR a b hab
+  have RaRbR_zero : TwoSidedIdeal.span {a} * TwoSidedIdeal.span {b} = ⊥ := bothmul_zero_implies_prod_zero a b hab
+  have h := hR (TwoSidedIdeal.span {a}) (TwoSidedIdeal.span {b}) RaRbR_zero
+  cases h with
+  | inl ha =>
+    apply Or.inl
+    exact two_sided_span_bot_el_zero a ha
+  | inr hb =>
+    apply Or.inr
+    exact two_sided_span_bot_el_zero b hb
+
 
 
 
 -- equivalence between 1) and 3)
--- #EASIER
-theorem prime_ring_equiv' : IsPrimeRing R ↔ ∀ (I J : TwoSidedIdeal R), I * J = ⊥ → I = ⊥ ∨ J = ⊥ := by -- Mikita
+theorem prime_ring_equiv' : IsPrimeRing R ↔ ∀ (I J : TwoSidedIdeal R), I * J = ⊥ → I = ⊥ ∨ J = ⊥ := by -- Matevz
   constructor
   · exact prime_ring_implies_prime_by_two_sided
-  · sorry
+  · intro hR
+    exact prime_ring_equiv.mpr (prime_for_two_sided_implies_condition2 hR)
 
 
 
