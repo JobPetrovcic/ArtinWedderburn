@@ -13,13 +13,13 @@ def left_mul (a : R) : Set R := {x | ∃ r : R, x = r * a}
 -- right_mul a is the set aR
 def right_mul (a : R) : Set R := {x | ∃ r : R, x = a * r}
 
-theorem left_mul_zero_impl_mul_zero : both_mul a b = {0} → a * b = 0 := by
+theorem left_mul_zero_impl_mul_zero : both_mul a b = {0} → a * b = 0 := by -- Matevz
   intro h
   have k : a * b ∈ both_mul a b := by use 1; simp
   rw [h] at k
   exact k
 
-theorem in_particular (a c b : R) : both_mul a b = {0} → a * c * b = 0 := by
+theorem in_particular (a c b : R) : both_mul a b = {0} → a * c * b = 0 := by -- Matevz
   intro h
   have k : a * c * b ∈ both_mul a b := by use c
   rw [h] at k
@@ -28,7 +28,7 @@ theorem in_particular (a c b : R) : both_mul a b = {0} → a * c * b = 0 := by
 open Pointwise Set
 
 -- aRb = 0 implies Ra = 0 or Rb = 0
-theorem both_mul_zero_one_left_zero : both_mul a b = {0} → (left_mul a) * (left_mul b) = {0} := by
+theorem both_mul_zero_one_left_zero : both_mul a b = {0} → (left_mul a) * (left_mul b) = {0} := by -- Matevz
   intro h
   apply Set.ext_iff.mpr
   intro x
@@ -51,7 +51,7 @@ theorem both_mul_zero_one_left_zero : both_mul a b = {0} → (left_mul a) * (lef
       · use 0; noncomm_ring
       · simp; symm; exact hx
 
-def left_ideal_of_element (a : R) : Ideal R := {
+def left_ideal_of_element (a : R) : Ideal R := { -- Matevz
   carrier := left_mul a,
   zero_mem' := by use 0; noncomm_ring,
   add_mem' := by
@@ -66,4 +66,4 @@ def left_ideal_of_element (a : R) : Ideal R := {
     noncomm_ring
 }
 
-theorem carrier_of_left_ideal_of_element (a : R) : (left_ideal_of_element a).carrier = left_mul a := rfl
+theorem carrier_of_left_ideal_of_element (a : R) : (left_ideal_of_element a).carrier = left_mul a := rfl -- Matevz
