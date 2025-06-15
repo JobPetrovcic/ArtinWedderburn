@@ -6,7 +6,7 @@ variable {R : Type*} [Ring R]
 -- A ring is prime if from I * J = 0 it follows that I = 0 or J = 0 for any ideals I, J
 def IsPrimeRing (R : Type*) [Ring R] : Prop := ∀ (I J : Ideal R), (I * J) = ⊥ → I = ⊥ ∨ J = ⊥
 
--- A ring is prime if any the following equivalent statements hold
+-- A ring is prime if any of the following equivalent statements hold
 -- 1) from I * J = 0 follows I = 0 or J = 0
 -- 2) for all a, b: if a R b = 0 then a = 0 or b = 0
 -- 3) for all TWO-SIDED ideals I, J: I * J = 0 implies I = 0 or J = 0
@@ -71,28 +71,84 @@ theorem prime_ring_equiv : IsPrimeRing R ↔ ∀ (a b : R), both_mul a b = {0} �
 
 
 
-theorem span_le_two_sided_span (S : Set R) : Ideal.span S ≤ TwoSidedIdeal.asIdeal (TwoSidedIdeal.span S) := by
+
+
+theorem span_le_two_sided_span (S : Set R) : Ideal.span S ≤ TwoSidedIdeal.asIdeal (TwoSidedIdeal.span S) := by -- Matevz
   have h : S ⊆ TwoSidedIdeal.asIdeal (TwoSidedIdeal.span S) := TwoSidedIdeal.subset_span
   exact Ideal.span_le.mpr h
 
 
-theorem ideal_bot (I J : TwoSidedIdeal R) : I * J = ⊥ → (TwoSidedIdeal.asIdeal I) * (TwoSidedIdeal.asIdeal J) = ⊥ := by
+theorem two_sided_ideal_equality (I J : TwoSidedIdeal R) : I = J ↔ (↑I : Set R) = (↑J : Set R) := by -- Matevz
+  exact SetLike.ext'_iff
+
+
+theorem ideal_equality (I J : Ideal R) : I = J ↔ (↑I : Set R) = (↑J : Set R) := by -- Matevz
+  exact SetLike.ext'_iff
+
+
+theorem equal_sets (I : TwoSidedIdeal R) : (↑(TwoSidedIdeal.asIdeal I) : Set R) = (↑I : Set R) := by rfl -- Matevz
+
+
+theorem ideal_eq_to_two_sided_ideal_eq (I J : TwoSidedIdeal R) : I = J ↔ TwoSidedIdeal.asIdeal I = TwoSidedIdeal.asIdeal J := by -- Matevz
+  constructor
+  · intro h
+    rw [h]
+  · intro h
+    apply (two_sided_ideal_equality I J).mpr
+    rw [←equal_sets I, ←equal_sets J]
+    exact (ideal_equality (TwoSidedIdeal.asIdeal I) (TwoSidedIdeal.asIdeal J)).mp h
+
+
+theorem two_sided_bot_iff_set_zero (I : TwoSidedIdeal R) : I = ⊥ ↔ (I : Set R) = {0} := by -- Matevz
+  exact Iff.symm (StrictMono.apply_eq_bot_iff fun ⦃a b⦄ a ↦ a)
+
+theorem ideal_bot_iff_set_zero (I : Ideal R) : I = ⊥ ↔ (I : Set R) = {0} := by -- Matevz
+  exact Iff.symm (StrictMono.apply_eq_bot_iff fun ⦃a b⦄ a ↦ a)
+
+
+theorem ideal_bot (I : TwoSidedIdeal R) : I = ⊥ ↔ TwoSidedIdeal.asIdeal I = ⊥ := by -- Matevz
+  constructor
+  · intro h
+    rw [h]
+    rfl
+  · intro h
+    apply (two_sided_bot_iff_set_zero I).mpr
+    apply (ideal_bot_iff_set_zero (TwoSidedIdeal.asIdeal I)).mp h
+
+theorem ideal_span_sub_two_sided_ideal_span (S : Set R) : Ideal.span S ≤ TwoSidedIdeal.asIdeal (TwoSidedIdeal.span S) := by -- Matevz
+  exact span_le_two_sided_span S
+
+theorem same_prod (I J : TwoSidedIdeal R) : I * J = ⊥ → (TwoSidedIdeal.asIdeal I) * (TwoSidedIdeal.asIdeal J) = ⊥ := by -- Matevz
   intro h
-  apply Ideal.span_eq_bot.mpr
-  rintro x ⟨a, ha, b, hb, hx⟩
-  simp at hx
-  have h2 : ↑(TwoSidedIdeal.asIdeal I) = (↑I : Set R) := by rfl
-  have haI : a ∈ I := ha
-  have hbJ : b ∈ J := hb
-  have hab1 : a * b ∈ (↑I : Set R) * (↑J : Set R) := by exact mul_mem_mul ha hb
-  have hss : (↑I : Set R) * (↑J : Set R) ⊆ I * J := by exact fun ⦃a⦄ a ↦ a
-  have hab : a * b ∈ I * J := by
-    sorry
-  have abz : a * b = 0 := by
-    rw [h] at hab
-    exact hab
-  rw [← hx]
-  exact abz
+  apply Ideal.ext
+  intro x
+  rw [Submodule.mem_bot]
+  constructor
+  · intro hx
+    have rwhx : x ∈ Ideal.span ((I : Set R) * (J : Set R)) := hx
+    have span_ineq := ideal_span_sub_two_sided_ideal_span ((I : Set R) * (J : Set R))
+    apply span_ineq at rwhx
+    have hxIJ : x ∈ (TwoSidedIdeal.asIdeal (I * J)) := by exact span_ineq hx
+    rw [h] at hxIJ
+    exact hxIJ
+  · intro hx
+    rw [hx]
+    exact Submodule.zero_mem (TwoSidedIdeal.asIdeal I * TwoSidedIdeal.asIdeal J)
+
+
+
+theorem prime_ring_implies_prime_by_two_sided : IsPrimeRing R → ∀ (I J : TwoSidedIdeal R), I * J = ⊥ → I = ⊥ ∨ J = ⊥ := by -- Matevz
+  rintro hR I J hIJ
+  have hIJasIdeals := same_prod I J hIJ
+  have h := hR (TwoSidedIdeal.asIdeal I) (TwoSidedIdeal.asIdeal J) hIJasIdeals
+  cases h with
+  | inl hi => apply Or.inl; exact (ideal_bot I).mpr hi
+  | inr hj => apply Or.inr; exact (ideal_bot J).mpr hj
+
+
+
+theorem prime_for_two_sided_implies_condition2 : ∀ (I J : TwoSidedIdeal R), I * J = ⊥ → (I = ⊥ ∨ J = ⊥ → ∀ (a b : R), both_mul a b = {0} → a = 0 ∨ b = 0) := by
+  sorry
 
 
 
@@ -100,11 +156,8 @@ theorem ideal_bot (I J : TwoSidedIdeal R) : I * J = ⊥ → (TwoSidedIdeal.asIde
 -- #EASIER
 theorem prime_ring_equiv' : IsPrimeRing R ↔ ∀ (I J : TwoSidedIdeal R), I * J = ⊥ → I = ⊥ ∨ J = ⊥ := by -- Mikita
   constructor
-  · intro hPR I J hIJ
-    sorry
-  sorry
-
-
+  · exact prime_ring_implies_prime_by_two_sided
+  · sorry
 
 
 
