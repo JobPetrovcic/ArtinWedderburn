@@ -275,7 +275,6 @@ lemma two_sided_span_bot_forall {a b x y : R} (hab : both_mul a b = {0}) (hx : x
   induction hy using AddSubgroup.closure_induction with
   | mem z hz => {
     apply span_mul_closure_bot_forall' hab
-    rw [span_mul_closure_eq_span]
     exact hx
     exact hz
   }
@@ -291,10 +290,31 @@ lemma two_sided_span_bot_forall {a b x y : R} (hab : both_mul a b = {0}) (hx : x
     simp
   }
 
-lemma span_mul_span_bot' (a b : R) (hab : both_mul a b = {0}) : (TwoSidedIdeal.span {a} : Set R) * (AddSubgroup.closure (mul_closure b)) = {0} := by sorry
+lemma span_mul_span_bot' (a b : R) (hab : both_mul a b = {0}) : (TwoSidedIdeal.span {a} : Set R) * (AddSubgroup.closure (mul_closure b)) = {0} := by -- Job and Matevz
+  ext x
+  constructor
+  {
+    rintro ⟨y, hy, z, hz, h⟩
+    simp at h
+    rw [two_sided_span_bot_forall hab hy hz] at h
+    rw [←h]
+    simp
+  }
+  {
+    intro hx
+    rw [hx]
+    use 0
+    constructor
+    · simp
+    · use 0
+      constructor
+      · exact zero_mem (AddSubgroup.closure (mul_closure b))
+      · simp
+  }
 
 theorem span_mul_span_bot (a b : R) (hab : both_mul a b = {0}) : (TwoSidedIdeal.span {a} : Set R) * (TwoSidedIdeal.span {b} : Set R) = {0} := by -- Job and Matevz
-  have k : (TwoSidedIdeal.span {b} : Set R) = AddSubgroup.closure (mul_closure b) := by sorry
+  have k : (TwoSidedIdeal.span {b} : Set R) = AddSubgroup.closure (mul_closure b) := by
+    rw [← (span_mul_closure_eq_span b), ideal_mul_closure b]
   rw [k]
   exact span_mul_span_bot' a b hab
 
