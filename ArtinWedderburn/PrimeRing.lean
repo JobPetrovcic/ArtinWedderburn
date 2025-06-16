@@ -200,7 +200,18 @@ theorem span_mul_closure_eq_span (a : R) : TwoSidedIdeal.span (mul_closure a) = 
 
 #check AddSubgroup.closure_induction
 
-lemma both_mul_zero {a b x y: R} (hab : both_mul a b = {0}) (hx : x ∈ mul_closure a) (hy : y ∈ mul_closure b) : x * y = 0 := by sorry
+lemma both_mul_zero {a b x y: R} (hab : both_mul a b = {0}) (hx : x ∈ mul_closure a) (hy : y ∈ mul_closure b) : x * y = 0 := by
+  obtain ⟨x1, x2, hx⟩ := hx
+  obtain ⟨y1, y2, hy⟩ := hy
+  have prod_in_both_mul : a * (x2 * y1) * b ∈ both_mul a b := by
+    use x2 * y1
+  have prod_zero : a * (x2 * y1) * b = 0 := by
+    rw [hab] at prod_in_both_mul
+    exact prod_in_both_mul
+  rw [hx, hy]
+  calc
+    x1 * a * x2 * (y1 * b * y2) = x1 * (a * (x2 * y1) * b) * y2 := by noncomm_ring
+    _ = 0 := by rw [prod_zero]; noncomm_ring
 
 lemma span_mul_closure_bot_forall {a b x y: R} (hab : both_mul a b = {0}) (hx : x ∈ TwoSidedIdeal.span {a}) (hy : y ∈ mul_closure b ) : x * y = 0 := by
   rw [←span_mul_closure_eq_span] at hx
