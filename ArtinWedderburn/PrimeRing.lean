@@ -156,9 +156,40 @@ theorem two_sided_span_bot_el_zero (a : R) : TwoSidedIdeal.span {a} = ⊥ → a 
 
 
 
-theorem bothmul_zero_implies_prod_zero (a b : R) : both_mul a b = {0} → TwoSidedIdeal.span {a} * TwoSidedIdeal.span {b} = ⊥ := by
-  intro hab
+def mul_closure (a : R) : Set R := {x : R | ∃ y z : R, x = y * a * z} -- Job and Matevz
+
+theorem mul_closure_left (a : R) : ∀ x y, y ∈ mul_closure a → x * y ∈ mul_closure a := by -- Job and Matevz
+  rintro x y ⟨y1, y2, hy⟩
+  use x * y1, y2
+  simp only [mul_assoc, hy]
+
+theorem mul_closure_right (a : R) : ∀ y x, y ∈ mul_closure a → y * x ∈ mul_closure a := by -- Job and Matevz
+  rintro y x ⟨y1, y2, hy⟩
+  use y1, y2 * x
+  simp only [mul_assoc, hy]
+
+
+
+theorem ideal_mul_closure (a : R) : AddSubgroup.closure (mul_closure a) = ((TwoSidedIdeal.span (mul_closure a)) : Set R) := by -- Job and Matevz
   sorry
+
+
+theorem span_mul_closure_bot (a b : R) (hab : both_mul a b = {0}) : (TwoSidedIdeal.span {a} : Set R) * (mul_closure b) = {0} := by -- Job and Matevz
+  sorry
+
+
+theorem span_mul_span_bot (a b : R) (hab : both_mul a b = {0}) : (TwoSidedIdeal.span {a} : Set R) * (TwoSidedIdeal.span {b} : Set R) = {0} := by -- Job and Matevz
+  sorry
+
+
+theorem bothmul_zero_implies_prod_zero (a b : R) : both_mul a b = {0} → TwoSidedIdeal.span {a} * TwoSidedIdeal.span {b} = ⊥ := by -- Job and Matevz
+  intro hab
+  have k : TwoSidedIdeal.span ({0} : Set R) = ⊥ := Eq.symm (TwoSidedIdealProd.ideal_eq_span ⊥)
+  rw [TwoSidedIdealProd.mul_two_sided_ideal_eq_span]
+  unfold TwoSidedIdealProd.ring_subset_prod_two_sided_ideal
+  rw [←k]
+  rw [span_mul_span_bot a b hab]
+
 
 theorem prime_for_two_sided_implies_condition2 : (∀ (I J : TwoSidedIdeal R), I * J = ⊥ → I = ⊥ ∨ J = ⊥) → (∀ (a b : R), both_mul a b = {0} → a = 0 ∨ b = 0) := by -- Matevz
   rintro hR a b hab
