@@ -26,7 +26,7 @@ universe u
 
 set_option pp.proofs true
 
-def ArtinWedderburnForPrime {R : Type u} [Ring R] [h_nontriv : Nontrivial R] (h_prime : IsPrimeRing R) (h_artinian : IsArtinian R R) :
+theorem ArtinWedderburnForPrime {R : Type u} [Ring R] [h_nontriv : Nontrivial R] (h_prime : IsPrimeRing R) (h_artinian : IsArtinian R R) :
   ∃ (n : ℕ) (D : Type u) ( _ : DivisionRing D), Nonempty (R ≃+* Matrix (Fin n) (Fin n) D) := by -- Maša
   have top_acc : Acc (fun x y => x < y) (⊤ : Ideal R) := by exact IsWellFounded.apply (fun x y ↦ x < y) ⊤
   have top_nice := acc_ideal_nice h_prime h_artinian ⊤ top_acc
@@ -56,7 +56,7 @@ def ArtinWedderburnForPrime {R : Type u} [Ring R] [h_nontriv : Nontrivial R] (h_
 
 
 -- Just an application
-def ArtinWedderburnForSimple {R : Type u} [Ring R] [IsSimpleRing R] [h_art : IsArtinian R R]:
+theorem ArtinWedderburnForSimple {R : Type u} [Ring R] [IsSimpleRing R] [h_art : IsArtinian R R]:
   ∃ (n : ℕ) (D : Type u) ( _ :DivisionRing D), Nonempty (R ≃+* Matrix (Fin n) (Fin n) D) := by --Maša
   apply ArtinWedderburnForPrime
   exact simple_ring_is_prime
