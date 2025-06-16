@@ -232,7 +232,8 @@ lemma span_mul_closure_bot_forall {a b x y: R} (hab : both_mul a b = {0}) (hx : 
     simp
   }
 
-lemma span_mul_closure_bot_forall' {a b x y: R} (hab : both_mul a b = {0}) (hx : x ∈ TwoSidedIdeal.span (mul_closure a)) (hy : y ∈ mul_closure b ) : x * y = 0 := by
+lemma span_mul_closure_bot_forall' {a b x y: R} (hab : both_mul a b = {0}) (hx : x ∈ TwoSidedIdeal.span {a}) (hy : y ∈ mul_closure b ) : x * y = 0 := by
+  rw [←span_mul_closure_eq_span a] at hx
   apply span_mul_closure_bot_forall hab
   have hx' : x ∈ (AddSubgroup.closure (mul_closure a) : Set R) := by
     rw [ideal_mul_closure a]
@@ -250,11 +251,23 @@ theorem span_mul_closure_bot (a b : R) (hab : both_mul a b = {0}) : (TwoSidedIde
   ext x
   constructor
   {
-    intro hx
+    rintro ⟨y, hy, z, hz, h⟩
+    simp at h
+    rw [span_mul_closure_bot_forall' hab hy hz] at h
+    rw [←h]
+    simp
   }
   {
     intro hx
-
+    rw [hx]
+    use 0
+    constructor
+    · simp
+    · use 0
+      constructor
+      · use 0, 0
+        noncomm_ring
+      · simp
   }
 
 
