@@ -28,7 +28,7 @@ If time permits, we will work on the uniqueness part of the proof.
 
 \begin{definition}[Left/Right Ideal]
   \label{def:left_right_ideal}
-  \lean{left_right_ideal}
+  \lean{Ideal}
   \leanok % No leanok indicated
   \uses{} % No explicit dependencies in the definition statement
   A \textit{left/right ideal} $I$ of a ring $R$ is an additive subgroup of $R$ such that $rI \subseteq I$ for all $r \in R$ or $Ir \subseteq I$ for all $r \in R$, respectively.
@@ -275,7 +275,7 @@ From here on, let $e$ and $f$ denote orthogonal idempotents in $R$.
   \label{thm:artinian_has_minimal_left_ideal}
   \lean{artinian_ring_has_minimal_left_ideal_of_element}
   \leanok
-  \uses{def:left_right_ideal} % Definition of Artinian ring implicit
+  \uses{def:left_right_ideal}
   (Already proven in Mathlib) A nonzero left artinian ring has a minimal left ideal.
 \end{theorem}
 % No proof provided for the above theorem in the original document.
