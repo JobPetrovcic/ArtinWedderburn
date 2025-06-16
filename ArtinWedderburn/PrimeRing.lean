@@ -202,21 +202,49 @@ theorem span_mul_closure_eq_span (a : R) : TwoSidedIdeal.span (mul_closure a) = 
 
 lemma both_mul_zero {a b x y: R} (hab : both_mul a b = {0}) (hx : x ∈ mul_closure a) (hy : y ∈ mul_closure b) : x * y = 0 := by sorry
 
-lemma span_mul_closure_bot_forall {a b x y: R} (hab : both_mul a b = {0}) (hx : x ∈ TwoSidedIdeal.span {a}) (hy : y ∈ mul_closure b ) : x * y = 0 := by
-  rw [←span_mul_closure_eq_span] at hx
-  have hx' : x ∈ (TwoSidedIdeal.span (mul_closure a) : Set R) := by exact hx
-  rw [←ideal_mul_closure a] at hx'
-  induction hx' using AddSubgroup.closure_induction with
+--rw [←span_mul_closure_eq_span] at hx
+--  have hx' : x ∈ (TwoSidedIdeal.span (mul_closure a) : Set R) := by exact hx
+--  rw [←ideal_mul_closure a] at hx'
+
+lemma span_mul_closure_bot_forall {a b x y: R} (hab : both_mul a b = {0}) (hx : x ∈ AddSubgroup.closure (mul_closure a)) (hy : y ∈ mul_closure b ) : x * y = 0 := by
+  induction hx using AddSubgroup.closure_induction with
   | mem z hz => {apply both_mul_zero hab hz hy}
-  | one =>
-  | mul
-  | inv
+  | one => { simp}
+  | mul u v hu hv ihu ihv => {
+    noncomm_ring
+    rw [ihu, ihv]
+    simp
+  }
+  | inv u hu ihu => {
+    noncomm_ring
+    rw [ihu]
+    simp
+  }
+
+lemma span_mul_closure_bot_forall' {a b x y: R} (hab : both_mul a b = {0}) (hx : x ∈ TwoSidedIdeal.span (mul_closure a)) (hy : y ∈ mul_closure b ) : x * y = 0 := by
+  apply span_mul_closure_bot_forall hab
+  have hx' : x ∈ (AddSubgroup.closure (mul_closure a) : Set R) := by
+    rw [ideal_mul_closure a]
+    exact hx
+  exact hx'
+  exact hy
+
+
+
+
 
 
 
 theorem span_mul_closure_bot (a b : R) (hab : both_mul a b = {0}) : (TwoSidedIdeal.span {a} : Set R) * (mul_closure b) = {0} := by -- Job and Matevz
+  ext x
+  constructor
+  {
+    intro hx
+  }
+  {
+    intro hx
 
-  sorry
+  }
 
 
 
