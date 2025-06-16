@@ -20,7 +20,7 @@
 
 title: Artin Wedderburn
 #email: your-email@example.com
-description: by Matevz Miscic and Mikita Barodka and Job Petrovcic
+description: by Matevz Miscic and Job Petrovcic
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://JobPetrovcic.github.io/ArtinWedderburn" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username:

@@ -65,7 +65,7 @@ def ArtinWedderburnForSimple {R : Type u} [Ring R] [IsSimpleRing R] [h_art : IsA
 
 
 -- We can use previous to prove this
-proof_wanted isSemisimpleRing_iff_pi_matrix_divisionRing {R : Type u} [Ring R] : -- Mikita
+proof_wanted isSemisimpleRing_iff_pi_matrix_divisionRing {R : Type u} [Ring R] :
     IsSemisimpleRing R ↔
     ∃ (n : ℕ) (S : Fin n → Type u) (d : Fin n → ℕ) (_ : ∀ i, DivisionRing (S i)),
       Nonempty (R ≃+* ∀ i, Matrix (Fin (d i)) (Fin (d i)) (S i))

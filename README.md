@@ -3,7 +3,7 @@
 This repository contains an ongoing formalization of the Artin-Wedderburn theorem in the proof assistant [**Lean 4**](https://lean-lang.org/).
 
 ## Authors
-Matevž Miščič, Mikita Barodka, Maša Žaucer, Job Petrovčič
+Matevž Miščič, Maša Žaucer, Job Petrovčič
 
 ## Info
 Information about the actual formalization is available at the [project web pages](https://jobpetrovcic.github.io/ArtinWedderburn/):
