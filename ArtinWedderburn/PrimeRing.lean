@@ -251,6 +251,7 @@ theorem span_mul_closure_bot (a b : R) (hab : both_mul a b = {0}) : (TwoSidedIde
   constructor
   {
     intro hx
+
   }
   {
     intro hx
@@ -258,12 +259,32 @@ theorem span_mul_closure_bot (a b : R) (hab : both_mul a b = {0}) : (TwoSidedIde
   }
 
 
+lemma two_sided_span_bot_forall {a b x y : R} (hab : both_mul a b = {0}) (hx : x ∈ TwoSidedIdeal.span {a}) (hy : y ∈ AddSubgroup.closure (mul_closure b)) : x * y = 0 := by
+  induction hy using AddSubgroup.closure_induction with
+  | mem z hz => {
+    apply span_mul_closure_bot_forall' hab
+    rw [span_mul_closure_eq_span]
+    exact hx
+    exact hz
+  }
+  | one => { simp }
+  | mul u v hu hv ihu ihv => {
+    noncomm_ring
+    rw [ihu, ihv]
+    simp
+  }
+  | inv u hu ihu => {
+    noncomm_ring
+    rw [ihu]
+    simp
+  }
 
-
+lemma span_mul_span_bot' (a b : R) (hab : both_mul a b = {0}) : (TwoSidedIdeal.span {a} : Set R) * (AddSubgroup.closure (mul_closure b)) = {0} := by sorry
 
 theorem span_mul_span_bot (a b : R) (hab : both_mul a b = {0}) : (TwoSidedIdeal.span {a} : Set R) * (TwoSidedIdeal.span {b} : Set R) = {0} := by -- Job and Matevz
-  sorry
-
+  have k : (TwoSidedIdeal.span {b} : Set R) = AddSubgroup.closure (mul_closure b) := by sorry
+  rw [k]
+  exact span_mul_span_bot' a b hab
 
 theorem bothmul_zero_implies_prod_zero (a b : R) : both_mul a b = {0} → TwoSidedIdeal.span {a} * TwoSidedIdeal.span {b} = ⊥ := by -- Job and Matevz
   intro hab
