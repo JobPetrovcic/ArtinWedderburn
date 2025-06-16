@@ -278,7 +278,11 @@ From here on, let $e$ and $f$ denote orthogonal idempotents in $R$.
   \uses{def:left_right_ideal}
   (Already proven in Mathlib) A nonzero left artinian ring has a minimal left ideal.
 \end{theorem}
-% No proof provided for the above theorem in the original document.
+\begin{proof}
+  \leanok
+  \uses{def:left_right_ideal}
+  If minimal left ideal does not exist, then starting with any nonzero left ideal, we can allways find a strictly smaller nonzero left ideal. We can thus construct an infinite strictly decreasing sequence of left ideals, which contradicts the left artinian property.
+\end{proof}
 
 \begin{definition}[Set of Matrix Units]
   \label{def:matrixunits}
