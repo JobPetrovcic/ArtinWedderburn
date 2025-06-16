@@ -194,6 +194,21 @@ theorem span_mul_closure_eq_span (a : R) : TwoSidedIdeal.span (mul_closure a) = 
     use 1, 1
     simp
 
+#check AddSubgroup.closure_induction
+
+lemma both_mul_zero {a b x y: R} (hab : both_mul a b = {0}) (hx : x ∈ mul_closure a) (hy : y ∈ mul_closure b) : x * y = 0 := by sorry
+
+lemma span_mul_closure_bot_forall {a b x y: R} (hab : both_mul a b = {0}) (hx : x ∈ TwoSidedIdeal.span {a}) (hy : y ∈ mul_closure b ) : x * y = 0 := by
+  rw [←span_mul_closure_eq_span] at hx
+  have hx' : x ∈ (TwoSidedIdeal.span (mul_closure a) : Set R) := by exact hx
+  rw [←ideal_mul_closure a] at hx'
+  induction hx' using AddSubgroup.closure_induction with
+  | mem z hz => {apply both_mul_zero hab hz hy}
+  | one =>
+  | mul
+  | inv
+
+
 
 theorem span_mul_closure_bot (a b : R) (hab : both_mul a b = {0}) : (TwoSidedIdeal.span {a} : Set R) * (mul_closure b) = {0} := by -- Job and Matevz
 
