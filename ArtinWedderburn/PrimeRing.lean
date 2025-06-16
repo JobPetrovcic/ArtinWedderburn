@@ -168,6 +168,13 @@ theorem mul_closure_right (a : R) : ∀ y x, y ∈ mul_closure a → y * x ∈ m
   use y1, y2 * x
   simp only [mul_assoc, hy]
 
+theorem mul_closure_sub_span (a : R) : mul_closure a ⊆ TwoSidedIdeal.span {a} := by
+  rintro x ⟨y, z, hx⟩
+  rw [hx]
+  have a_in_span : a ∈ TwoSidedIdeal.span {a} :=
+    TwoSidedIdeal.mem_span_iff.mpr fun I a_1 ↦ a_1 rfl
+  exact TwoSidedIdeal.mul_mem_right (TwoSidedIdeal.span {a}) (y * a) z (TwoSidedIdeal.mul_mem_left (TwoSidedIdeal.span {a}) y a a_in_span)
+
 
 
 theorem ideal_mul_closure (a : R) : AddSubgroup.closure (mul_closure a) = ((TwoSidedIdeal.span (mul_closure a)) : Set R) := by -- Job and Matevz
@@ -176,7 +183,20 @@ theorem ideal_mul_closure (a : R) : AddSubgroup.closure (mul_closure a) = ((TwoS
   exact id (Iff.symm lem)
 
 
+
+theorem span_mul_closure_eq_span (a : R) : TwoSidedIdeal.span (mul_closure a) = TwoSidedIdeal.span {a} := by
+  apply le_antisymm
+  ·
+    sorry
+  · apply TwoSidedIdeal.span_mono
+    intro x hx
+    rw [hx]
+    use 1, 1
+    simp
+
+
 theorem span_mul_closure_bot (a b : R) (hab : both_mul a b = {0}) : (TwoSidedIdeal.span {a} : Set R) * (mul_closure b) = {0} := by -- Job and Matevz
+
   sorry
 
 
