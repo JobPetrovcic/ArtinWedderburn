@@ -171,7 +171,9 @@ theorem mul_closure_right (a : R) : ∀ y x, y ∈ mul_closure a → y * x ∈ m
 
 
 theorem ideal_mul_closure (a : R) : AddSubgroup.closure (mul_closure a) = ((TwoSidedIdeal.span (mul_closure a)) : Set R) := by -- Job and Matevz
-  sorry
+  ext x
+  have lem := @TwoSidedIdeal.mem_span_iff_mem_addSubgroup_closure_absorbing R _ (mul_closure a) (mul_closure_left a) (mul_closure_right a) x
+  exact id (Iff.symm lem)
 
 
 theorem span_mul_closure_bot (a b : R) (hab : both_mul a b = {0}) : (TwoSidedIdeal.span {a} : Set R) * (mul_closure b) = {0} := by -- Job and Matevz
