@@ -183,11 +183,15 @@ theorem ideal_mul_closure (a : R) : AddSubgroup.closure (mul_closure a) = ((TwoS
   exact id (Iff.symm lem)
 
 
+theorem sub_span (s : Set R) (I : TwoSidedIdeal R) : s ⊆ I → TwoSidedIdeal.span s ≤ I := by
+  intro h x hx
+  exact TwoSidedIdeal.mem_span_iff.mp hx I h
+
 
 theorem span_mul_closure_eq_span (a : R) : TwoSidedIdeal.span (mul_closure a) = TwoSidedIdeal.span {a} := by
   apply le_antisymm
-  ·
-    sorry
+  · apply sub_span (mul_closure a) (TwoSidedIdeal.span {a})
+    exact mul_closure_sub_span a
   · apply TwoSidedIdeal.span_mono
     intro x hx
     rw [hx]
@@ -198,6 +202,9 @@ theorem span_mul_closure_eq_span (a : R) : TwoSidedIdeal.span (mul_closure a) = 
 theorem span_mul_closure_bot (a b : R) (hab : both_mul a b = {0}) : (TwoSidedIdeal.span {a} : Set R) * (mul_closure b) = {0} := by -- Job and Matevz
 
   sorry
+
+
+
 
 
 theorem span_mul_span_bot (a b : R) (hab : both_mul a b = {0}) : (TwoSidedIdeal.span {a} : Set R) * (TwoSidedIdeal.span {b} : Set R) = {0} := by -- Job and Matevz
