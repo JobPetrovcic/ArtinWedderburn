@@ -515,7 +515,6 @@ In this section, we prove the following result, which clearly generalizes Artin 
   Let $R$ be a semisimple ring. Then, $R$ is isomorphic to a direct product of simple, artinian rings.
 \end{theorem}
 \begin{proof}
-  \leanok
   \uses{def:IsSimpleRing, def:two_sided_ideal, def:left_right_ideal, thm:artin_wedderburn_for_simple, def:IsOrthogonal} % Semisimple, Artinian, idempotent defs implicit
   WLOG, suppose, $R$ is not simple. We know that $R$ is (left) artinian, which is a stronger condition that being (two-sided) artinian. Since it is (two-sided) artinian, it must contain a nontrivial minimal (two-sided) ideal $I$, which is therefore simple. Since $R$ is semisimple, $I$ must be a direct summand of $R$ (AS A LEFT $R$-module). Thus, $R = I \oplus J$ for some (left) ideal $J$. Then $1 = i + j$ for some $i \in I$ and $j \in J$ . Note that $I$ and $J$ are both nontrivial.
   \begin{claim}
